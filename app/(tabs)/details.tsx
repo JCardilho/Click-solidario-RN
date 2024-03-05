@@ -1,10 +1,15 @@
 import { Feather } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useEffect } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import firebase from '~/utils/firebase';
+import { useCacheHook } from '~/utils/hooks/cacheHook';
 
 export default function Details() {
   const { name } = useLocalSearchParams();
   const router = useRouter();
+  const { getCache, setCache } = useCacheHook();
 
   const BackButton = () => (
     <TouchableOpacity onPress={router.back}>

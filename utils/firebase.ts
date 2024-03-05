@@ -1,12 +1,13 @@
 import { initializeApp } from 'firebase/app';
 
 // Optionally import the services that you want to use
-import { setPersistence, initializeAuth } from 'firebase/auth';
+import { inMemoryPersistence, initializeAuth } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 import Storage from 'react-native-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'firebase/firestore';
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { collection, getDocs, getFirestore, persistentLocalCache } from 'firebase/firestore';
+
 // import {...} from "firebase/functions";
 // import {...} from "firebase/storage";
 
@@ -24,6 +25,9 @@ const firebaseConfig = {
 
 const firebase = initializeApp(firebaseConfig);
 const db = getFirestore(firebase);
+const auth = initializeAuth(firebase, {
+  persistence: inMemoryPersistence,
+});
 
 // Get a list of cities from your database
 /* async function getCities(db: any) {
