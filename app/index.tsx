@@ -6,7 +6,8 @@ import { z } from 'zod';
 import { UserService } from '~/utils/services/UserService';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod/src/zod';
-import { useCurrentUser } from '~/utils/hooks/currentUser';
+import { useCurrentUserHook } from '~/utils/hooks/currentUser';
+import { useCacheHook } from '~/utils/hooks/cacheHook';
 
 const criarUserSchema = z.object({
   email: z
@@ -29,7 +30,8 @@ type CreateUser = z.infer<typeof criarUserSchema>;
 
 export default function Page() {
   const router = useRouter();
-  const { verifyUserAndSendUserFromHome, user, setUser } = useCurrentUser();
+  const { verifyUserAndSendUserFromHome, user, setUser } = useCurrentUserHook();
+  const { setCache } = useCacheHook();
 
   const { isPending, isError, mutate } = useMutation({
     mutationKey: ['loginUser'],
@@ -44,7 +46,7 @@ export default function Page() {
     onSuccess: (data) => {
       console.log('Usuário criado com sucesso');
       console.log('data', data.user.email);
-      setUser(data.user);
+      setUser(data);
       console.log('setou o usuario');
       router.push('/home');
     },
@@ -66,6 +68,11 @@ export default function Page() {
         await verifyUserAndSendUserFromHome();
       };
       verify();
+
+      /* const verify = async () => {
+        setCache('user', null);
+      };
+      verify(); */
     }
   }, [user]);
 

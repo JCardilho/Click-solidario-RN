@@ -1,11 +1,25 @@
-import auth, { User, onAuthStateChanged } from 'firebase/auth';
+import auth, { User, UserCredential, onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import firebase from '../firebase';
 import { useRouter } from 'expo-router';
+import { create } from 'zustand';
 import { useCacheHook } from './cacheHook';
 
-export const useCurrentUser = () => {
-  const [user, setUser] = useState<auth.User | null>(null);
+interface Types {
+  user: UserCredential | null;
+}
+
+interface Actions {
+  setUser: (user: UserCredential) => void;
+}
+
+const useCurrentUser = create<Types & Actions>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+}));
+
+export const useCurrentUserHook = () => {
+  const { user, setUser } = useCurrentUser();
   const router = useRouter();
   const { getCache, setCache } = useCacheHook();
 
@@ -18,10 +32,9 @@ export const useCurrentUser = () => {
       }
       const getAuth = auth.getAuth(firebase);
       const unsubscribe = onAuthStateChanged(getAuth, async (user) => {
-        if (user) {
-          setUser(user);
-          await setCache('user', user);
-        } else router.push('/');
+        if (!user) {
+          router.push('/');
+        }
       });
 
       return () => unsubscribe();
@@ -40,8 +53,6 @@ export const useCurrentUser = () => {
       const getAuth = auth.getAuth(firebase);
       const unsubscribe = onAuthStateChanged(getAuth, async (user) => {
         if (user) {
-          setUser(user);
-          await setCache('user', user);
           router.push('/home');
         } else router.push('/');
       });
@@ -49,10 +60,6 @@ export const useCurrentUser = () => {
       return () => unsubscribe();
     } catch (err) {}
   };
-
-  useEffect(() => {
-    console.log('user', user);
-  }, [user]);
 
   return { user, verifyUser, verifyUserAndSendUserFromHome, setUser };
 };

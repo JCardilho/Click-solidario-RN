@@ -6,11 +6,36 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CreateUserDTO } from './DTO/user.dto';
+import {
+  collection,
+  addDoc,
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
 
-const createUser = async (email: string, password: string): Promise<UserCredential> => {
-  const auth = getAuth(firebase);
-  const response = await createUserWithEmailAndPassword(auth, email, password);
-  return response;
+const createUser = async (params: CreateUserDTO): Promise<void> => {
+  try {
+    const ref = collection(getFirestore(firebase), 'users');
+    await addDoc(ref, {
+      name: params.name || '',
+      email: params.email,
+      cpf: params.cpf || '',
+      pix: {
+        key: params.pix?.key || '',
+        type: params.pix?.type || '',
+      },
+    });
+    const auth = getAuth(firebase);
+    await createUserWithEmailAndPassword(auth, params.email, params.password);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const loginUser = async (email: string, password: string): Promise<UserCredential> => {

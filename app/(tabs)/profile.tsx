@@ -1,13 +1,16 @@
+import { useEffect } from 'react';
 import { Text, View } from 'react-native';
-import { useCurrentUser } from '~/utils/hooks/currentUser';
+import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 
 export default function Profile() {
-  const { user } = useCurrentUser();
+  const { user } = useCurrentUserHook();
 
   return (
-    <View>
-      <Text>Profile</Text>
-      <Text>Olá, {user?.email}</Text>
-    </View>
+    user && (
+      <View>
+        <Text>Profile</Text>
+        <Text>Olá, {user?.user.email}</Text>
+      </View>
+    )
   );
 }
