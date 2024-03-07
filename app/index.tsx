@@ -1,5 +1,5 @@
 import { Stack, Link, useRouter } from 'expo-router';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { z } from 'zod';
@@ -8,6 +8,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod/src/zod';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { useCacheHook } from '~/utils/hooks/cacheHook';
+import BackgroundImage from '~/assets/background/banner.jpg';
+import BackgroundLogo from '~/assets/icon/logo.png';
 
 const criarUserSchema = z.object({
   email: z
@@ -78,9 +80,20 @@ export default function Page() {
 
   return (
     <View className={styles.container}>
-      <Stack.Screen options={{ title: 'Overview' }} />
+      <Stack.Screen options={{ headerShown: false }} />
       <View className={styles.main}>
-        <View className="w-auto flex flex-col gap-4">
+        <View className="absolute  left-[-150px] bottom-[-50px] opacity-50 rounded-full  overflow-hidden">
+          <Image
+            source={BackgroundImage}
+            className="object-cover w-[500px] h-[500px]"
+            alt="background-image"
+          />
+        </View>
+
+        <View className="w-auto flex flex-col gap-4 border border-zinc-400 rounded-lg p-4 shadow-xl shadow-zinc-600 bg-white">
+          <View className="w-auto flex flex-row gap-4  m-4 items-center justify-center">
+            <Text className="text-center text-6xl font-bold uppercase">ENTRAR</Text>
+          </View>
           <View>
             <Text className="text-lg">Digite seu email:</Text>
             <Controller
@@ -113,7 +126,6 @@ export default function Page() {
             />
             {errors.senha && <Text>{errors.senha?.message}</Text>}
           </View>
-
           {isError && <Text>Erro ao cadastrar</Text>}
           {isPending ? (
             <Text>Carregando...</Text>
@@ -124,13 +136,24 @@ export default function Page() {
               <Text className="text-center text-white text-2xl">Entrar</Text>
             </TouchableOpacity>
           )}
+          <View className="w-full h-[0.10px] bg-zinc-900 my-4"></View>
+          <View className="w-full flex items-center justify-center" gap-2>
+            <Text>Não tem uma conta?</Text>
+            <Link
+              href={'/registrar'}
+              className="  p-2  rounded-lg text-blue-300 underline font-bold">
+              <Text className="text-center  text-2xl">Registre-se</Text>
+            </Link>
+          </View>
 
-          <Link href={'/registrar'} className="w-full  p-2  rounded-lg ">
-            <Text className="text-center  text-2xl">Registrar</Text>
-          </Link>
-          <Link href={'/menu'} className="w-full  p-2  rounded-lg ">
-            <Text className="text-center  text-2xl">Details</Text>
-          </Link>
+          <View className="w-full flex items-center justify-center" gap-2>
+            <Text>Esqueceu sua senha?</Text>
+            <Link
+              href={'/registrar'}
+              className="  p-2  rounded-lg text-blue-300 underline font-bold">
+              <Text className="text-center  text-2xl">Recuperar-senha</Text>
+            </Link>
+          </View>
         </View>
       </View>
     </View>
@@ -140,8 +163,8 @@ export default function Page() {
 const styles = {
   button: 'items-center bg-indigo-500 rounded-[28px] shadow-md p-4',
   buttonText: 'text-white text-lg font-semibold text-center',
-  container: 'flex-1 p-6',
-  main: 'flex-1 max-w-[960] justify-between',
+  container: 'flex-1 p-6 ',
+  main: 'flex-1 max-w-[960] justify-center relative',
   title: 'text-[64px] font-bold',
   subtitle: 'text-4xl text-gray-700',
 };
