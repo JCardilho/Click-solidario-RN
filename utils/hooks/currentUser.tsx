@@ -1,16 +1,24 @@
-import auth, { User, UserCredential, onAuthStateChanged } from 'firebase/auth';
+import auth, {
+  User,
+  UserCredential,
+  getAuth,
+  sendEmailVerification,
+  getIdToken,
+  onAuthStateChanged,
+} from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import firebase from '../firebase';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import { create } from 'zustand';
 import { useCacheHook } from './cacheHook';
+import { IUser, verifyUserWithZodSchema } from '../services/DTO/user.dto';
 
 interface Types {
-  user: UserCredential | null;
+  user: IUser | null;
 }
 
 interface Actions {
-  setUser: (user: UserCredential) => void;
+  setUser: (user: IUser) => void;
 }
 
 const useCurrentUser = create<Types & Actions>((set) => ({
@@ -21,7 +29,8 @@ const useCurrentUser = create<Types & Actions>((set) => ({
 export const useCurrentUserHook = () => {
   const { user, setUser } = useCurrentUser();
   const router = useRouter();
-  const { getCache, setCache } = useCacheHook();
+  const { getCache } = useCacheHook();
+  const path = usePathname();
 
   const verifyUser = async () => {
     try {
@@ -43,22 +52,37 @@ export const useCurrentUserHook = () => {
     }
   };
 
+  const sendFromHome = (user: IUser) => {
+    const verify = verifyUserWithZodSchema(user);
+    console.log(verify)
+    if (verify) {
+      setUser(user);
+      router.push('/home');
+      return;
+    }
+    console.log("não passou")
+    sendFromLogin();
+  };
+
+  const sendFromLogin = () => {
+    if (path == '/') return;
+    router.push('/');
+    return;
+  };
+
   const verifyUserAndSendUserFromHome = async () => {
     try {
-      const getCachedUser: any = await getCache('user');
+      if (user && user !== null) return sendFromHome(user);
+      const getCachedUser = (await getCache('user')) as IUser | null;
+      console.log("user on cache", getCachedUser)
+      if (!getCachedUser || getCachedUser === null) return sendFromLogin();
       if (getCachedUser) {
-        setUser(getCachedUser);
-        router.push('/home');
+        sendFromHome(getCachedUser);
+        return;
       }
-      const getAuth = auth.getAuth(firebase);
-      const unsubscribe = onAuthStateChanged(getAuth, async (user) => {
-        if (user) {
-          router.push('/home');
-        } else router.push('/');
-      });
-
-      return () => unsubscribe();
-    } catch (err) {}
+    } catch (err) {
+      router.push('/');
+    }
   };
 
   return { user, verifyUser, verifyUserAndSendUserFromHome, setUser };

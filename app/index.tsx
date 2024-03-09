@@ -38,6 +38,8 @@ export default function Page() {
   const { isPending, isError, mutate } = useMutation({
     mutationKey: ['loginUser'],
     mutationFn: async () => {
+      console.log('email', getValues('email'));
+      console.log('senha', getValues('senha'));
       const resposta = await UserService.loginUser(getValues('email'), getValues('senha'));
       return resposta;
     },
@@ -47,7 +49,7 @@ export default function Page() {
     },
     onSuccess: (data) => {
       console.log('Usuário criado com sucesso');
-      console.log('data', data.user.email);
+      console.log('data', data.email);
       setUser(data);
       console.log('setou o usuario');
       router.push('/home');
@@ -71,7 +73,7 @@ export default function Page() {
       };
       verify();
 
-      /* const verify = async () => {
+      /*  const verify = async () => {
         setCache('user', null);
       };
       verify(); */
@@ -136,6 +138,40 @@ export default function Page() {
               <Text className="text-center text-white text-2xl">Entrar</Text>
             </TouchableOpacity>
           )}
+
+          <TouchableOpacity
+            className="w-full bg-blue-500 p-2  rounded-lg "
+            onPress={() => {
+              if (!user) {
+                const verify = async () => {
+                  await verifyUserAndSendUserFromHome();
+                };
+                verify();
+
+                /*  const verify = async () => {
+                    setCache('user', null);
+                  };
+                  verify(); */
+              }
+            }}>
+            <Text className="text-center text-white text-2xl">Verify</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="w-full bg-blue-500 p-2  rounded-lg "
+            onPress={() => {
+              setValue('email', 'gustavo@gmail.com');
+              setValue('senha', 'Gustavo1');
+            }}>
+            <Text className="text-center text-white text-2xl">Login with user</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="w-full bg-blue-500 p-2  rounded-lg "
+            onPress={() => {
+              setValue('email', 'admin@admin.com');
+              setValue('senha', 'admin123');
+            }}>
+            <Text className="text-center text-white text-2xl">Login with admin</Text>
+          </TouchableOpacity>
           <View className="w-full h-[0.10px] bg-zinc-900 my-4"></View>
           <View className="w-full flex items-center justify-center" gap-2>
             <Text>Não tem uma conta?</Text>
