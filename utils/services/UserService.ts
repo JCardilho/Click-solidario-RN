@@ -33,6 +33,7 @@ const createUser = async (params: CreateUserDTO): Promise<void> => {
       },
       administrator: false,
       socialAssistant: false,
+      image: '',
     });
     const auth = getAuth(firebase);
     await createUserWithEmailAndPassword(auth, params.email, params.password);
@@ -49,27 +50,43 @@ const loginUser = async (email: string, password: string): Promise<IUser> => {
   const docSnap = await getDocs(getDocRef);
   if (docSnap.empty) throw new Error('Usuário não encontrado');
   const user = docSnap.docs[0].data() as IUser;
-  console.log('user');
+
+  const saveUserForApplication = {
+    ...user,
+    providerId: response.user.providerId,
+    uid: docSnap.docs[0].id,
+  };
+
   try {
     console.log('setou no cache');
-    await AsyncStorage.setItem(
-      'user',
-      JSON.stringify({
-        ...user,
-        providerId: response.user.providerId,
-      })
-    );
+    await AsyncStorage.setItem('user', JSON.stringify(saveUserForApplication));
   } catch (err: any) {
     console.log('Erro ao salvar usuário no AsyncStorage');
     throw new Error(err);
   }
-  return {
-    ...user,
-    providerId: response.user.providerId,
-  };
+  return saveUserForApplication;
+};
+
+const addImageToUserInFirebase = async (image: string) => {
+  try {
+    const cache = await AsyncStorage.getItem('user');
+    if (!cache) throw new Error('Usuário não encontrado');
+    const user = JSON.parse(cache) as IUser;
+    const docRef = doc(getFirestore(firebase), 'users', user.uid);
+    try {
+      AsyncStorage.setItem('user', JSON.stringify({ ...user, image }));
+    } catch (err) {
+      console.log('Erro ao salvar usuário no AsyncStorage');
+    }
+
+    await setDoc(docRef, { image }, { merge: true });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const UserService = {
   createUser,
   loginUser,
+  addImageToUserInFirebase,
 };

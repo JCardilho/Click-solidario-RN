@@ -159,7 +159,7 @@ export default function Page() {
           <TouchableOpacity
             className="w-full bg-blue-500 p-2  rounded-lg "
             onPress={() => {
-              setValue('email', 'gustavo@gmail.com');
+              setValue('email', 'Gustavo@gmail.com');
               setValue('senha', 'Gustavo1');
             }}>
             <Text className="text-center text-white text-2xl">Login with user</Text>

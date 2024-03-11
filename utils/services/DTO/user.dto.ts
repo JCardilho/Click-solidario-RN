@@ -15,6 +15,8 @@ export interface CreateUserDTO {
 export interface IUser extends Omit<CreateUserDTO, 'password'>, Pick<AuthCredential, 'providerId'> {
   socialAssistant?: boolean;
   administrator?: boolean;
+  image?: string;
+  uid: string;
 }
 
 const userSchema = z.object({
@@ -30,6 +32,8 @@ const userSchema = z.object({
   socialAssistant: z.boolean().optional(),
   administrator: z.boolean().optional(),
   providerId: z.string(),
+  image: z.string().optional(),
+  uid: z.string(),
 });
 
 export const verifyUserWithZodSchema = (user: IUser | null): boolean => {

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { Kanit_400Regular, useFonts } from './../../node_modules/@expo-google-fonts/kanit/index';
 import { FontAwesome } from '@expo/vector-icons';
 import { Button } from '~/components/Button';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { SelectImage } from '~/layouts/profile/select-image';
 
 export default function Profile() {
   const { user } = useCurrentUserHook();
@@ -29,6 +30,7 @@ export default function Profile() {
         <SafeAreaView />
         <Text className=" font-bold text-4xl font-montserrat">Perfil</Text>
         <View className="w-full flex  p-4 border-zinc-300 shadow-black bg-white shadow-2xl rounded-lg border-2">
+          <SelectImage />
           <Text className="font-kanit text-2xl">
             {greeting}, {user?.name}
           </Text>
