@@ -36,7 +36,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="donations-items"
+        name="reserve-donations"
         options={{
           title: 'Donations',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="dropbox" color={color} />,

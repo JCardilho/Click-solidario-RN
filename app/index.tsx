@@ -10,6 +10,7 @@ import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { useCacheHook } from '~/utils/hooks/cacheHook';
 import BackgroundImage from '~/assets/background/banner.jpg';
 import BackgroundLogo from '~/assets/icon/logo.png';
+import { Button } from '~/components/Button';
 
 const criarUserSchema = z.object({
   email: z
@@ -129,7 +130,7 @@ export default function Page() {
             {errors.senha && <Text>{errors.senha?.message}</Text>}
           </View>
           {isError && <Text>Erro ao cadastrar</Text>}
-          {isPending ? (
+          {/* {isPending ? (
             <Text>Carregando...</Text>
           ) : (
             <TouchableOpacity
@@ -137,7 +138,19 @@ export default function Page() {
               onPress={handleSubmit(() => mutate())}>
               <Text className="text-center text-white text-2xl">Entrar</Text>
             </TouchableOpacity>
-          )}
+          )} */}
+
+          <Button
+            variant="default"
+            onPress={handleSubmit(() => mutate())}
+            isLoading={isPending}
+            icon={{
+              name: 'sign-in',
+              color: 'white',
+              size: 15,
+            }}>
+            Entrar
+          </Button>
 
           <TouchableOpacity
             className="w-full bg-blue-500 p-2  rounded-lg "

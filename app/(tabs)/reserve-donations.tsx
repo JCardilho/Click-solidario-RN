@@ -2,17 +2,37 @@ import { Feather, FontAwesome } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useEffect } from 'react';
-import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '~/components/Button';
 import firebase from '~/utils/firebase';
 import { useCacheHook } from '~/utils/hooks/cacheHook';
 import Logo from '~/assets/icon/logo.png';
+import { useQuery } from '@tanstack/react-query';
+import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
+import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
+import { format } from 'date-fns';
 
-export default function Donations() {
+export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
   const router = useRouter();
   const { getCache, setCache } = useCacheHook();
+
+  const { data, isLoading, refetch } = useQuery<IReserveDonation[]>({
+    queryKey: ['request-donations'],
+    queryFn: async () => {
+      const result = await ReserveDonationsService.GetAllReserveDonations();
+      return result;
+    },
+  });
 
   return (
     <ScrollView
@@ -47,7 +67,8 @@ export default function Donations() {
           name: 'plus',
           color: 'white',
           size: 15,
-        }}>
+        }}
+        href={() => router.push('/(tabs-stack)/create-donation-items')}>
         Disponibilizar um item à doação
       </Button>
 
@@ -64,24 +85,43 @@ export default function Donations() {
         </Button>
       </View>
 
-      {[1, 2, 3, 4].map((item, index) => (
-        <TouchableOpacity
-          className="w-full border-2 border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4"
-          key={index}>
-          <Text className="text-xl font-bold underline">Doação de Sofá</Text>
-          <Text className="font-kanit text-lg text-justify">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit ipsam perferendis commodi
-            quas deserunt quam illo laudantium voluptatem in delectus quae sequi nobis numquam sunt
-            obcaecati, odio, corrupti aut tempora!
-          </Text>
-          <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
-          <View className="w-full">
-            <Text className="text-md ">Proprietário da doação: Gustavo Rafael</Text>
-          </View>
-          <Text className="text-md font-kanit">Criado em: 11/06/2007</Text>
-          <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
-        </TouchableOpacity>
-      ))}
+      <Button
+        variant="default"
+        icon={{
+          name: 'refresh',
+          color: 'white',
+          size: 15,
+        }}
+        onPress={() => refetch()}
+        isLoading={isLoading}
+        className="mb-2">
+        Atualizar
+      </Button>
+
+      {isLoading && (
+        <View className="w-full flex items-center justify-center">
+          <ActivityIndicator size="large" color={'#023E8A'} />
+        </View>
+      )}
+
+      {!isLoading &&
+        data &&
+        data.map((item, index) => (
+          <TouchableOpacity
+            className="w-full border-2 border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4"
+            key={index}>
+            <Text className="text-xl font-bold underline">{item.name}</Text>
+            <Text className="font-kanit text-lg text-justify">{item.description}</Text>
+            <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
+            <View className="w-full">
+              <Text className="text-md ">Proprietário da doação: {item.uid}</Text>
+            </View>
+            <Text className="text-md font-kanit">
+              Criado em: {format(new Date(item.createdAt), 'dd-MM-yyyy HH:mm')}
+            </Text>
+            <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
+          </TouchableOpacity>
+        ))}
 
       <View className="my-12"></View>
     </ScrollView>

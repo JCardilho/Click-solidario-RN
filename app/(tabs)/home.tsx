@@ -1,3 +1,4 @@
+import { Link } from 'expo-router';
 import _default from 'react-hook-form/dist/utils/get';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useCacheHook } from '~/utils/hooks/cacheHook';
@@ -20,6 +21,9 @@ export default function Home() {
         }}>
         <Text className="text-center text-white text-2xl">Limpar cache</Text>
       </TouchableOpacity>
+      <Link href="/(tabs-stack)/create-donation-items">
+        <Text>Go to create-donation-items</Text>
+      </Link>
     </View>
   );
 }

@@ -1,11 +1,13 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { Divider } from '~/components/Divider';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { MediaTypeOptions, launchImageLibraryAsync } from 'expo-image-picker';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { Button } from '~/components/Button';
+import { useMutation } from '@tanstack/react-query';
+import { format } from 'date-fns';
 
 export const SelectImage = () => {
   const { user, addImageToUserAndSetCache } = useCurrentUserHook();
@@ -24,36 +26,44 @@ export const SelectImage = () => {
     }
   };
 
-  const uploadImage = async () => {
-    if (!uploading) return;
-    try {
-      const response = await fetch(uploading);
-      const blob = await response.blob();
-      const fileName = uploading.substring(uploading.lastIndexOf('/') + 1);
-      const storage = getStorage();
-      const mountainsRef = ref(storage, `images/${user?.uid}/${fileName}`);
+  const { mutate, isPending } = useMutation({
+    mutationKey: ['uploadImage', format(Date.now(), 'yyyy-MM-dd HH:mm:ss')],
+    mutationFn: async () => {
+      if (!uploading) return;
+      try {
+        const response = await fetch(uploading);
+        const blob = await response.blob();
+        const fileName = uploading.substring(uploading.lastIndexOf('/') + 1);
+        const storage = getStorage();
+        const mountainsRef = ref(
+          storage,
+          `images/${user?.uid}/${fileName + Date.now().toString()}`
+        );
 
-      uploadBytes(mountainsRef, blob).then(async (snapshot) => {
-        console.log('Uploaded a blob or file!', snapshot.ref.fullPath);
-        await getDownloadURL(snapshot.ref).then((url) => {
-          addImageToUserAndSetCache(url);
-          setUploading(undefined);
+        await uploadBytes(mountainsRef, blob).then(async (snapshot) => {
+          console.log('Uploaded a blob or file!', snapshot.ref.fullPath);
+          await getDownloadURL(snapshot.ref).then(async (url) => {
+            await addImageToUserAndSetCache(url);
+            setUploading(undefined);
+          });
         });
-      });
-    } catch (err) {
-      console.log('err', err);
-    }
-  };
+      } catch (err) {
+        console.log('err', err);
+      }
+    },
+  });
 
   return (
     <>
-      {user?.image && (
+      {user?.image && !uploading && (
         <TouchableOpacity className="w-full flex items-center justify-center" onPress={pickImage}>
-          <Image
-            source={{ uri: uploading ? uploading : user.image }}
-            className="w-40 h-40 rounded-full"
-            alt="user-image"
-          />
+          <Image source={{ uri: user.image }} className="w-40 h-40 rounded-full" alt="user-image" />
+        </TouchableOpacity>
+      )}
+
+      {uploading && (
+        <TouchableOpacity className="w-full flex items-center justify-center" onPress={pickImage}>
+          <Image source={{ uri: uploading }} className="w-40 h-40 rounded-full" alt="user-image" />
         </TouchableOpacity>
       )}
 
@@ -85,20 +95,17 @@ export const SelectImage = () => {
 
       {uploading && (
         <>
-          <TouchableOpacity>
-            <Button
-              variant="default"
-              onPress={async () => {
-                await uploadImage();
-              }}
-              icon={{
-                name: 'upload',
-                color: 'white',
-                size: 15,
-              }}>
-              Salvar imagem
-            </Button>
-          </TouchableOpacity>
+          <Button
+            variant="default"
+            onPress={mutate}
+            isLoading={isPending}
+            icon={{
+              name: 'upload',
+              color: 'white',
+              size: 15,
+            }}>
+            Salvar imagem
+          </Button>
         </>
       )}
 

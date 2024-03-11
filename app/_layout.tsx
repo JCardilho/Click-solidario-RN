@@ -15,6 +15,7 @@ export default function Layout() {
       <FontsLoadProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs-stack)" options={{ headerShown: false }} />
         </Stack>
       </FontsLoadProvider>
     </QueryClientProvider>
