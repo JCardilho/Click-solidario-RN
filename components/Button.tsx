@@ -23,7 +23,7 @@ interface IProps {
   href?: () => void;
 }
 
-type Variants = 'default' | 'destructive' | 'primary';
+type Variants = 'default' | 'destructive' | 'primary' | 'ghost' | 'success' | 'borded';
 
 export const Button = (props: IProps) => {
   const createClassnameForTouchableOpacity = (variant: Variants) => {
@@ -35,6 +35,12 @@ export const Button = (props: IProps) => {
         return `${styleDefault} bg-blue-500 border-blue-300 ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
       case 'primary':
         return `${styleDefault} bg-primary border-blue-600 ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
+      case 'ghost':
+        return `${styleDefault} bg-transparent border-transparent ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
+      case 'success':
+        return `${styleDefault} bg-green-500 border-green-400 ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
+      case 'borded':
+        return `${styleDefault} bg-white border-zinc-500 ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
       default:
         return `${styleDefault} bg-blue-500 border-blue-300 ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
     }
@@ -59,7 +65,12 @@ export const Button = (props: IProps) => {
         {props.icon && props.isLoading && (
           <ActivityIndicator size="small" color={props.loaderColor ? props.loaderColor : '#fff'} />
         )}
-        <Text className="text-white font-kanit">{props.children}</Text>
+        <Text
+          className={`
+          font-kanit ${props.variant == 'ghost' || props.variant == 'borded' ? 'text-black' : 'text-white'}
+        `}>
+          {props.children}
+        </Text>
       </TouchableOpacity>
     </>
   );

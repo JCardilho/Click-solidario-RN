@@ -16,20 +16,20 @@ export const HeaderBack = (props: IProps) => {
       <View className="w-full h-full max-h-[80px] ">
         <View className="w-full h-full  rounded-lg flex flex-row gap-2 items-center justify-start p-2">
           <Button
-            variant="default"
+            variant="ghost"
             href={() => props.returnHref()}
             icon={{
               name: 'arrow-left',
-              color: 'white',
+              color: 'black',
               size: 15,
-            }}>
+            }}
+            loaderColor="#000000">
             Voltar
           </Button>
 
-          <Text className="font-kanit text-xl p-4 bg-white w-full rounded-lg">{props.title}</Text>
+          <Text className="font-kanit text-xl p-4 w-full rounded-lg">{props.title}</Text>
         </View>
       </View>
-      <Divider margin="my-1 mb-4" color="bg-white" />
     </>
   );
 };
