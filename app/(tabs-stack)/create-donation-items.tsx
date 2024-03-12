@@ -12,6 +12,7 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import { z } from 'zod';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
+import { Input } from '~/components/Input';
 import firebase from '~/utils/firebase';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
@@ -57,24 +58,23 @@ export default function CreateDonationItems() {
         name: getValues('name'),
         images: [],
         ownerUid: user.uid,
+        ownerName: user.name,
       });
 
       return result;
     },
     onSuccess: async (data) => {
       if (!data) return;
-
-      await mutateAddImage(data);
-      router.back();
+      mutateAddImage(data);
     },
   });
 
-  const { mutateAsync: mutateAddImage, isPending: isPendingAddImage } = useMutation({
+  const { mutate: mutateAddImage, isPending: isPendingAddImage } = useMutation({
     mutationKey: ['addImage'],
     mutationFn: async (data: IReserveDonation) => {
       if (!getValues('image')) return;
       const images = getValues('image');
-      images.forEach(async (uploading) => {
+      const urls = await images.map(async (uploading) => {
         if (!uploading) return;
         try {
           const response = await fetch(uploading);
@@ -87,18 +87,27 @@ export default function CreateDonationItems() {
             `images/reserve-donations/${data?.uid}/${fileName + Date.now().toString()}`
           );
 
-          await uploadBytes(mountainsRef, blob).then(async (snapshot) => {
+          const result = await uploadBytes(mountainsRef, blob).then(async (snapshot) => {
             console.log('Uploaded a blob or file!', snapshot.ref.fullPath);
-            await getDownloadURL(snapshot.ref).then(async (url) => {
-              const col = collection(getFirestore(firebase), 'reserve-donations');
-              const docsRef = doc(col, data?.uid);
-              await setDoc(docsRef, { images: [url] }, { merge: true });
+            const downloadUrl = await getDownloadURL(snapshot.ref).then(async (url) => {
+              return url;
             });
+            return downloadUrl;
           });
+          return result;
         } catch (err) {
           console.log('err', err);
         }
       });
+
+      return Promise.all(urls).then(async (urls) => {
+        const db = getFirestore();
+        const docRef = doc(db, 'reserve-donations', data?.uid);
+        await setDoc(docRef, { images: urls }, { merge: true });
+      });
+    },
+    onSuccess: (data) => {
+      router.back();
     },
   });
 
@@ -135,12 +144,12 @@ export default function CreateDonationItems() {
             name="name"
             render={({ field, fieldState: { error } }) => (
               <>
-                <TextInput
-                  placeholder="Nome do item"
-                  className="border border-primary rounded-lg p-4"
+                <Input
+                  placeholder="Nome"
+                  label="Nome do item: "
                   onChangeText={field.onChange}
+                  error={error?.message}
                 />
-                {error && <Text>{error.message}</Text>}
               </>
             )}
           />
@@ -150,12 +159,13 @@ export default function CreateDonationItems() {
             name="description"
             render={({ field, fieldState: { error } }) => (
               <>
-                <TextInput
+                <Input
                   placeholder="Descrição"
-                  className="border border-primary rounded-lg p-4"
+                  label="Descrição do item: "
                   onChangeText={field.onChange}
+                  isTextArea={true}
+                  error={error?.message}
                 />
-                {error && <Text>{error.message}</Text>}
               </>
             )}
           />
@@ -201,12 +211,6 @@ export default function CreateDonationItems() {
                 </Text>
               </View>
             ))}
-
-          {errors && (
-            <Text className="text-red-500">
-              {errors.name?.message || errors.description?.message}
-            </Text>
-          )}
         </View>
       </ScrollView>
       <View className="absolute bottom-4 full items-center justify-center px-2">

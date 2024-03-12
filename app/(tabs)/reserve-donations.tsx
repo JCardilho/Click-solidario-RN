@@ -26,7 +26,7 @@ export default function ReserveDonations() {
   const router = useRouter();
   const { getCache, setCache } = useCacheHook();
 
-  const { data, isLoading, refetch } = useQuery<IReserveDonation[]>({
+  const { data, isLoading, refetch, isRefetching } = useQuery<IReserveDonation[]>({
     queryKey: ['request-donations'],
     queryFn: async () => {
       const result = await ReserveDonationsService.GetAllReserveDonations();
@@ -86,14 +86,15 @@ export default function ReserveDonations() {
       </View>
 
       <Button
-        variant="default"
+        variant="ghost"
         icon={{
           name: 'refresh',
-          color: 'white',
+          color: 'black',
           size: 15,
         }}
         onPress={() => refetch()}
-        isLoading={isLoading}
+        isLoading={isLoading || isRefetching}
+        loaderColor="black"
         className="mb-2">
         Atualizar
       </Button>
@@ -110,11 +111,22 @@ export default function ReserveDonations() {
           <TouchableOpacity
             className="w-full border-2 border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4"
             key={index}>
+            {item.images && item.images.length > 0 && (
+              <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+                {item.images.map((image: any) => (
+                  <Image
+                    source={{ uri: image }}
+                    className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"
+                    key={image}
+                  />
+                ))}
+              </ScrollView>
+            )}
             <Text className="text-xl font-bold underline">{item.name}</Text>
             <Text className="font-kanit text-lg text-justify">{item.description}</Text>
             <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
             <View className="w-full">
-              <Text className="text-md ">Proprietário da doação: {item.uid}</Text>
+              <Text className="text-md ">Proprietário da doação: {item.ownerName}</Text>
             </View>
             <Text className="text-md font-kanit">
               Criado em: {format(new Date(item.createdAt), 'dd-MM-yyyy HH:mm')}

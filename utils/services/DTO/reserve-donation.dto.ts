@@ -3,6 +3,7 @@ export interface CreateReserveDonationDTO {
   description: string;
   images: Array<String> | undefined;
   ownerUid: string;
+  ownerName?: string;
 }
 
 export interface IReserveDonation extends CreateReserveDonationDTO {

@@ -14,6 +14,7 @@ const CreateReserveDonation = async (
     ownerUid: donation.ownerUid,
     created: date,
     isReserved: false,
+    ownerName: donation.ownerName,
   });
 
   return {
@@ -37,6 +38,7 @@ const GetAllReserveDonations = async (): Promise<IReserveDonation[]> => {
       ownerUid: data.ownerUid,
       createdAt: data.created.toDate(),
       isReserved: data.isReserved,
+      ownerName: data.ownerName,
     };
   });
 };
