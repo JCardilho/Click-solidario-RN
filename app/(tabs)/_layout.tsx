@@ -1,7 +1,7 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 
 export default function TabLayout() {
   return (
@@ -37,7 +37,12 @@ export default function TabLayout() {
         options={{
           title: 'Donations',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="dropbox" color={color} />,
-          tabBarLabel: () => <Text className="font-kanit text-md">Reservar</Text>,
+          tabBarLabel: () => (
+            <View className="w-auto flex flex-col items-center justify-center">
+              <Text className="font-kanit text-xs text-center">Reservar</Text>
+              <Text className="font-kanit text-xs text-center">Disponibilizados</Text>
+            </View>
+          ),
           headerShown: false,
         }}
       />
@@ -49,7 +54,10 @@ export default function TabLayout() {
             <FontAwesome size={28} name="plus" color={color} className="overflow-visible" />
           ),
           tabBarLabel: () => (
-            <Text className="font-kanit text-md text-center bg-transparent">Solicitar/Doar</Text>
+            <View className="w-auto flex flex-col items-center justify-center">
+              <Text className="font-kanit text-xs text-center">Solicitar</Text>
+              <Text className="font-kanit text-xs text-center">Doar</Text>
+            </View>
           ),
           headerShown: false,
         }}

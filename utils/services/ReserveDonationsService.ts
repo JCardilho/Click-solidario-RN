@@ -43,7 +43,51 @@ const GetAllReserveDonations = async (): Promise<IReserveDonation[]> => {
   });
 };
 
+const GetMyReserveDonations = async (uid: string): Promise<IReserveDonation[]> => {
+  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const snapshot = await getDocs(ref);
+  return snapshot.docs
+    .map((doc) => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        name: data.name,
+        description: data.description,
+        images: data.images,
+        ownerUid: data.ownerUid,
+        createdAt: data.created.toDate(),
+        isReserved: data.isReserved,
+        ownerName: data.ownerName,
+      };
+    })
+    .filter((donation) => donation.ownerUid === uid);
+};
+
+const GetOneReserveDonation = async (uid: string): Promise<IReserveDonation | undefined> => {
+  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const snapshot = await getDocs(ref);
+  const result = snapshot.docs
+    .map((doc) => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        name: data.name,
+        description: data.description,
+        images: data.images,
+        ownerUid: data.ownerUid,
+        createdAt: data.created.toDate(),
+        isReserved: data.isReserved,
+        ownerName: data.ownerName,
+      };
+    })
+    .filter((donation) => donation.uid === uid);
+
+  return result[0];
+};
+
 export const ReserveDonationsService = {
   CreateReserveDonation,
   GetAllReserveDonations,
+  GetMyReserveDonations,
+  GetOneReserveDonation,
 };

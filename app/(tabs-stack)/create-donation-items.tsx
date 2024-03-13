@@ -137,7 +137,7 @@ export default function CreateDonationItems() {
             headerShown: false,
           }}
         />
-        <HeaderBack title="Disponibilizar um item à doação" returnHref={() => router.back()} />
+        <HeaderBack title="Disponibilizar um item à doação" />
         <View className="px-2 flex flex-col gap-4">
           <Controller
             control={control}

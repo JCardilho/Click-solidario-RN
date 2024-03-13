@@ -5,7 +5,10 @@ import { Text } from 'react-native';
 
 export default function StackLayout() {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}>
       <Stack.Screen name="create-donation-items" />
     </Stack>
   );

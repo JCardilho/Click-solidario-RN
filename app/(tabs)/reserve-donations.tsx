@@ -20,6 +20,8 @@ import { useQuery } from '@tanstack/react-query';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
 import { format } from 'date-fns';
+import { DefaultInformationsForReserveDonationsPage } from '~/layouts/reserve-donations/default-informations';
+import { Input } from '~/components/Input';
 
 export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
@@ -35,107 +37,107 @@ export default function ReserveDonations() {
   });
 
   return (
-    <ScrollView
-      className="w-full p-4 flex flex-col gap-4"
-      style={{
-        gap: 4,
-      }}>
+    <>
       <SafeAreaView />
-      <View className="w-full  rounded-xl flex flex-col gap-4 p-4 items-center justify-center my-4">
-        <FontAwesome name="dropbox" size={50} />
-        {/*  <Image source={Logo} className="w-20 h-20 rounded-full" alt="background-image" /> */}
+      <ScrollView
+        className="w-full p-4 flex flex-col gap-4"
+        style={{
+          gap: 4,
+        }}>
+        <View className="w-full  rounded-xl flex flex-col gap-4 p-4 items-center justify-center my-4">
+          <FontAwesome name="dropbox" size={50} />
+          {/*  <Image source={Logo} className="w-20 h-20 rounded-full" alt="background-image" /> */}
 
-        <Text className="text-4xl font-kanit ">Reservar doação</Text>
-        <Text className="text-xl font-kanit text-center">
-          Reserve a doação que um usuario disponibilizou {' :) '}
-        </Text>
-      </View>
-
-      <Button
-        variant="default"
-        icon={{
-          name: 'user',
-          color: 'white',
-          size: 15,
-        }}
-        className="mb-2">
-        Minhas doações
-      </Button>
-      <Button
-        variant="default"
-        icon={{
-          name: 'plus',
-          color: 'white',
-          size: 15,
-        }}
-        href={() => router.push('/(tabs-stack)/create-donation-items')}>
-        Disponibilizar um item à doação
-      </Button>
-
-      <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
-      <Text className="text-4xl font-kanit">Itens disponibilizados:</Text>
-
-      <View className="w-full flex flex-row gap-1 justify-around">
-        <TextInput
-          placeholder="Pesquisar doações"
-          className="border-2 border-blue-500 p-2 rounded-lg w-[84%]"
-        />
-        <Button variant="default">
-          <FontAwesome name="search" size={15} color="white" />
-        </Button>
-      </View>
-
-      <Button
-        variant="ghost"
-        icon={{
-          name: 'refresh',
-          color: 'black',
-          size: 15,
-        }}
-        onPress={() => refetch()}
-        isLoading={isLoading || isRefetching}
-        loaderColor="black"
-        className="mb-2">
-        Atualizar
-      </Button>
-
-      {isLoading && (
-        <View className="w-full flex items-center justify-center">
-          <ActivityIndicator size="large" color={'#023E8A'} />
+          <Text className="text-4xl font-kanit text-center">Reservar / Disponibilizar doação</Text>
         </View>
-      )}
 
-      {!isLoading &&
-        data &&
-        data.map((item, index) => (
-          <TouchableOpacity
-            className="w-full border-2 border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4"
-            key={index}>
-            {item.images && item.images.length > 0 && (
-              <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
-                {item.images.map((image: any) => (
-                  <Image
-                    source={{ uri: image }}
-                    className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"
-                    key={image}
-                  />
-                ))}
-              </ScrollView>
-            )}
-            <Text className="text-xl font-bold underline">{item.name}</Text>
-            <Text className="font-kanit text-lg text-justify">{item.description}</Text>
-            <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
-            <View className="w-full">
-              <Text className="text-md ">Proprietário da doação: {item.ownerName}</Text>
-            </View>
-            <Text className="text-md font-kanit">
-              Criado em: {format(new Date(item.createdAt), 'dd-MM-yyyy HH:mm')}
-            </Text>
-            <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
-          </TouchableOpacity>
-        ))}
+        <DefaultInformationsForReserveDonationsPage />
 
-      <View className="my-12"></View>
-    </ScrollView>
+        <Button
+          variant="default"
+          icon={{
+            name: 'user',
+            color: 'white',
+            size: 15,
+          }}
+          className="mb-2"
+          href={() => router.push('/(tabs-stack)/(my-donations)/reserve-donations')}>
+          Minhas doações
+        </Button>
+        <Button
+          variant="default"
+          icon={{
+            name: 'plus',
+            color: 'white',
+            size: 15,
+          }}
+          href={() => router.push('/(tabs-stack)/create-donation-items')}
+          className="mb-2">
+          Disponibilizar um item à doação
+        </Button>
+
+        <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
+        <Text className="text-4xl font-kanit my-6">Itens disponibilizados:</Text>
+
+        <View className="w-full flex flex-row gap-1">
+          <Input label="" placeholder="Pesquisar" className="w-[85%]" />
+          <Button variant="default" className="mt-6 px-5">
+            <FontAwesome name="search" size={15} color="white" />
+          </Button>
+        </View>
+
+        <Button
+          variant="ghost"
+          icon={{
+            name: 'refresh',
+            color: 'black',
+            size: 15,
+          }}
+          onPress={() => refetch()}
+          isLoading={isLoading || isRefetching}
+          loaderColor="black"
+          className="mb-2">
+          Atualizar
+        </Button>
+
+        {isLoading && (
+          <View className="w-full flex items-center justify-center">
+            <ActivityIndicator size="large" color={'#023E8A'} />
+          </View>
+        )}
+
+        {!isLoading &&
+          data &&
+          data.map((item, index) => (
+            <TouchableOpacity
+              className="w-full border-2 border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4"
+              key={index}>
+              {item.images && item.images.length > 0 && (
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+                  {item.images.map((image: any) => (
+                    <Image
+                      source={{ uri: image }}
+                      className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"
+                      key={image}
+                    />
+                  ))}
+                </ScrollView>
+              )}
+              <Text className="text-xl font-bold underline">{item.name}</Text>
+              <Text className="font-kanit text-lg text-justify">{item.description}</Text>
+              <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
+              <View className="w-full">
+                <Text className="text-md ">Proprietário da doação: {item.ownerName}</Text>
+              </View>
+              <Text className="text-md font-kanit">
+                Criado em: {format(new Date(item.createdAt), 'dd-MM-yyyy HH:mm')}
+              </Text>
+              <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
+            </TouchableOpacity>
+          ))}
+
+        <View className="my-12"></View>
+      </ScrollView>
+    </>
   );
 }

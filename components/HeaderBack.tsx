@@ -3,13 +3,15 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from './Button';
 import { Divider } from './Divider';
+import { useRouter } from 'expo-router';
 
 interface IProps {
-  returnHref: () => void;
   title: string;
 }
 
 export const HeaderBack = (props: IProps) => {
+  const router = useRouter();
+
   return (
     <>
       <SafeAreaView />
@@ -17,7 +19,7 @@ export const HeaderBack = (props: IProps) => {
         <View className="w-full h-full  rounded-lg flex flex-row gap-2 items-center justify-start p-2">
           <Button
             variant="ghost"
-            href={() => props.returnHref()}
+            href={() => router.back()}
             icon={{
               name: 'arrow-left',
               color: 'black',

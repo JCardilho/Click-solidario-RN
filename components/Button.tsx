@@ -21,6 +21,7 @@ interface IProps {
   isLoading?: boolean;
   loaderColor?: string;
   href?: () => void;
+  borderVariant?: string;
 }
 
 type Variants = 'default' | 'destructive' | 'primary' | 'ghost' | 'success' | 'borded';
@@ -40,7 +41,7 @@ export const Button = (props: IProps) => {
       case 'success':
         return `${styleDefault} bg-green-500 border-green-400 ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
       case 'borded':
-        return `${styleDefault} bg-white border-zinc-500 ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
+        return `${styleDefault} bg-transparent ${props.borderVariant ? props.borderVariant : 'border-zinc-500'} ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
       default:
         return `${styleDefault} bg-blue-500 border-blue-300 ${props.isLoading ? 'opacity-50' : ''} ${props.className}`;
     }

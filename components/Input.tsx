@@ -8,11 +8,12 @@ interface IProps {
   isDisabled?: boolean;
   onChangeText?: (text: string) => void;
   message?: string;
+  className?: string;
 }
 
 export const Input = (props: IProps) => {
   return (
-    <View className="w-auto flex flex-col ">
+    <View className={`w-auto flex flex-col ${props.className}`}>
       <Text className="text-md font-kanit">{props.label}</Text>
       <TextInput
         placeholder={props.placeholder}

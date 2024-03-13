@@ -10,20 +10,18 @@ export default function Home() {
 
   return (
     <View>
-      <Text>Oi</Text>
-      <TouchableOpacity
-        className="w-full bg-blue-500 p-2  rounded-lg "
-        onPress={() => {
-          const verify = async () => {
-            setCache('user', null);
-          };
-          verify();
-        }}>
-        <Text className="text-center text-white text-2xl">Limpar cache</Text>
-      </TouchableOpacity>
-      <Link href="/(tabs-stack)/create-donation-items">
-        <Text>Go to create-donation-items</Text>
-      </Link>
+      <View className="w-full p-4 items-center justify-center flex">
+        <TouchableOpacity
+          className="w-full bg-blue-500 p-2  rounded-lg "
+          onPress={() => {
+            const verify = async () => {
+              setCache('user', null);
+            };
+            verify();
+          }}>
+          <Text className="text-center text-white text-2xl">Limpar cache</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
