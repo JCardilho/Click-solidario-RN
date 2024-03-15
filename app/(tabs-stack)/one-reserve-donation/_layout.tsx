@@ -9,9 +9,8 @@ export default function StackLayout() {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="create-reserve-donation" />
-      <Stack.Screen name="(my-donations)" />
-      <Stack.Screen name="one-reserve-donation" />
+      <Stack.Screen name="(edit-reserve-donation)" />
+      <Stack.Screen name="(view-reserve-donation)" />
     </Stack>
   );
 }

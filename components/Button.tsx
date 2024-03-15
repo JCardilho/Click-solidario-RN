@@ -7,7 +7,7 @@ import Svg, { Path, SvgFromUri, SvgUri } from 'react-native-svg';
 import { Link } from 'expo-router';
 
 interface Icon {
-  name: typeof IconAwesome.defaultProps;
+  name: keyof typeof IconAwesome.glyphMap;
   color: string;
   size: number;
 }

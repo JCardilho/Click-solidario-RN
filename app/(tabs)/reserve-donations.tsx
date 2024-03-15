@@ -19,9 +19,10 @@ import Logo from '~/assets/icon/logo.png';
 import { useQuery } from '@tanstack/react-query';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
-import { format } from 'date-fns';
+import { addMilliseconds, format } from 'date-fns';
 import { DefaultInformationsForReserveDonationsPage } from '~/layouts/reserve-donations/default-informations';
 import { Input } from '~/components/Input';
+import { Card } from '~/components/Card';
 
 export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
@@ -32,6 +33,7 @@ export default function ReserveDonations() {
     queryKey: ['request-donations'],
     queryFn: async () => {
       const result = await ReserveDonationsService.GetAllReserveDonations();
+
       return result;
     },
   });
@@ -71,7 +73,7 @@ export default function ReserveDonations() {
             color: 'white',
             size: 15,
           }}
-          href={() => router.push('/(tabs-stack)/create-donation-items')}
+          href={() => router.push('/(tabs-stack)/create-reserve-donation')}
           className="mb-2">
           Disponibilizar um item à doação
         </Button>
@@ -109,31 +111,24 @@ export default function ReserveDonations() {
         {!isLoading &&
           data &&
           data.map((item, index) => (
-            <TouchableOpacity
-              className="w-full border-2 border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4"
-              key={index}>
-              {item.images && item.images.length > 0 && (
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
-                  {item.images.map((image: any) => (
-                    <Image
-                      source={{ uri: image }}
-                      className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"
-                      key={image}
-                    />
-                  ))}
-                </ScrollView>
-              )}
-              <Text className="text-xl font-bold underline">{item.name}</Text>
-              <Text className="font-kanit text-lg text-justify">{item.description}</Text>
-              <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
-              <View className="w-full">
-                <Text className="text-md ">Proprietário da doação: {item.ownerName}</Text>
-              </View>
-              <Text className="text-md font-kanit">
-                Criado em: {format(new Date(item.createdAt), 'dd-MM-yyyy HH:mm')}
-              </Text>
-              <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
-            </TouchableOpacity>
+            <Card
+              key={`${item.uid}-reserve-donations-${index}`}
+              item={{
+                createdAt: item.createdAt,
+                id: item.uid,
+                name: item.name,
+                description:
+                  item.description && item.description.length > 300
+                    ? item.description.substring(0, 300) + '...'
+                    : item.description,
+                images: item.images as string[],
+                ownerName: item.ownerName,
+              }}
+              hidden={{
+                status: true,
+              }}
+              href={() => router.push(`/(tabs-stack)/one-reserve-donation/(view-reserve-donation)/${item.uid}`)}
+            />
           ))}
 
         <View className="my-12"></View>

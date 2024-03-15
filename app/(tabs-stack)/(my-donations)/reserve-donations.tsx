@@ -24,13 +24,13 @@ export default function MyDonationsInReserveDonationsPage() {
 
   return (
     <>
-      <HeaderBack title="Reservar doações" />
-      <Stack.Screen options={{ headerShown: false }} />
+      <HeaderBack title="Minhas doações" />
+
       <ScrollView className="w-full px-2">
-        <View className="w-full flex items-center">
+        {/* <View className="w-full flex items-center">
           <Text className="text-4xl font-kanit">Minhas doações</Text>
           <Divider />
-        </View>
+        </View> */}
         <Loader hiddenLoaderActive center isLoader={isPending} />
 
         {data &&
@@ -51,7 +51,9 @@ export default function MyDonationsInReserveDonationsPage() {
                 status: true,
               }}
               href={() => {
-                router.push(`/(tabs-stack)/(view-one-reserve-donation)/${item.uid}`);
+                router.push(
+                  `/(tabs-stack)/one-reserve-donation/(view-reserve-donation)/${item.uid}`
+                );
               }}
             />
           ))}

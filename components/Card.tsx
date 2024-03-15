@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Divider } from './Divider';
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { Button } from './Button';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -24,6 +24,7 @@ interface IProps {
   children?: ReactNode;
   hidden?: IHidden;
   href?: () => void;
+  status?: React.ReactNode;
 }
 
 export const Card = (props: IProps) => {
@@ -57,12 +58,7 @@ export const Card = (props: IProps) => {
         {!props.hidden?.status && (
           <>
             <Text className="text-md font-kanit">Status:</Text>
-            <View className="w-full flex items-center flex-row gap-2">
-              <View className="rounded-[50px] w-fit flex flex-row gap-4 bg-green-500 px-4 py-1 items-center justify-center">
-                <FontAwesome name="check" color={'white'} size={10}></FontAwesome>
-                <Text className="text-white font-kanit">Verificado pela assistente social</Text>
-              </View>
-            </View>
+            <View className="w-full flex items-center flex-row gap-2">{props.status}</View>
             <Divider />
           </>
         )}

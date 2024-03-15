@@ -8,6 +8,12 @@ export interface CreateReserveDonationDTO {
 
 export interface IReserveDonation extends CreateReserveDonationDTO {
   createdAt: Date;
-  isReserved: boolean;
+  reserve: IReserveOwner;
   uid: string;
+}
+
+interface IReserveOwner {
+  endDateOfLastReserve?: Date;
+  endOwnerUidOfLastReserve?: string;
+  endOwnerNameOfLastReserve?: string;
 }

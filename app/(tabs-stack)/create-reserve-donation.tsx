@@ -67,6 +67,9 @@ export default function CreateDonationItems() {
       if (!data) return;
       mutateAddImage(data);
     },
+    onError: (error) => {
+      console.log('error', error);
+    },
   });
 
   const { mutate: mutateAddImage, isPending: isPendingAddImage } = useMutation({
@@ -131,12 +134,12 @@ export default function CreateDonationItems() {
   return (
     <>
       <ScrollView>
-        <Stack.Screen
+        {/* <Stack.Screen
           options={{
             title: 'Disponibilizar um item à doação',
             headerShown: false,
           }}
-        />
+        /> */}
         <HeaderBack title="Disponibilizar um item à doação" />
         <View className="px-2 flex flex-col gap-4">
           <Controller
