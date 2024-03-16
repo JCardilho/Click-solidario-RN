@@ -34,7 +34,7 @@ type CreateUser = z.infer<typeof criarUserSchema>;
 export default function Page() {
   const router = useRouter();
   const { verifyUserAndSendUserFromHome, user, setUser } = useCurrentUserHook();
-  const { setCache } = useCacheHook();
+  const { setCache, getCache } = useCacheHook();
 
   const { isPending, isError, mutate } = useMutation({
     mutationKey: ['loginUser'],
@@ -69,15 +69,20 @@ export default function Page() {
 
   useEffect(() => {
     if (!user) {
+      const teste = async () => {
+        try {
+          if (await getCache('user')) return;
+          await setCache('user', null);
+        } catch (err) {
+          await setCache('user', null);
+        }
+      };
+      teste();
+
       const verify = async () => {
         await verifyUserAndSendUserFromHome();
       };
       verify();
-
-      /*  const verify = async () => {
-        setCache('user', null);
-      };
-      verify(); */
     }
   }, [user]);
 
