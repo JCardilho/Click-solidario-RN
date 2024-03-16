@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   setDoc,
@@ -10,6 +11,7 @@ import {
 import { CreateReserveDonationDTO, IReserveDonation } from './DTO/reserve-donation.dto';
 import firebase from '../firebase';
 import { addDays, addMilliseconds } from 'date-fns';
+import { deleteObject, ref, getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const CreateReserveDonation = async (
   donation: CreateReserveDonationDTO
@@ -161,6 +163,84 @@ const ExcludeReserveDonation = async (uid: string): Promise<void> => {
   await deleteDoc(docRef);
 };
 
+const UpdateReserveDonation = async (
+  uid: string,
+  donation: CreateReserveDonationDTO
+): Promise<IReserveDonation> => {
+  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  await setDoc(
+    docRef,
+    {
+      name: donation.name,
+      description: donation.description,
+      images: donation.images,
+    },
+    { merge: true }
+  );
+  const getResult = await GetOneReserveDonation(uid);
+  console.log('getResult', getResult);
+  if (!getResult) throw new Error('Donation not found');
+  return getResult;
+};
+
+const DeleteImages = async (images: string[], uid: string): Promise<void> => {
+  const storage = getStorage();
+  const result = images.map(async (url) => {
+    if (!url) return;
+    const desertRef = ref(storage, url);
+    await deleteObject(desertRef);
+    console.log('deletado', url);
+  });
+  const getReserveRef = collection(getFirestore(firebase), 'reserve-donations', uid);
+  const getDoc = await getDocs(getReserveRef);
+  const data = getDoc.docs[0].data();
+  const newImages = data.images.filter((image: string) => !images.includes(image));
+  await setDoc(getDoc.docs[0].ref, { images: newImages }, { merge: true });
+  await Promise.all(result);
+};
+
+const DeleteImage = async (image: string, uid: string): Promise<void> => {
+  const storage = getStorage();
+  const desertRef = ref(storage, image);
+  await deleteObject(desertRef);
+  console.log('deletou', image);
+  const getReserveRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const getDocrSnap = await getDoc(getReserveRef);
+  const data = getDocrSnap.data();
+  if (!data) throw new Error('Reserva não encontrada');
+  const newImages = data.images.filter((img: string) => img !== image);
+  console.log('ref', getDocrSnap.ref);
+  await setDoc(getDocrSnap.ref, { images: newImages }, { merge: true });
+};
+
+const AddImages = async (uid: string, images: string): Promise<string | undefined> => {
+  try {
+    const response = await fetch(images);
+    const blob = await response.blob();
+    const fileName = images.substring(images.lastIndexOf('/') + 1);
+    const storage = getStorage();
+    const mountainsRef = ref(
+      storage,
+      `images/reserve-donations/${uid}/${fileName + Date.now().toString()}`
+    );
+
+    const result = await uploadBytes(mountainsRef, blob).then(async (snapshot) => {
+      const downloadUrl = await getDownloadURL(snapshot.ref).then(async (url) => {
+        const updateDoc = doc(getFirestore(firebase), 'reserve-donations', uid);
+        const oldValue = await getDoc(updateDoc);
+        const data = oldValue.data();
+        await setDoc(updateDoc, { images: [...(data?.images || []), url] }, { merge: true });
+        return url;
+      });
+      return downloadUrl;
+    });
+
+    return result;
+  } catch (err) {
+    console.log('err', err);
+  }
+};
+
 export const ReserveDonationsService = {
   CreateReserveDonation,
   GetAllReserveDonations,
@@ -169,4 +249,8 @@ export const ReserveDonationsService = {
   ReserveDonationAction,
   RemoveReserveAction,
   ExcludeReserveDonation,
+  UpdateReserveDonation,
+  DeleteImage,
+  DeleteImages,
+  AddImages,
 };

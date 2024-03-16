@@ -19,6 +19,7 @@ import {
   where,
   getDocs,
 } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, deleteObject } from 'firebase/storage';
 
 const createUser = async (params: CreateUserDTO): Promise<void> => {
   try {
@@ -85,8 +86,18 @@ const addImageToUserInFirebase = async (image: string) => {
   }
 };
 
+const deleteOldImageToUserInFirebaseStorage = async (image: string) => {
+  const cache = await AsyncStorage.getItem('user');
+  if (!cache) throw new Error('Usuário não encontrado');
+  const user = JSON.parse(cache) as IUser;
+  const storage = getStorage();
+  const desertRef = ref(storage, image);
+  await deleteObject(desertRef);
+};
+
 export const UserService = {
   createUser,
   loginUser,
   addImageToUserInFirebase,
+  deleteOldImageToUserInFirebaseStorage,
 };

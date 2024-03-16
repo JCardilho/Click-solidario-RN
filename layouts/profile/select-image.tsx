@@ -8,10 +8,12 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { Button } from '~/components/Button';
 import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import { UserService } from '~/utils/services/UserService';
 
 export const SelectImage = () => {
   const { user, addImageToUserAndSetCache } = useCurrentUserHook();
   const [uploading, setUploading] = useState<string>();
+  
 
   const pickImage = async () => {
     const result = await launchImageLibraryAsync({
@@ -37,8 +39,12 @@ export const SelectImage = () => {
         const storage = getStorage();
         const mountainsRef = ref(
           storage,
-          `images/${user?.uid}/${fileName + Date.now().toString()}`
+          `images/users/${user?.uid}/${fileName + Date.now().toString()}`
         );
+
+        if (user && user.image) {
+          await UserService.deleteOldImageToUserInFirebaseStorage(user.image);
+        }
 
         await uploadBytes(mountainsRef, blob).then(async (snapshot) => {
           console.log('Uploaded a blob or file!', snapshot.ref.fullPath);

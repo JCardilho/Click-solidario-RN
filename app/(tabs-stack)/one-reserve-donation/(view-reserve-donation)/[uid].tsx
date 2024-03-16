@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect } from 'react';
+import { ScrollView, Text, View } from 'react-native';
 import { Badge } from '~/components/Badge';
 import { Button } from '~/components/Button';
-import { Divider } from '~/components/Divider';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Loader, useLoaderHook } from '~/components/Loader';
 import { CancelReserve } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/cancel-reserve';
@@ -15,6 +15,7 @@ import {
   ViewDataTextForViewReserveDonation,
 } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/view-datas';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
+import { useReserveDonations } from '~/utils/hooks/screens/view-reserve-donation/view-reserve-donation';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
 
@@ -23,6 +24,8 @@ export default function ViewOneReserveDonation() {
   const { user } = useCurrentUserHook();
   const router = useRouter();
   const { setIsLoading } = useLoaderHook();
+  const { searchViewReserveDonations, addViewReserveDonations, ViewReserveDonations } =
+    useReserveDonations();
 
   const { data, refetch } = useQuery<IReserveDonation>({
     queryKey: ['reserve-donation', uid],
@@ -30,17 +33,29 @@ export default function ViewOneReserveDonation() {
       setIsLoading(true);
       const uidFormatted = Array.isArray(uid) ? uid[0] : uid;
       if (!uidFormatted) throw new Error('UID não encontrado');
+      const searchForData = searchViewReserveDonations(uidFormatted);
+      if (searchForData) {
+        setIsLoading(false);
+        return searchForData;
+      }
       const result = await ReserveDonationsService.GetOneReserveDonation(uidFormatted);
       if (!result) throw new Error('Reserva não encontrada');
       setIsLoading(false);
+      addViewReserveDonations(result);
       return result;
     },
   });
 
+  useEffect(() => {
+    if (ViewReserveDonations.find((item) => item.uid === uid)) {
+      refetch();
+    }
+  }, [ViewReserveDonations.find((item) => item.uid === uid)]);
+
   return (
     <>
       <HeaderBack title={`Reserva: ${data?.name}`} />
-      <Loader fullscreen />
+      <Loader fullscreen activeHook />
       <ScrollView className="w-full p-2 flex flex-col gap-4 pb-12">
         {data && (
           <>

@@ -33,8 +33,8 @@ export const ViewDataImageForViewReserveDonation = ({ data }: IProps) => {
         <>
           <Text className="font-kanit">Imagens: </Text>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
-            {data.images.map((image: any) => (
-              <TouchableOpacity key={image}>
+            {data.images.map((image: any, index) => (
+              <TouchableOpacity key={image + Math.random() * 100 + index}>
                 <Image
                   source={{ uri: image }}
                   className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"

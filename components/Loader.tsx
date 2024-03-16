@@ -36,7 +36,8 @@ export const useLoaderHook = () => {
   };
 
   const stopLoadingForReactQueryError = {
-    onError: () => {
+    onError: (err: any) => {
+      console.log(err)
       setIsLoading(false);
     },
   };
