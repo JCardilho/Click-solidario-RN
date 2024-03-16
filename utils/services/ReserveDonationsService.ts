@@ -127,7 +127,7 @@ const GetOneReserveDonation = async (uid: string): Promise<IReserveDonation | un
 const ReserveDonationAction = async (
   uid: string,
   owner: Omit<IReserveDonation['reserve'], 'endDateOfLastReserve'>
-): Promise<void> => {
+): Promise<IReserveDonation['reserve']> => {
   const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
   const endDateOfLastReserve = addDays(new Date(), 1);
   await setDoc(
@@ -141,6 +141,11 @@ const ReserveDonationAction = async (
     },
     { merge: true }
   );
+  return {
+    endDateOfLastReserve,
+    endOwnerNameOfLastReserve: owner.endOwnerNameOfLastReserve,
+    endOwnerUidOfLastReserve: owner.endOwnerUidOfLastReserve,
+  };
 };
 
 const RemoveReserveAction = async (uid: string): Promise<void> => {

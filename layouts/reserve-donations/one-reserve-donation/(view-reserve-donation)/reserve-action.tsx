@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Button } from '~/components/Button';
 import { useLoaderHook } from '~/components/Loader';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
+import { useReserveDonations } from '~/utils/hooks/screens/view-reserve-donation/view-reserve-donation';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
 
@@ -18,6 +19,7 @@ export const ReserveAction = ({ data, uid, refetch }: IProps) => {
     mutation: { startLoadingForUseMutation },
     setIsLoading,
   } = useLoaderHook();
+  const { setReserve } = useReserveDonations();
 
   const { mutate, isPending } = useMutation({
     mutationKey: ['reserve', uid],
@@ -29,6 +31,7 @@ export const ReserveAction = ({ data, uid, refetch }: IProps) => {
         endOwnerNameOfLastReserve: user.name,
         endOwnerUidOfLastReserve: user.uid,
       });
+      setReserve(result, data.uid);
       return result;
     },
     onSuccess: async (data) => {

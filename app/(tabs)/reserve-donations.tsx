@@ -1,7 +1,7 @@
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -23,6 +23,22 @@ import { addMilliseconds, format } from 'date-fns';
 import { DefaultInformationsForReserveDonationsPage } from '~/layouts/reserve-donations/default-informations';
 import { Input } from '~/components/Input';
 import { Card } from '~/components/Card';
+import { useFocusEffect } from '@react-navigation/native';
+
+export function useRefreshOnFocus<T>(refetch: () => Promise<T>) {
+  const firstTimeRef = useRef(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (firstTimeRef.current) {
+        firstTimeRef.current = false;
+        return;
+      }
+
+      refetch();
+    }, [refetch])
+  );
+}
 
 export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
@@ -33,10 +49,11 @@ export default function ReserveDonations() {
     queryKey: ['request-donations'],
     queryFn: async () => {
       const result = await ReserveDonationsService.GetAllReserveDonations();
-
       return result;
     },
   });
+
+  useRefreshOnFocus(refetch);
 
   return (
     <>
@@ -88,20 +105,6 @@ export default function ReserveDonations() {
           </Button>
         </View>
 
-        <Button
-          variant="ghost"
-          icon={{
-            name: 'refresh',
-            color: 'black',
-            size: 15,
-          }}
-          onPress={() => refetch()}
-          isLoading={isLoading || isRefetching}
-          loaderColor="black"
-          className="mb-2">
-          Atualizar
-        </Button>
-
         {isLoading && (
           <View className="w-full flex items-center justify-center">
             <ActivityIndicator size="large" color={'#023E8A'} />
@@ -127,7 +130,11 @@ export default function ReserveDonations() {
               hidden={{
                 status: true,
               }}
-              href={() => router.push(`/(tabs-stack)/one-reserve-donation/(view-reserve-donation)/${item.uid}`)}
+              href={() =>
+                router.push(
+                  `/(tabs-stack)/one-reserve-donation/(view-reserve-donation)/${item.uid}`
+                )
+              }
             />
           ))}
 

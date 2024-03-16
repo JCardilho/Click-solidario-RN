@@ -9,6 +9,7 @@ interface Actions {
   addViewReserveDonations: (data: IReserveDonation) => void;
   updateViewReserveDonations: (data: IReserveDonation) => void;
   setImages: (images: string[], uid: string) => void;
+  setReserve: (reserve: IReserveDonation['reserve'], uid: string) => void;
 }
 
 const useReserveDonationsZustand = create<Types & Actions>((set) => ({
@@ -29,22 +30,25 @@ const useReserveDonationsZustand = create<Types & Actions>((set) => ({
       return { ViewReserveDonations: state.ViewReserveDonations };
     });
   },
+  setReserve: (reserve, uid) => {
+    set((state) => {
+      const index = state.ViewReserveDonations.findIndex((item) => item.uid === uid);
+      state.ViewReserveDonations[index].reserve = reserve;
+      return { ViewReserveDonations: state.ViewReserveDonations };
+    });
+  },
 }));
 
 export const useReserveDonations = () => {
-  const { ViewReserveDonations, addViewReserveDonations, updateViewReserveDonations, setImages } =
-    useReserveDonationsZustand();
+  const zustand = useReserveDonationsZustand();
 
   const searchViewReserveDonations = (uid: string) => {
-    const result = ViewReserveDonations.find((item) => item.uid === uid);
+    const result = zustand.ViewReserveDonations.find((item) => item.uid === uid);
     return result;
   };
 
   return {
-    ViewReserveDonations,
-    addViewReserveDonations,
+    ...zustand,
     searchViewReserveDonations,
-    updateViewReserveDonations,
-    setImages,
   };
 };
