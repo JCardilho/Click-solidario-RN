@@ -7,7 +7,6 @@ import { Kanit_400Regular } from './../node_modules/@expo-google-fonts/kanit/ind
 import { Montserrat_400Regular } from './../node_modules/@expo-google-fonts/montserrat/index.d';
 import { FontsLoadProvider } from '~/utils/hooks/fontsLoad';
 
-
 export default function Layout() {
   const queryClient = new QueryClient();
 

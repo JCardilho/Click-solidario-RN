@@ -22,8 +22,18 @@ export const useCacheHook = () => {
     }
   };
 
+  const DeleteCache = async (key: string): Promise<void> => {
+    try {
+      await AsyncStorage.removeItem(key);
+    } catch (error: any) {
+      console.log('Erro ao deletar usuário no AsyncStorage');
+      throw new Error(error);
+    }
+  };
+
   return {
     setCache,
     getCache,
+    DeleteCache,
   };
 };

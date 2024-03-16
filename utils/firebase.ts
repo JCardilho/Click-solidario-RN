@@ -10,7 +10,7 @@ import { collection, getDocs, getFirestore, persistentLocalCache } from 'firebas
 // import {...} from "firebase/storage";
 
 // Initialize Firebase
-const firebaseConfig = {
+/* const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
   databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
@@ -19,6 +19,17 @@ const firebaseConfig = {
   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
+}; */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB2MnlM2Iwsyd3V8obVP2xF4Ti4dFzRAFI",
+  authDomain: "click-solidariov2.com",
+  databaseURL: "https://project-id.firebaseio.com",
+  projectId: "click-solidariov2",
+  storageBucket: "click-solidariov2.appspot.com",
+  messagingSenderId: "sender-id",
+  appId: "1:622298577976:android:d8e1009e351856cef5bacd",
+  measurementId: "G-measurement-id",
 };
 
 const firebase = initializeApp(firebaseConfig);

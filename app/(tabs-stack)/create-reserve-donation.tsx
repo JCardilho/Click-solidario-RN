@@ -134,12 +134,6 @@ export default function CreateDonationItems() {
   return (
     <>
       <ScrollView>
-        {/* <Stack.Screen
-          options={{
-            title: 'Disponibilizar um item à doação',
-            headerShown: false,
-          }}
-        /> */}
         <HeaderBack title="Disponibilizar um item à doação" />
         <View className="px-2 flex flex-col gap-4">
           <Controller

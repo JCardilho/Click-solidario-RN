@@ -11,6 +11,7 @@ import { useCacheHook } from '~/utils/hooks/cacheHook';
 import BackgroundImage from '~/assets/background/banner.jpg';
 import BackgroundLogo from '~/assets/icon/logo.png';
 import { Button } from '~/components/Button';
+import { Input } from '~/components/Input';
 
 const criarUserSchema = z.object({
   email: z
@@ -31,10 +32,10 @@ const criarUserSchema = z.object({
 
 type CreateUser = z.infer<typeof criarUserSchema>;
 
-export default function Page() {
+export default function LoginPage() {
   const router = useRouter();
   const { verifyUserAndSendUserFromHome, user, setUser } = useCurrentUserHook();
-  const { setCache, getCache } = useCacheHook();
+  const { setCache, getCache, DeleteCache } = useCacheHook();
 
   const { isPending, isError, mutate } = useMutation({
     mutationKey: ['loginUser'],
@@ -69,15 +70,16 @@ export default function Page() {
 
   useEffect(() => {
     if (!user) {
-      const teste = async () => {
+      /*    const teste = async () => {
         try {
+          await DeleteCache('user');
           if (await getCache('user')) return;
-          await setCache('user', null);
+          await DeleteCache('user');
         } catch (err) {
-          await setCache('user', null);
+          await DeleteCache('user');
         }
       };
-      teste();
+      teste();  */
 
       const verify = async () => {
         await verifyUserAndSendUserFromHome();
@@ -103,15 +105,14 @@ export default function Page() {
             <Text className="text-center text-6xl font-bold uppercase">ENTRAR</Text>
           </View>
           <View>
-            <Text className="text-lg">Digite seu email:</Text>
             <Controller
               control={control}
               name="email"
               render={({ field: { onChange, value } }) => (
-                <TextInput
+                <Input
                   placeholder="Email"
-                  className="text-lg border-2 border-blue-500 p-2 rounded-lg placeholder:text-2xl placeholder:text-black"
                   onChangeText={onChange}
+                  label="Digite seu email"
                   value={value}
                 />
               )}
@@ -119,15 +120,14 @@ export default function Page() {
             {errors.email && <Text>{errors.email?.message}</Text>}
           </View>
           <View>
-            <Text className="text-lg">Digite seu senha:</Text>
             <Controller
               control={control}
               name="senha"
               render={({ field: { onChange, value } }) => (
-                <TextInput
-                  placeholder="Senha"
-                  className="text-lg border-2 border-blue-500 p-2 rounded-lg placeholder:text-2xl placeholder:text-black"
+                <Input
+                  placeholder="senha"
                   onChangeText={onChange}
+                  label="Digite sua senha"
                   value={value}
                 />
               )}
@@ -135,15 +135,6 @@ export default function Page() {
             {errors.senha && <Text>{errors.senha?.message}</Text>}
           </View>
           {isError && <Text>Erro ao cadastrar</Text>}
-          {/* {isPending ? (
-            <Text>Carregando...</Text>
-          ) : (
-            <TouchableOpacity
-              className="w-full bg-blue-500 p-2  rounded-lg "
-              onPress={handleSubmit(() => mutate())}>
-              <Text className="text-center text-white text-2xl">Entrar</Text>
-            </TouchableOpacity>
-          )} */}
 
           <Button
             variant="default"
@@ -156,42 +147,28 @@ export default function Page() {
             }}>
             Entrar
           </Button>
-
-          <TouchableOpacity
-            className="w-full bg-blue-500 p-2  rounded-lg "
-            onPress={() => {
-              if (!user) {
-                const verify = async () => {
-                  await verifyUserAndSendUserFromHome();
-                };
-                verify();
-
-                /*  const verify = async () => {
-                    setCache('user', null);
-                  };
-                  verify(); */
-              }
-            }}>
-            <Text className="text-center text-white text-2xl">Verify</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="w-full bg-blue-500 p-2  rounded-lg "
+          <Button
+            variant="default"
             onPress={() => {
               setValue('email', 'Gustavo@gmail.com');
               setValue('senha', 'Gustavo1');
-            }}>
-            <Text className="text-center text-white text-2xl">Login with user</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="w-full bg-blue-500 p-2  rounded-lg "
+            }}
+            isLoading={isPending}>
+            <Text> Entrar com usuario</Text>
+          </Button>
+
+          <Button
+            variant="default"
             onPress={() => {
               setValue('email', 'admin@admin.com');
               setValue('senha', 'admin123');
-            }}>
-            <Text className="text-center text-white text-2xl">Login with admin</Text>
-          </TouchableOpacity>
+            }}
+            isLoading={isPending}>
+            <Text>Entrar com administrador</Text>
+          </Button>
+
           <View className="w-full h-[0.10px] bg-zinc-900 my-4"></View>
-          <View className="w-full flex items-center justify-center" gap-2>
+          <View className="w-full flex items-center justify-center gap-2">
             <Text>Não tem uma conta?</Text>
             <Link
               href={'/registrar'}

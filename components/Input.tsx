@@ -9,6 +9,7 @@ interface IProps {
   onChangeText?: (text: string) => void;
   message?: string;
   className?: string;
+  value?: string;
 }
 
 export const Input = (props: IProps) => {
@@ -16,6 +17,7 @@ export const Input = (props: IProps) => {
     <View className={`w-auto flex flex-col ${props.className}`}>
       <Text className="text-md font-kanit">{props.label}</Text>
       <TextInput
+        value={props.value}
         placeholder={props.placeholder}
         className={`
     border rounded-lg p-4 font-kanit
