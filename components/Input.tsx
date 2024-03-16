@@ -3,7 +3,7 @@ import { Text, TextInput, View } from 'react-native';
 interface IProps {
   isTextArea?: boolean;
   placeholder: string;
-  label: string;
+  label?: string;
   error?: string;
   isDisabled?: boolean;
   onChangeText?: (text: string) => void;
@@ -15,7 +15,7 @@ interface IProps {
 export const Input = (props: IProps) => {
   return (
     <View className={`w-auto flex flex-col ${props.className}`}>
-      <Text className="text-md font-kanit">{props.label}</Text>
+      {props.label && <Text className="text-md font-kanit">{props.label}</Text>}
       <TextInput
         value={props.value}
         placeholder={props.placeholder}

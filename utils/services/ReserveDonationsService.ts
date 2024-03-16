@@ -7,6 +7,8 @@ import {
   getDocs,
   getFirestore,
   setDoc,
+  query,
+  where,
 } from 'firebase/firestore';
 import { CreateReserveDonationDTO, IReserveDonation } from './DTO/reserve-donation.dto';
 import firebase from '../firebase';
@@ -246,6 +248,31 @@ const AddImages = async (uid: string, images: string): Promise<string | undefine
   }
 };
 
+const SearchReserveDonations = async (search: string): Promise<IReserveDonation[]> => {
+  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const q = query(ref, where('name', '==', search));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      uid: doc.id,
+      name: data.name,
+      description: data.description,
+      images: data.images,
+      ownerUid: data.ownerUid,
+      createdAt: data.created.toDate(),
+      ownerName: data.ownerName,
+      reserve: {
+        endDateOfLastReserve: data.reserve.endDateOfLastReserve
+          ? data.reserve.endDateOfLastReserve.toDate()
+          : undefined,
+        endOwnerNameOfLastReserve: data.reserve.endOwnerNameOfLastReserve,
+        endOwnerUidOfLastReserve: data.reserve.endOwnerUidOfLastReserve,
+      },
+    };
+  });
+};
+
 export const ReserveDonationsService = {
   CreateReserveDonation,
   GetAllReserveDonations,
@@ -258,4 +285,5 @@ export const ReserveDonationsService = {
   DeleteImage,
   DeleteImages,
   AddImages,
+  SearchReserveDonations,
 };

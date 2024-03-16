@@ -29,7 +29,7 @@ export default function TabLayout() {
         name="home"
         options={{
           tabBarIcon: ({ color }) => <FontAwesome size={35} name="home" color={color} />,
-          tabBarLabel: () => <Text className="font-kanit text-xl">Inicio</Text>,
+          tabBarLabel: () => <Text className="font-kanit text-lg text-center">Inicio</Text>,
         }}
       />
       <Tabs.Screen
@@ -39,8 +39,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="dropbox" color={color} />,
           tabBarLabel: () => (
             <View className="w-auto flex flex-col items-center justify-center">
-              <Text className="font-kanit text-xs text-center">Reservar</Text>
-              <Text className="font-kanit text-xs text-center">Disponibilizados</Text>
+              <Text className="font-kanit text-xs text-center">Reservar ou</Text>
+              <Text className="font-kanit text-xs text-center">Disponibilizar</Text>
             </View>
           ),
           headerShown: false,
@@ -55,7 +55,7 @@ export default function TabLayout() {
           ),
           tabBarLabel: () => (
             <View className="w-auto flex flex-col items-center justify-center">
-              <Text className="font-kanit text-xs text-center">Solicitar</Text>
+              <Text className="font-kanit text-xs text-center">Solicitar ou</Text>
               <Text className="font-kanit text-xs text-center">Doar</Text>
             </View>
           ),
@@ -67,7 +67,7 @@ export default function TabLayout() {
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
-          tabBarLabel: () => <Text className="font-kanit text-xl">Perfil</Text>,
+          tabBarLabel: () => <Text className="font-kanit text-lg text-center">Perfil</Text>,
           headerShown: false,
         }}
       />

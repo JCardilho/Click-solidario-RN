@@ -47,7 +47,9 @@ export const Card = (props: IProps) => {
         <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
         {!props.hidden?.ownerName && (
           <View className="w-full">
-            <Text className="text-md ">Proprietário da doação: {props.item.ownerName}</Text>
+            <Text className="text-md font-kanit">
+              Proprietário da doação: {props.item.ownerName}
+            </Text>
           </View>
         )}
         <Text className="text-md font-kanit">

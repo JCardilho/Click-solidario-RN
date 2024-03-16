@@ -6,11 +6,16 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Button } from '~/components/Button';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SelectImage } from '~/layouts/profile/select-image';
+import { useMutation } from '@tanstack/react-query';
+import { useCacheHook } from '~/utils/hooks/cacheHook';
+import { useRouter } from 'expo-router';
 
 export default function Profile() {
   const { user } = useCurrentUserHook();
   const [greeting, setGreeting] = useState('');
   const currentHour = new Date().getHours();
+  const { setCache } = useCacheHook();
+  const router = useRouter();
 
   useEffect(() => {
     if (currentHour >= 5 && currentHour < 12) {
@@ -23,6 +28,14 @@ export default function Profile() {
       setGreeting('Boa madrugada');
     }
   }, []);
+
+  const { isPending, mutate: LogOut } = useMutation({
+    mutationKey: ['log-out'],
+    mutationFn: async () => {
+      await setCache('user', null);
+      router.push('/');
+    },
+  });
 
   return (
     user && (
@@ -68,7 +81,9 @@ export default function Profile() {
             color: 'white',
             size: 15,
           }}
-          variant="destructive">
+          variant="destructive"
+          isLoading={isPending}
+          onPress={() => LogOut()}>
           Sair
         </Button>
       </View>

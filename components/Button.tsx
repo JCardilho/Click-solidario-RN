@@ -14,9 +14,9 @@ interface Icon {
 
 interface IProps {
   icon?: Icon;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   onPress?: () => void;
-  variant: Variants;
+  variant?: Variants;
   className?: string;
   isLoading?: boolean;
   loaderColor?: string;
@@ -27,7 +27,7 @@ interface IProps {
 type Variants = 'default' | 'destructive' | 'primary' | 'ghost' | 'success' | 'borded';
 
 export const Button = (props: IProps) => {
-  const createClassnameForTouchableOpacity = (variant: Variants) => {
+  const createClassnameForTouchableOpacity = (variant?: Variants) => {
     const styleDefault = ` flex flex-row gap-4 items-center  p-4 rounded-lg  border-2`;
     switch (variant) {
       case 'destructive':
@@ -66,12 +66,14 @@ export const Button = (props: IProps) => {
         {props.icon && props.isLoading && (
           <ActivityIndicator size="small" color={props.loaderColor ? props.loaderColor : '#fff'} />
         )}
-        <Text
-          className={`
+        {props.children && (
+          <Text
+            className={`
           font-kanit ${props.variant == 'ghost' || props.variant == 'borded' ? 'text-black' : 'text-white'}
         `}>
-          {props.children}
-        </Text>
+            {props.children}
+          </Text>
+        )}
       </TouchableOpacity>
     </>
   );

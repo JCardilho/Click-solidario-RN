@@ -1,7 +1,7 @@
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -24,30 +24,21 @@ import { DefaultInformationsForReserveDonationsPage } from '~/layouts/reserve-do
 import { Input } from '~/components/Input';
 import { Card } from '~/components/Card';
 import { useFocusEffect } from '@react-navigation/native';
-
-export function useRefreshOnFocus<T>(refetch: () => Promise<T>) {
-  const firstTimeRef = useRef(true);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (firstTimeRef.current) {
-        firstTimeRef.current = false;
-        return;
-      }
-
-      refetch();
-    }, [refetch])
-  );
-}
+import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 
 export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
   const router = useRouter();
   const { getCache, setCache } = useCacheHook();
+  const [search, setSearch] = useState('');
 
   const { data, isLoading, refetch, isRefetching } = useQuery<IReserveDonation[]>({
     queryKey: ['request-donations'],
     queryFn: async () => {
+      if (search && search.length > 2) {
+        const result = await ReserveDonationsService.SearchReserveDonations(search);
+        return result;
+      }
       const result = await ReserveDonationsService.GetAllReserveDonations();
       return result;
     },
@@ -67,7 +58,7 @@ export default function ReserveDonations() {
           <FontAwesome name="dropbox" size={50} />
           {/*  <Image source={Logo} className="w-20 h-20 rounded-full" alt="background-image" /> */}
 
-          <Text className="text-4xl font-kanit text-center">Reservar / Disponibilizar doação</Text>
+          <Text className="text-2xl font-kanit text-center">Reservar / Disponibilizar doação</Text>
         </View>
 
         <DefaultInformationsForReserveDonationsPage />
@@ -96,13 +87,25 @@ export default function ReserveDonations() {
         </Button>
 
         <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
-        <Text className="text-4xl font-kanit my-6">Itens disponibilizados:</Text>
+        <Text className="text-2xl text-center font-kanit my-6">Itens disponibilizados:</Text>
 
-        <View className="w-full flex flex-row gap-1">
-          <Input label="" placeholder="Pesquisar" className="w-[85%]" />
-          <Button variant="default" className="mt-6 px-5">
-            <FontAwesome name="search" size={15} color="white" />
-          </Button>
+        <View className="w-full flex flex-row gap-1 items-center justify-center">
+          <Input
+            placeholder="Pesquisar"
+            className="w-[85%]"
+            onChangeText={(text) => setSearch(text)}
+            value={search}
+          />
+          <Button
+            variant="default"
+            className="h-full px-7"
+            onPress={() => refetch()}
+            isLoading={isRefetching}
+            icon={{
+              name: 'search',
+              color: 'white',
+              size: 15,
+            }}></Button>
         </View>
 
         {isLoading && (

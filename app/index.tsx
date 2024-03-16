@@ -1,6 +1,6 @@
 import { Stack, Link, useRouter } from 'expo-router';
 import { Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { z } from 'zod';
 import { UserService } from '~/utils/services/UserService';
@@ -12,6 +12,7 @@ import BackgroundImage from '~/assets/background/banner.jpg';
 import BackgroundLogo from '~/assets/icon/logo.png';
 import { Button } from '~/components/Button';
 import { Input } from '~/components/Input';
+import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 
 const criarUserSchema = z.object({
   email: z
@@ -68,25 +69,38 @@ export default function LoginPage() {
     resolver: zodResolver(criarUserSchema),
   });
 
+  const { refetch: verifyUser } = useQuery({
+    queryKey: ['verify-user-funcction'],
+    queryFn: async () => {
+      /*    const teste = async () => {
+          try {
+            await DeleteCache('user');
+            if (await getCache('user')) return;
+            await DeleteCache('user');
+          } catch (err) {
+            await DeleteCache('user');
+          }
+        };
+        teste();  */
+      const verify = async () => {
+        await verifyUserAndSendUserFromHome();
+      };
+      verify();
+      return 'OK';
+    },
+    enabled: false,
+  });
+
   useEffect(() => {
     if (!user) {
-      /*    const teste = async () => {
-        try {
-          await DeleteCache('user');
-          if (await getCache('user')) return;
-          await DeleteCache('user');
-        } catch (err) {
-          await DeleteCache('user');
-        }
-      };
-      teste();  */
-
       const verify = async () => {
         await verifyUserAndSendUserFromHome();
       };
       verify();
     }
   }, [user]);
+
+  useRefreshOnFocus(verifyUser);
 
   return (
     <View className={styles.container}>
