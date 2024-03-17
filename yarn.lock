@@ -7808,6 +7808,11 @@ react-native-gesture-handler@~2.14.0:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
+react-native-pager-view@6.2.3:
+  version "6.2.3"
+  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.2.3.tgz#698f6387fdf06cecc3d8d4792604419cb89cb775"
+  integrity sha512-dqVpXWFtPNfD3D2QQQr8BP+ullS5MhjRJuF8Z/qml4QTILcrWaW8F5iAxKkQR3Jl0ikcEryG/+SQlNcwlo0Ggg==
+
 react-native-picker-select@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/react-native-picker-select/-/react-native-picker-select-9.0.1.tgz#af454433061a18b7307a725fc045c05ad494e300"
