@@ -14,6 +14,7 @@ export default function Layout() {
     <QueryClientProvider client={queryClient}>
       <FontsLoadProvider>
         <Stack>
+          <Stack.Screen name="registrar" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs-stack)" options={{ headerShown: false }} />
         </Stack>

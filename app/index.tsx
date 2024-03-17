@@ -128,10 +128,11 @@ export default function LoginPage() {
                   onChangeText={onChange}
                   label="Digite seu email"
                   value={value}
+                  error={errors.email?.message}
                 />
               )}
             />
-            {errors.email && <Text>{errors.email?.message}</Text>}
+        
           </View>
           <View>
             <Controller
@@ -143,10 +144,11 @@ export default function LoginPage() {
                   onChangeText={onChange}
                   label="Digite sua senha"
                   value={value}
+                  error={errors.senha?.message}
                 />
               )}
             />
-            {errors.senha && <Text>{errors.senha?.message}</Text>}
+          
           </View>
           {isError && <Text>Erro ao cadastrar</Text>}
 

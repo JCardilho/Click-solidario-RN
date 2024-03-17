@@ -13,11 +13,10 @@ import { UserService } from '~/utils/services/UserService';
 export const SelectImage = () => {
   const { user, addImageToUserAndSetCache } = useCurrentUserHook();
   const [uploading, setUploading] = useState<string>();
-  
 
   const pickImage = async () => {
     const result = await launchImageLibraryAsync({
-      mediaTypes: MediaTypeOptions.All,
+      mediaTypes: MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -29,7 +28,7 @@ export const SelectImage = () => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationKey: ['uploadImage', format(Date.now(), 'yyyy-MM-dd HH:mm:ss')],
+    mutationKey: ['upload-image-for-profile'],
     mutationFn: async () => {
       if (!uploading) return;
       try {
@@ -61,19 +60,33 @@ export const SelectImage = () => {
 
   return (
     <>
-      {user?.image && !uploading && (
-        <TouchableOpacity className="w-full flex items-center justify-center" onPress={pickImage}>
-          <Image source={{ uri: user.image }} className="w-40 h-40 rounded-full" alt="user-image" />
-        </TouchableOpacity>
-      )}
-
-      {uploading && (
+      {uploading ? (
         <TouchableOpacity className="w-full flex items-center justify-center" onPress={pickImage}>
           <Image source={{ uri: uploading }} className="w-40 h-40 rounded-full" alt="user-image" />
+          <Text className="text-center font-kanit text-lg">
+                Clique no icone acima para adicionar uma imagem!!
+              </Text>
         </TouchableOpacity>
+      ) : (
+        <>
+          {user?.image && user?.image.length > 10 && !uploading && (
+            <TouchableOpacity
+              className="w-full flex items-center justify-center"
+              onPress={pickImage}>
+              <Image
+                source={{ uri: user.image }}
+                className="w-40 h-40 rounded-full"
+                alt="user-image"
+              />
+               <Text className="text-center font-kanit text-lg">
+                Clique no icone acima para adicionar uma imagem!!
+              </Text>
+            </TouchableOpacity>
+          )}
+        </>
       )}
 
-      {!user?.image && (
+      {!user?.image && !uploading && (
         <View className="w-full flex items-center justify-center gap-2">
           {!uploading && (
             <>
@@ -87,15 +100,6 @@ export const SelectImage = () => {
               </Text>
             </>
           )}
-
-          {uploading && (
-            <>
-              <Image
-                source={{ uri: uploading }}
-                className="p-2 bg-zinc-200 rounded-full w-[130px] h-[130px] flex items-center justify-center"
-              />
-            </>
-          )}
         </View>
       )}
 
@@ -103,7 +107,7 @@ export const SelectImage = () => {
         <>
           <Button
             variant="default"
-            onPress={mutate}
+            onPress={() => mutate()}
             isLoading={isPending}
             icon={{
               name: 'upload',

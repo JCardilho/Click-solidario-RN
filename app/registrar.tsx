@@ -1,5 +1,5 @@
 import { Link, Stack, useRouter } from 'expo-router';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useMutation } from '@tanstack/react-query';
 import { UserService } from '~/utils/services/UserService';
 import { z } from 'zod';
@@ -8,6 +8,9 @@ import { zodResolver } from './../node_modules/@hookform/resolvers/zod/src/zod';
 import { useState } from 'react';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import RNPickerSelect from 'react-native-picker-select';
+import { HeaderBack } from '~/components/HeaderBack';
+import { Input } from '~/components/Input';
+import { Button } from '~/components/Button';
 
 const criarUserSchema = z
   .object({
@@ -28,18 +31,21 @@ const criarUserSchema = z
     cpf: z.string().optional(),
     name: z.string().optional(),
     isReceptor: z.boolean(),
-    pix: z.object({
-      key: z.string({
-        required_error: 'Chave pix é obrigatória',
-      }),
-      type: z.string({
-        required_error: 'Tipo de chave pix é obrigatória',
-      }),
-    }),
+    pix: z
+      .object({
+        key: z.string().optional(),
+        type_pix: z.string().optional(),
+      })
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.isReceptor) {
-      if (data.cpf) return;
+      if (!data.cpf)
+        ctx.addIssue({
+          message: 'CPF é obrigatório',
+          path: ['cpf'],
+          code: z.ZodIssueCode.custom,
+        });
 
       if (!data.name)
         ctx.addIssue({
@@ -47,6 +53,7 @@ const criarUserSchema = z
           path: ['name'],
           code: z.ZodIssueCode.custom,
         });
+
       if (
         (data.name && data.name.split(' ').length < 2) ||
         (data.name &&
@@ -56,6 +63,13 @@ const criarUserSchema = z
         ctx.addIssue({
           message: 'Nome completo é obrigatório',
           path: ['name'],
+          code: z.ZodIssueCode.custom,
+        });
+
+      if (data.pix && data.pix.key && (!data.pix.type_pix || data.pix.type_pix.length < 3))
+        ctx.addIssue({
+          message: 'Tipo de chave pix é obrigatório',
+          path: ['pix.type_pix'],
           code: z.ZodIssueCode.custom,
         });
 
@@ -92,8 +106,8 @@ export default function Registrar() {
         cpf: getValues('cpf'),
         name: getValues('name'),
         pix: {
-          key: getValues('pix.key'),
-          type: getValues('pix.type'),
+          key: getValues('pix.key') || '',
+          type: getValues('pix.type_pix') || '',
         },
       });
       return resposta;
@@ -109,7 +123,8 @@ export default function Registrar() {
       setValue('cpf', '');
       setValue('name', '');
       setValue('pix.key', '');
-      setValue('pix.type', '');
+      setValue('pix.type_pix', '');
+      setValue('isReceptor', false);
       router.push('/');
     },
   });
@@ -123,162 +138,180 @@ export default function Registrar() {
     watch,
   } = useForm<CreateUser>({
     resolver: zodResolver(criarUserSchema),
+
+    reValidateMode: 'onChange',
   });
 
   return (
-    <View className={styles.container}>
-      <Stack.Screen
-        options={{
-          title: 'Registrar',
-          headerShown: true,
-        }}
-      />
-      <View className={styles.main}>
-        <View className="w-auto flex flex-col gap-4">
-          <View>
-            <Text className="text-lg">Digite seu email:</Text>
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  placeholder="Email"
-                  className="text-lg border-2 border-blue-500 p-2 rounded-lg placeholder:text-2xl placeholder:text-black"
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
+    <>
+      <HeaderBack title="Criar conta" />
+      <ScrollView className={styles.container}>
+        <View className={styles.main}>
+          <View className="w-auto flex flex-col gap-4">
+            <View>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Email"
+                    label="Digite seu email:"
+                    onChangeText={onChange}
+                    value={value}
+                    error={errors.email?.message}
+                  />
+                )}
+              />
+            </View>
+            <View>
+              <Controller
+                control={control}
+                name="senha"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="Senha"
+                    label="Digite sua senha:"
+                    onChangeText={onChange}
+                    value={value}
+                    error={errors.senha?.message}
+                  />
+                )}
+              />
+            </View>
+
+            <BouncyCheckbox
+              className="text-lg bg-zinc-100 p-5 rounded-lg border border-primary"
+              text="Selecione se você deseja receber doações!!"
+              fillColor="##3b82f6"
+              unfillColor="#FFFFFF"
+              iconStyle={{ borderColor: 'blue' }}
+              onPress={(isChecked: boolean) => setValue('isReceptor', isChecked)}
             />
-            {errors.email && <Text>{errors.email?.message}</Text>}
-          </View>
-          <View>
-            <Text className="text-lg">Digite seu senha:</Text>
-            <Controller
-              control={control}
-              name="senha"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  placeholder="Senha"
-                  className="text-lg border-2 border-blue-500 p-2 rounded-lg placeholder:text-2xl placeholder:text-black"
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-            />
-            {errors.senha && <Text>{errors.senha?.message}</Text>}
-          </View>
 
-          <BouncyCheckbox
-            className="text-lg"
-            text="Recetor"
-            fillColor="blue"
-            unfillColor="#FFFFFF"
-            iconStyle={{ borderColor: 'blue' }}
-            onPress={(isChecked: boolean) => setValue('isReceptor', isChecked)}
-          />
+            {watch('isReceptor') && (
+              <>
+                <View>
+                  <Controller
+                    control={control}
+                    name="name"
+                    render={({ field: { onChange, value } }) => (
+                      <Input
+                        placeholder="Nome"
+                        label="Digite seu nome:"
+                        onChangeText={onChange}
+                        value={value}
+                        error={errors.name?.message}
+                      />
+                    )}
+                  />
+                </View>
+                <View>
+                  <Controller
+                    control={control}
+                    name="cpf"
+                    render={({ field: { onChange, value } }) => (
+                      <Input
+                        placeholder="CPF"
+                        label="Digite seu CPF:"
+                        onChangeText={onChange}
+                        value={value}
+                        error={errors.cpf?.message}
+                      />
+                    )}
+                  />
+                </View>
+                <View>
+                  <Controller
+                    control={control}
+                    name="pix"
+                    render={({ field: { onChange, value } }) => (
+                      <Input
+                        placeholder="Pix"
+                        label="Digite sua chave pix: ( * opcional )"
+                        error={errors.pix?.key?.message}
+                        onChangeText={(text) => {
+                          onChange(text);
+                          setValue('pix.key', text);
+                        }}
+                        message="Utilize a chave pix caso queira receber doações em espécie"
+                      />
+                    )}
+                  />
+                </View>
+                <View>
+                  {watch('pix') && watch('pix.key') && (
+                    <>
+                      <Controller
+                        control={control}
+                        name="pix"
+                        render={({ field: { value } }) => (
+                          <RNPickerSelect
+                            key={`select-type-pix`}
+                            style={{
+                              viewContainer: {
+                                backgroundColor: '#fff',
+                                borderRadius: 10,
+                                borderWidth: 1,
+                                borderColor: errors.pix?.type_pix ? 'red' : '#000',
+                              },
+                              placeholder: {
+                                textAlign: 'center',
+                                color: '#000',
+                              },
+                              modalViewMiddle: {
+                                borderRadius: 10,
+                              },
+                            }}
+                            onValueChange={(value) => setValue('pix.type_pix', value)}
+                            items={[
+                              {
+                                label: 'Telefone',
+                                value: 'telephone',
+                                key: 'select-type-pix-telephone',
+                              },
+                              { label: 'CPF', value: 'cpf', key: 'select-type-pix-cpf' },
+                              {
+                                label: 'Chave Aleatoria',
+                                value: 'aleatory-key',
+                                key: 'select-type-pix-aleatory-key',
+                              },
+                              { label: 'Email', value: 'email', key: 'select-type-pix-email' },
+                            ]}
+                            placeholder={{
+                              label: 'Selecione o tipo de chave pix',
+                              value: null,
+                            }}
+                          />
+                        )}
+                      />
+                      {errors.pix?.type_pix && (
+                        <Text className="text-md text-red-500">
+                          * {errors.pix?.type_pix?.message}
+                        </Text>
+                      )}
+                    </>
+                  )}
+                </View>
+              </>
+            )}
 
-          {watch('isReceptor') && (
-            <>
-              <View>
-                <Text className="text-lg">Digite seu nome:</Text>
-                <Controller
-                  control={control}
-                  name="name"
-                  render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      placeholder="Nome"
-                      className="text-lg border-2 border-blue-500 p-2 rounded-lg placeholder:text-2xl placeholder:text-black"
-                      onChangeText={onChange}
-                      value={value}
-                    />
-                  )}
-                />
-                {errors.name && <Text>{errors.name?.message}</Text>}
-              </View>
-              <View>
-                <Text className="text-lg">Digite seu CPF:</Text>
-                <Controller
-                  control={control}
-                  name="cpf"
-                  render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      placeholder="CPF"
-                      className="text-lg border-2 border-blue-500 p-2 rounded-lg placeholder:text-2xl placeholder:text-black"
-                      onChangeText={onChange}
-                      value={value}
-                    />
-                  )}
-                />
-                {errors.cpf && <Text>{errors.cpf?.message}</Text>}
-              </View>
-              <View>
-                <Text className="text-lg">Digite sua chave pix:</Text>
-
-                <Controller
-                  control={control}
-                  name="pix"
-                  render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      placeholder="Pix"
-                      className="text-lg border-2 border-blue-500 p-2 rounded-lg placeholder:text-2xl placeholder:text-black"
-                      onChangeText={(text) => {
-                        onChange(text);
-                        setValue('pix.key', text);
-                      }}
-                    />
-                  )}
-                />
-                {errors.pix && <Text>{errors.pix?.message}</Text>}
-                <Text className="text-md text-red-500 font-medium">
-                  Utilize a chave pix caso queira receber doações em espécie
-                </Text>
-              </View>
-              <View>
-                <Controller
-                  control={control}
-                  name="pix"
-                  render={({ field: { value } }) => (
-                    <RNPickerSelect
-                      key={`select-type-pix`}
-                      onValueChange={(value) => setValue('pix.type', value)}
-                      items={[
-                        { label: 'Telefone', value: 'telephone', key: 'select-type-pix-telephone' },
-                        { label: 'CPF', value: 'cpf', key: 'select-type-pix-cpf' },
-                        {
-                          label: 'Chave Aleatoria',
-                          value: 'aleatory-key',
-                          key: 'select-type-pix-aleatory-key',
-                        },
-                        { label: 'Email', value: 'email', key: 'select-type-pix-email' },
-                      ]}
-                      placeholder={{
-                        label: 'Selecione o tipo de chave pix',
-                        value: null,
-                      }}
-                    />
-                  )}
-                />
-              </View>
-            </>
-          )}
-
-          {isError && <Text>Erro ao cadastrar</Text>}
-          {isPending ? (
-            <Text>Carregando...</Text>
-          ) : (
-            <TouchableOpacity
+            <Button
               className="w-full bg-blue-500 p-2  rounded-lg "
-              onPress={handleSubmit(() => mutate())}>
-              <Text className="text-center text-white text-2xl">Registrar</Text>
-            </TouchableOpacity>
-          )}
-
-          <Link href={'/'} className="w-full  p-2  rounded-lg ">
-            <Text className="text-center  text-2xl">Voltar</Text>
-          </Link>
+              onPress={handleSubmit(() => mutate())}
+              icon={{
+                name: 'arrow-right',
+                size: 20,
+                color: '#fff',
+              }}
+              isLoading={isPending}>
+              Registrar
+            </Button>
+          </View>
         </View>
-      </View>
-    </View>
+
+        <View className="h-[250px] w-full"></View>
+      </ScrollView>
+    </>
   );
 }
 

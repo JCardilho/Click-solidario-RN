@@ -17,10 +17,7 @@ export default function TabLayout() {
           marginBottom: 10,
         },
         tabBarItemStyle: {
-          borderRightWidth: 1,
-          borderRightColor: '#8f8f8f50',
-          borderLeftWidth: 1,
-          borderLeftColor: '#8f8f8f50',
+         
           borderRadius: 10,
           padding: 4,
         },
@@ -29,7 +26,7 @@ export default function TabLayout() {
         name="home"
         options={{
           tabBarIcon: ({ color }) => <FontAwesome size={35} name="home" color={color} />,
-          tabBarLabel: () => <Text className="font-kanit text-lg text-center">Inicio</Text>,
+          tabBarLabel: () => <Text className="font-kanit text-md text-center">Inicio</Text>,
         }}
       />
       <Tabs.Screen
@@ -67,7 +64,7 @@ export default function TabLayout() {
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
-          tabBarLabel: () => <Text className="font-kanit text-lg text-center">Perfil</Text>,
+          tabBarLabel: () => <Text className="font-kanit text-md text-center">Perfil</Text>,
           headerShown: false,
         }}
       />

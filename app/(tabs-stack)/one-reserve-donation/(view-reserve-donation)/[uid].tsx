@@ -111,6 +111,15 @@ export default function ViewOneReserveDonation() {
 
               {user?.uid !== data.ownerUid && (
                 <>
+                  <ReserveAction uid={uid} refetch={refetch} data={data} />
+                </>
+              )}
+
+              {data.reserve &&
+                user &&
+                data.reserve.endOwnerUidOfLastReserve &&
+                data.reserve.endOwnerUidOfLastReserve === user.uid &&
+                data.reserve.endOwnerNameOfLastReserve === user.name && (
                   <Button
                     variant="default"
                     icon={{
@@ -120,9 +129,8 @@ export default function ViewOneReserveDonation() {
                     }}>
                     Entrar em contato
                   </Button>
-                  <ReserveAction uid={uid} refetch={refetch} data={data} />
-                </>
-              )}
+                )}
+
               <CancelReserve uid={uid} refetch={refetch} data={data} />
             </View>
           </>

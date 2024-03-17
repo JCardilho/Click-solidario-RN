@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Button } from '~/components/Button';
 import { useLoaderHook } from '~/components/Loader';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
+import { useReserveDonations } from '~/utils/hooks/screens/view-reserve-donation/view-reserve-donation';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
 
@@ -18,6 +19,7 @@ export const CancelReserve = ({ uid, refetch, data }: IProps) => {
     mutation: { startLoadingForUseMutation },
     stopLoadingForReactQuerySuccess,
   } = useLoaderHook();
+  const { setReserve } = useReserveDonations();
 
   const { mutate: mutateCancelReserve, isPending: isPendinCancelReserve } = useMutation({
     mutationKey: ['cacel-reserve', uid],
@@ -26,6 +28,14 @@ export const CancelReserve = ({ uid, refetch, data }: IProps) => {
       if (!user || !user.uid || !uid) throw new Error('Usuário não encontrado');
       const uidFormatted = Array.isArray(uid) ? uid[0] : uid;
       const result = await ReserveDonationsService.RemoveReserveAction(uidFormatted);
+      setReserve(
+        {
+          endDateOfLastReserve: undefined,
+          endOwnerNameOfLastReserve: undefined,
+          endOwnerUidOfLastReserve: undefined,
+        },
+        uidFormatted
+      );
       await refetch();
       return result;
     },

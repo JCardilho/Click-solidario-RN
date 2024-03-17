@@ -89,7 +89,7 @@ export default function ReserveDonations() {
         <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
         <Text className="text-2xl text-center font-kanit my-6">Itens disponibilizados:</Text>
 
-        <View className="w-full flex flex-row gap-1 items-center justify-center">
+        <View className="w-full flex flex-row gap-1 ">
           <Input
             placeholder="Pesquisar"
             className="w-[85%]"
@@ -98,13 +98,13 @@ export default function ReserveDonations() {
           />
           <Button
             variant="default"
-            className="h-full px-7"
+            className="h-full px-6"
             onPress={() => refetch()}
             isLoading={isRefetching}
             icon={{
               name: 'search',
               color: 'white',
-              size: 15,
+              size: 16,
             }}></Button>
         </View>
 
