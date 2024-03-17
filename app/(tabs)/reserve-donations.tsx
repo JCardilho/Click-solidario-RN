@@ -19,7 +19,7 @@ import Logo from '~/assets/icon/logo.png';
 import { useQuery } from '@tanstack/react-query';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
-import { addMilliseconds, format } from 'date-fns';
+import { addMilliseconds, format, set } from 'date-fns';
 import { DefaultInformationsForReserveDonationsPage } from '~/layouts/reserve-donations/default-informations';
 import { Input } from '~/components/Input';
 import { Card } from '~/components/Card';
@@ -33,6 +33,10 @@ export default function ReserveDonations() {
   const { getCache, setCache } = useCacheHook();
   const [search, setSearch] = useState('');
   const { user } = useCurrentUserHook();
+  const [endAt, setEndAt] = useState<number>(5);
+  const [endCount, setEndCount] = useState<number>(0);
+  const [disableLoadMore, setDisableLoadMore] = useState<boolean>(false);
+  const scrollRef = useRef<ScrollView>(null);
 
   const { data, isLoading, refetch, isRefetching } = useQuery<{
     userReserveCount: number;
@@ -45,16 +49,32 @@ export default function ReserveDonations() {
           userReserveCount: 0,
           donations: [],
         };
-      if (search && search.length > 2) {
-        const result = await ReserveDonationsService.SearchReserveDonations(search);
-        return {
-          userReserveCount: 0,
-          donations: result,
-        };
-      }
+
       try {
-        const result = await ReserveDonationsService.GetAllReserveDonations(user?.uid);
-        console.log('result', result);
+        if (search && search.length > 2) {
+          const result = await ReserveDonationsService.SearchReserveDonations(
+            search,
+            user?.uid,
+            0,
+            1000
+          );
+          setDisableLoadMore(true);
+          setEndCount(0);
+          setEndAt(5);
+          return {
+            userReserveCount: result.userReserveCount,
+            donations: result.donations,
+          };
+        }
+        const result = await ReserveDonationsService.GetAllReserveDonations(user?.uid, 0, endAt);
+        if (result.donations.length != endCount) {
+          setEndCount(result.donations.length);
+        }
+        if (result.donations.length === endCount) {
+          setDisableLoadMore(true);
+        } else {
+          setDisableLoadMore(false);
+        }
         return result;
       } catch (err) {
         console.log('err', err);
@@ -68,10 +88,17 @@ export default function ReserveDonations() {
 
   useRefreshOnFocus(refetch);
 
+  useEffect(() => {
+    if (endAt && endAt != 5) {
+      refetch();
+    }
+  }, [endAt]);
+
   return (
     <>
       <SafeAreaView />
       <ScrollView
+        ref={scrollRef}
         className="w-full p-4 flex flex-col gap-4"
         style={{
           gap: 4,
@@ -147,7 +174,7 @@ export default function ReserveDonations() {
         </View>
 
         {isLoading && (
-          <View className="w-full flex items-center justify-center">
+          <View className="w-full flex items-center justify-center my-6">
             <ActivityIndicator size="large" color={'#023E8A'} />
           </View>
         )}
@@ -178,6 +205,44 @@ export default function ReserveDonations() {
               }
             />
           ))}
+
+        {!isLoading && data && data.donations.length !== 0 && !disableLoadMore && (
+          <View className="w-full flex items-center justify-center">
+            <Button
+              className="mt-4"
+              isLoading={isRefetching}
+              icon={{
+                name: 'plus',
+                color: 'white',
+                size: 15,
+              }}
+              onPress={() => {
+                setEndAt(endAt + 5);
+              }}>
+              Carregar mais
+            </Button>
+          </View>
+        )}
+
+        {disableLoadMore && (
+          <View className="w-full flex flex-col gap-4 items-center justify-center">
+            <Text className="text-center text-red-500 my-4 font-kanit">
+              Não há mais itens disponíveis para carregar
+            </Text>
+            <Button
+              variant="ghost"
+              icon={{
+                name: 'arrow-up',
+                color: 'black',
+                size: 15,
+              }}
+              onPress={() => {
+                scrollRef.current?.scrollTo({ y: 0, animated: true });
+              }}>
+              Subir
+            </Button>
+          </View>
+        )}
 
         <View className="my-12"></View>
       </ScrollView>

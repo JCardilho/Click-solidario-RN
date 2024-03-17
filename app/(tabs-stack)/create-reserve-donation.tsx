@@ -146,6 +146,7 @@ export default function CreateDonationItems() {
                   label="Nome do item: "
                   onChangeText={field.onChange}
                   error={error?.message}
+                  value={field.value}
                 />
               </>
             )}
@@ -162,6 +163,7 @@ export default function CreateDonationItems() {
                   onChangeText={field.onChange}
                   isTextArea={true}
                   error={error?.message}
+                  value={field.value}
                 />
               </>
             )}
@@ -209,7 +211,19 @@ export default function CreateDonationItems() {
               </View>
             ))}
         </View>
+
+        <Button
+          onPress={() => {
+            setValue('name', `${Math.random() * 1000}`);
+            setValue(
+              'description',
+              `      Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit odio, placeat temporibus mollitia reprehenderit modi consectetur, officiis, aliquam voluptatum saepe hic rem ratione minima expedita ullam. Deserunt facilis nihil voluptate. ${Math.random() * 1000}`
+            );
+          }}>
+          Random
+        </Button>
       </ScrollView>
+
       <View className="absolute bottom-4 full items-center justify-center px-2">
         <Button
           variant="success"

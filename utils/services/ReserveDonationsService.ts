@@ -11,6 +11,9 @@ import {
   where,
   or,
   and,
+  limit,
+  startAt,
+  orderBy,
 } from 'firebase/firestore';
 import { CreateReserveDonationDTO, IReserveDonation } from './DTO/reserve-donation.dto';
 import firebase from '../firebase';
@@ -50,7 +53,9 @@ const CreateReserveDonation = async (
 };
 
 const GetAllReserveDonations = async (
-  uid: string
+  uid: string,
+  startAtParam: number,
+  endAtParam: number
 ): Promise<{
   userReserveCount: number;
   donations: IReserveDonation[];
@@ -61,7 +66,10 @@ const GetAllReserveDonations = async (
     or(
       where('reserve.endDateOfLastReserve', '==', null),
       where('reserve.endDateOfLastReserve', '<', new Date())
-    )
+    ),
+    orderBy('reserve.endDateOfLastReserve', 'desc'),
+    startAt(startAtParam),
+    limit(endAtParam)
   );
   const snapshot = await getDocs(query1);
 
@@ -271,29 +279,58 @@ const AddImages = async (uid: string, images: string): Promise<string | undefine
   }
 };
 
-const SearchReserveDonations = async (search: string): Promise<IReserveDonation[]> => {
+const SearchReserveDonations = async (
+  search: string,
+  uid: string,
+  startAtParam: number,
+  endAtParam: number
+): Promise<{
+  userReserveCount: number;
+  donations: IReserveDonation[];
+}> => {
   const ref = collection(getFirestore(firebase), 'reserve-donations');
-  const q = query(ref, where('name', '==', search));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      uid: doc.id,
-      name: data.name,
-      description: data.description,
-      images: data.images,
-      ownerUid: data.ownerUid,
-      createdAt: data.created.toDate(),
-      ownerName: data.ownerName,
-      reserve: {
-        endDateOfLastReserve: data.reserve.endDateOfLastReserve
-          ? data.reserve.endDateOfLastReserve.toDate()
-          : undefined,
-        endOwnerNameOfLastReserve: data.reserve.endOwnerNameOfLastReserve,
-        endOwnerUidOfLastReserve: data.reserve.endOwnerUidOfLastReserve,
-      },
-    };
-  });
+  const q = query(
+    ref,
+
+    or(
+      where('reserve.endDateOfLastReserve', '==', null),
+      where('reserve.endDateOfLastReserve', '<', new Date())
+    ),
+
+    orderBy('reserve.endDateOfLastReserve', 'desc'),
+    startAt(startAtParam),
+    limit(endAtParam)
+  );
+  const snapshot = await getDocs(q);
+
+  const queryYourReserves = query(ref, where('reserve.endOwnerUidOfLastReserve', '==', uid));
+  const snapshotYourReserves = await getDocs(queryYourReserves);
+
+  return {
+    userReserveCount: snapshotYourReserves.docs.length,
+    donations: snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
+        return {
+          uid: doc.id,
+          name: data.name,
+          description: data.description,
+          images: data.images,
+          ownerUid: data.ownerUid,
+          createdAt: data.created.toDate(),
+          ownerName: data.ownerName,
+          reserve: {
+            endDateOfLastReserve: data.reserve.endDateOfLastReserve
+              ? data.reserve.endDateOfLastReserve.toDate()
+              : undefined,
+            endOwnerNameOfLastReserve: data.reserve.endOwnerNameOfLastReserve,
+            endOwnerUidOfLastReserve: data.reserve.endOwnerUidOfLastReserve,
+          },
+        };
+      })
+      .filter((data) => data.ownerUid !== uid)
+      .filter((data) => data.name.includes(search) || data.description.includes(search)),
+  };
 };
 
 const GetMyReserves = async (uid: string): Promise<IReserveDonation[]> => {
