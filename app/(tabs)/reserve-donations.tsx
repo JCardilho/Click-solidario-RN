@@ -25,22 +25,44 @@ import { Input } from '~/components/Input';
 import { Card } from '~/components/Card';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
+import { useCurrentUserHook } from './../../utils/hooks/currentUser';
 
 export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
   const router = useRouter();
   const { getCache, setCache } = useCacheHook();
   const [search, setSearch] = useState('');
+  const { user } = useCurrentUserHook();
 
-  const { data, isLoading, refetch, isRefetching } = useQuery<IReserveDonation[]>({
-    queryKey: ['request-donations'],
+  const { data, isLoading, refetch, isRefetching } = useQuery<{
+    userReserveCount: number;
+    donations: IReserveDonation[];
+  }>({
+    queryKey: ['reserve-donations'],
     queryFn: async () => {
+      if (!user || !user.uid)
+        return {
+          userReserveCount: 0,
+          donations: [],
+        };
       if (search && search.length > 2) {
         const result = await ReserveDonationsService.SearchReserveDonations(search);
-        return result;
+        return {
+          userReserveCount: 0,
+          donations: result,
+        };
       }
-      const result = await ReserveDonationsService.GetAllReserveDonations();
-      return result;
+      try {
+        const result = await ReserveDonationsService.GetAllReserveDonations(user?.uid);
+        console.log('result', result);
+        return result;
+      } catch (err) {
+        console.log('err', err);
+        return {
+          userReserveCount: 0,
+          donations: [],
+        };
+      }
     },
   });
 
@@ -74,6 +96,22 @@ export default function ReserveDonations() {
           href={() => router.push('/(tabs-stack)/(my-donations)/reserve-donations')}>
           Minhas doações
         </Button>
+
+        {data && data?.userReserveCount > 0 && (
+          <Button
+            variant="default"
+            icon={{
+              name: 'user',
+              color: 'white',
+              size: 15,
+            }}
+            className="mb-2"
+            href={() => router.push('/(tabs-stack)/my-reserves')}>
+            Minhas reservas (Você tem {data?.userReserveCount}{' '}
+            {data.userReserveCount === 1 ? 'reserva ativa' : 'reservas ativas'} )
+          </Button>
+        )}
+
         <Button
           variant="default"
           icon={{
@@ -116,7 +154,7 @@ export default function ReserveDonations() {
 
         {!isLoading &&
           data &&
-          data.map((item, index) => (
+          data.donations.map((item, index) => (
             <Card
               key={`${item.uid}-reserve-donations-${index}`}
               item={{
