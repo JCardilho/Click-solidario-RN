@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "click-solidario",
+    "name": "Click Solidário",
     "slug": "click-solidario",
     "version": "1.0.0",
-    "scheme": "click-solidario",
+    "scheme": "click-solidarioo",
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -42,7 +42,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.kyoudan.clicksolidario"
+      "package": "com.kyoudan.clicksolidarioo"
     },
     "extra": {
       "router": {

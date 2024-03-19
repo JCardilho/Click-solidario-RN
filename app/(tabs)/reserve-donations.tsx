@@ -67,14 +67,7 @@ export default function ReserveDonations() {
           };
         }
         const result = await ReserveDonationsService.GetAllReserveDonations(user?.uid, 0, endAt);
-        if (result.donations.length != endCount) {
-          setEndCount(result.donations.length);
-        }
-        if (result.donations.length === endCount) {
-          setDisableLoadMore(true);
-        } else {
-          setDisableLoadMore(false);
-        }
+
         return result;
       } catch (err) {
         console.log('err', err);
@@ -89,8 +82,16 @@ export default function ReserveDonations() {
   useRefreshOnFocus(refetch);
 
   useEffect(() => {
-    if (endAt && endAt != 5) {
+    if (endAt && endAt != 5 && data) {
       refetch();
+      if (data.donations.length != endCount) {
+        setEndCount(data.donations.length);
+      }
+      if (data.donations.length === endCount) {
+        setDisableLoadMore(true);
+      } else {
+        setDisableLoadMore(false);
+      }
     }
   }, [endAt]);
 
