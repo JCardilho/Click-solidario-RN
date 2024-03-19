@@ -9,9 +9,7 @@ export default function StackLayout() {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="(chat-reserve-donation)" />
-      <Stack.Screen name="(edit-reserve-donation)" />
-      <Stack.Screen name="(view-reserve-donation)" />
+      <Stack.Screen name="[chat_users]" getId={({ params }) => String(Date.now())} />
     </Stack>
   );
 }

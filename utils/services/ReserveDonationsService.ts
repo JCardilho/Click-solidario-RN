@@ -15,10 +15,23 @@ import {
   startAt,
   orderBy,
 } from 'firebase/firestore';
-import { CreateReserveDonationDTO, IReserveDonation } from './DTO/reserve-donation.dto';
+import {
+  CreateReserveDonationDTO,
+  IReserveDonation,
+  IReserveDonationMessageRealTime,
+} from './DTO/reserve-donation.dto';
 import firebase from '../firebase';
 import { addDays, addMilliseconds } from 'date-fns';
 import { deleteObject, ref, getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
+import {
+  Unsubscribe,
+  child,
+  get,
+  getDatabase,
+  onValue,
+  ref as refDatabase,
+  set,
+} from 'firebase/database';
 
 const CreateReserveDonation = async (
   donation: CreateReserveDonationDTO
@@ -75,9 +88,15 @@ const GetAllReserveDonations = async (
 
   const queryYourReserves = query(ref, where('reserve.endOwnerUidOfLastReserve', '==', uid));
   const snapshotYourReserves = await getDocs(queryYourReserves);
+  const removeIfDateIsBefore = snapshotYourReserves.docs.filter(
+    (doc) =>
+      doc.data().reserve.endDateOfLastReserve &&
+      doc.data().reserve.endDateOfLastReserve.toDate() > new Date()
+  );
+  console.log('removeIfDateIsBefore', removeIfDateIsBefore.length);
 
   return {
-    userReserveCount: snapshotYourReserves.docs.length,
+    userReserveCount: removeIfDateIsBefore.length,
     donations: snapshot.docs
       .map((doc) => {
         const data = doc.data();
@@ -363,6 +382,48 @@ const GetMyReserves = async (uid: string): Promise<IReserveDonation[]> => {
     );
 };
 
+const CreateMessage = async ({
+  uid,
+  ownerUid,
+  message,
+}: Omit<IReserveDonationMessageRealTime, 'createdAt'>): Promise<void> => {
+  const db = getDatabase(firebase);
+  const ref = set(refDatabase(db, `messages/reserve-donation/${uid}/${ownerUid}`), {
+    message,
+    createdAt: new Date(),
+    uid: uid,
+    ownerUid,
+  });
+
+  return ref;
+};
+
+const GetMyMessages = async (
+  uid: string,
+  ownerUid: string
+): Promise<IReserveDonationMessageRealTime[]> => {
+  const db = getDatabase(firebase);
+  const ref = refDatabase(db, `messages/reserve-donation/${uid}/${ownerUid}`);
+  const snapshot = await get(ref);
+  const data = snapshot.val();
+  if (!data) return [];
+  const result = Object.keys(data).map((key) => {
+    return {
+      ...data[key],
+      createdAt: new Date(data[key].createdAt),
+    };
+  });
+  return result;
+};
+
+const WatchEventMessage = async (uid: string, ownerUid: string): Promise<Unsubscribe> => {
+  const db = getDatabase(firebase);
+  const ref = refDatabase(db, `messages/reserve-donation/${uid}/${ownerUid}`);
+  return onValue(ref, (snapshot) => {
+    console.log('snapshot', snapshot.val());
+  });
+};
+
 export const ReserveDonationsService = {
   CreateReserveDonation,
   GetAllReserveDonations,
@@ -377,4 +438,7 @@ export const ReserveDonationsService = {
   AddImages,
   SearchReserveDonations,
   GetMyReserves,
+  CreateMessage,
+  GetMyMessages,
+  WatchEventMessage,
 };

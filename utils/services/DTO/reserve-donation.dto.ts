@@ -17,3 +17,10 @@ interface IReserveOwner {
   endOwnerUidOfLastReserve?: string;
   endOwnerNameOfLastReserve?: string;
 }
+
+export interface IReserveDonationMessageRealTime {
+  createdAt: Date;
+  message: string;
+  ownerUid: string;
+  uid: string;
+}

@@ -5,6 +5,7 @@ import { inMemoryPersistence, initializeAuth } from 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/storage';
 import { collection, getDocs, getFirestore, persistentLocalCache } from 'firebase/firestore';
+import initialize from './firebaseInitialize';
 
 // import {...} from "firebase/functions";
 // import {...} from "firebase/storage";
@@ -22,39 +23,18 @@ import { collection, getDocs, getFirestore, persistentLocalCache } from 'firebas
 }; */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB2MnlM2Iwsyd3V8obVP2xF4Ti4dFzRAFI",
-  authDomain: "click-solidariov2.com",
-  databaseURL: "https://project-id.firebaseio.com",
-  projectId: "click-solidariov2",
-  storageBucket: "click-solidariov2.appspot.com",
-  messagingSenderId: "sender-id",
-  appId: "1:622298577976:android:d8e1009e351856cef5bacd",
-  measurementId: "G-measurement-id",
+  apiKey: 'AIzaSyB2MnlM2Iwsyd3V8obVP2xF4Ti4dFzRAFI',
+  authDomain: 'click-solidariov2.com',
+  databaseURL: 'https://click-solidariov2-default-rtdb.firebaseio.com',
+  projectId: 'click-solidariov2',
+  storageBucket: 'click-solidariov2.appspot.com',
+  messagingSenderId: 'sender-id',
+  appId: '1:622298577976:android:d8e1009e351856cef5bacd',
+  measurementId: 'G-measurement-id',
+  
 };
 
 const firebase = initializeApp(firebaseConfig);
-const db = getFirestore(firebase);
-const auth = initializeAuth(firebase, {
-  persistence: inMemoryPersistence,
-});
-
-// Get a list of cities from your database
-/* async function getCities(db: any) {
-  const citiesCol = collection(db, 'users');
-  const citySnapshot = await getDocs(citiesCol);
-  const cityList = citySnapshot.docs.map((doc) => doc.data());
-  return cityList;
-}
-
-getCities(db).then((cityList) => {
-  console.log(cityList);
-}); */
-
-/* const auth = initializeAuth(firebase, {
-  persistence: undefined,
-}); */
-
-// For more information on how to access Firebase in your project,
-// see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
+initialize(firebase);
 
 export default firebase;

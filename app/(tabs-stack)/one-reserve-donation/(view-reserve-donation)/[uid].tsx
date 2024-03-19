@@ -126,12 +126,20 @@ export default function ViewOneReserveDonation() {
                       name: 'handshake-o',
                       color: 'white',
                       size: 15,
+                    }}
+                    href={() => {
+                      router.push(
+                        `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data.ownerUid}`
+                      );
                     }}>
                     Entrar em contato
                   </Button>
                 )}
 
-              <CancelReserve uid={uid} refetch={refetch} data={data} />
+              {data.reserve.endDateOfLastReserve &&
+                new Date() < data.reserve.endDateOfLastReserve && (
+                  <CancelReserve uid={uid} refetch={refetch} data={data} />
+                )}
             </View>
           </>
         )}
