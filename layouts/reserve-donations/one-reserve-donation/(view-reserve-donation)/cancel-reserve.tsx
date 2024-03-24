@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { useLoaderHook } from '~/components/Loader';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
@@ -44,6 +45,18 @@ export const CancelReserve = ({ uid, refetch, data }: IProps) => {
     ...stopLoadingForReactQuerySuccess,
   });
 
+  const { BottomSheet, open } = useBottomSheetHook({
+    isNeedConfirm: true,
+    button: {
+      onPress: () => {
+        mutateCancelReserve();
+      },
+      isLoading: isPendinCancelReserve,
+      variant: 'destructive',
+    },
+    textNeedConfirm: 'Você cancelar essa reserva?',
+  });
+
   return (
     <>
       {data.reserve &&
@@ -52,6 +65,7 @@ export const CancelReserve = ({ uid, refetch, data }: IProps) => {
         data.reserve.endOwnerUidOfLastReserve === user.uid &&
         data.reserve.endOwnerNameOfLastReserve === user.name && (
           <>
+            <BottomSheet />
             <Button
               variant="destructive"
               icon={{
@@ -60,7 +74,7 @@ export const CancelReserve = ({ uid, refetch, data }: IProps) => {
                 size: 15,
               }}
               isLoading={isPendinCancelReserve}
-              onPress={() => mutateCancelReserve()}>
+              onPress={() => open()}>
               Cancelar Reserva
             </Button>
           </>

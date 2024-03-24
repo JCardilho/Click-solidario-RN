@@ -21,9 +21,10 @@ import {
   IReserveDonationMessageRealTime,
 } from './DTO/reserve-donation.dto';
 import firebase from '../firebase';
-import { addDays, addMilliseconds } from 'date-fns';
+import { addDays, addMilliseconds, format } from 'date-fns';
 import { deleteObject, ref, getStorage, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
+  DataSnapshot,
   Unsubscribe,
   child,
   get,
@@ -383,45 +384,81 @@ const GetMyReserves = async (uid: string): Promise<IReserveDonation[]> => {
 };
 
 const CreateMessage = async ({
-  uid,
-  ownerUid,
-  message,
+  uid_person_donation,
+  uid_person_reserve,
+  messages,
 }: Omit<IReserveDonationMessageRealTime, 'createdAt'>): Promise<void> => {
   const db = getDatabase(firebase);
-  const ref = set(refDatabase(db, `messages/reserve-donation/${uid}/${ownerUid}`), {
-    message,
-    createdAt: new Date(),
-    uid: uid,
-    ownerUid,
-  });
+  const getOldMessages = await GetMyMessages(uid_person_reserve, uid_person_donation);
+
+  console.log('getOldMessages', getOldMessages);
+
+  const ref = set(
+    refDatabase(db, `messages/reserve-donation/${uid_person_reserve}/${uid_person_donation}`),
+    {
+      messages: getOldMessages ? [...getOldMessages, messages[0]] : [messages[0]],
+      createdAt: format(new Date(), 'dd-MM-yyyy HH:mm:ss'),
+      uid_person_reserve,
+      uid_person_donation,
+    }
+  );
 
   return ref;
 };
 
 const GetMyMessages = async (
-  uid: string,
-  ownerUid: string
-): Promise<IReserveDonationMessageRealTime[]> => {
+  uid_person_reserve: string,
+  uid_person_donation: string
+): Promise<IReserveDonationMessageRealTime['messages']> => {
   const db = getDatabase(firebase);
-  const ref = refDatabase(db, `messages/reserve-donation/${uid}/${ownerUid}`);
+  const ref = refDatabase(
+    db,
+    `messages/reserve-donation/${uid_person_reserve}/${uid_person_donation}`
+  );
   const snapshot = await get(ref);
   const data = snapshot.val();
   if (!data) return [];
-  const result = Object.keys(data).map((key) => {
-    return {
-      ...data[key],
-      createdAt: new Date(data[key].createdAt),
-    };
-  });
-  return result;
+  return data.messages;
 };
 
-const WatchEventMessage = async (uid: string, ownerUid: string): Promise<Unsubscribe> => {
+const WatchEventMessage = (
+  uid_person_reserve: string,
+  uid_person_donation: string,
+  func: (snap: DataSnapshot) => void
+): Unsubscribe => {
+  try {
+    console.log('uid_person_reserve', uid_person_reserve);
+    console.log('uid_person_donation', uid_person_donation);
+
+    const db = getDatabase(firebase);
+    const ref = refDatabase(
+      db,
+      `messages/reserve-donation/${uid_person_reserve}/${uid_person_donation}`
+    );
+
+    return onValue(ref, (snapshot) => func(snapshot));
+  } catch (err) {
+    console.log('err', err);
+    return () => {};
+  }
+};
+
+const CreateChatIfNotExists = async (
+  uid_person_reserve: string,
+  uid_person_donation: string
+): Promise<void> => {
   const db = getDatabase(firebase);
-  const ref = refDatabase(db, `messages/reserve-donation/${uid}/${ownerUid}`);
-  return onValue(ref, (snapshot) => {
-    console.log('snapshot', snapshot.val());
-  });
+  const ref = set(
+    refDatabase(db, `messages/reserve-donation/${uid_person_reserve}/${uid_person_donation}`),
+    {
+      messages: [],
+      createdAt: format(new Date(), 'dd-MM-yyyy HH:mm:ss'),
+      uid_person_reserve,
+      uid_person_donation,
+    }
+  );
+
+  return ref;
 };
 
 export const ReserveDonationsService = {

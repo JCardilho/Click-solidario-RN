@@ -5,11 +5,12 @@ import { MediaTypeOptions, launchImageLibraryAsync } from 'expo-image-picker';
 import { Stack, useRouter } from 'expo-router';
 import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, ScrollView, Text, TextInput, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import { z } from 'zod';
+import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Input } from '~/components/Input';
@@ -25,7 +26,7 @@ const createDonationItemsSchema = z.object({
   description: z.string({
     required_error: 'Descrição é obrigatória',
   }),
-  image: z.array(z.string().optional()),
+  image: z.array(z.string()),
 });
 
 type CreateDonationItemsType = z.infer<typeof createDonationItemsSchema>;
@@ -33,9 +34,9 @@ type CreateDonationItemsType = z.infer<typeof createDonationItemsSchema>;
 export default function CreateDonationItems() {
   const router = useRouter();
   const { user } = useCurrentUserHook();
+  const [submitRef, setSubmit] = useState(false);
 
   const {
-    handleSubmit,
     control,
     getValues,
     formState: { errors },
@@ -43,6 +44,7 @@ export default function CreateDonationItems() {
     watch,
   } = useForm<CreateDonationItemsType>({
     resolver: zodResolver(createDonationItemsSchema),
+
   });
 
   const { isPending, mutate } = useMutation<IReserveDonation | undefined>({
@@ -75,9 +77,11 @@ export default function CreateDonationItems() {
   const { mutate: mutateAddImage, isPending: isPendingAddImage } = useMutation({
     mutationKey: ['addImage'],
     mutationFn: async (data: IReserveDonation) => {
+      console.log('data', data);
       if (!getValues('image')) return;
       const images = getValues('image');
-      const urls = await images.map(async (uploading) => {
+      if (!images) return;
+      const urls = images.map(async (uploading) => {
         if (!uploading) return;
         try {
           const response = await fetch(uploading);
@@ -125,15 +129,36 @@ export default function CreateDonationItems() {
       setValue(
         'image',
         getValues('image')
-          ? [...getValues('image'), ...result.assets.map((image) => image.uri)]
+          ? [...getValues('image')!, ...result.assets.map((image) => image.uri)]
           : result.assets.map((image) => image.uri)
       );
     }
   };
 
+  const { BottomSheet, open } = useBottomSheetHook({
+    button: {
+      onPress: () => {
+        mutate();
+      },
+      isLoading: isPending,
+      variant: 'success',
+    },
+    isNeedConfirm: true,
+    textNeedConfirm: 'Você deseja confirmar a disponibilização desse item à doação?',
+  });
+
   return (
     <>
-      <ScrollView>
+      <ScrollView className="min-h-screen">
+        {/*  <Button
+          onPress={() => {
+            console.log('teste');
+            open();
+          }}
+          variant="default">
+          <Text>Teste</Text>
+        </Button> */}
+        <BottomSheet />
         <HeaderBack title="Disponibilizar um item à doação" />
         <View className="px-2 flex flex-col gap-4">
           <Controller
@@ -177,7 +202,7 @@ export default function CreateDonationItems() {
               className="mb-4"
               onPress={pickImages}
               icon={{
-                name: 'plus',
+                name: 'image',
                 color: 'white',
                 size: 15,
               }}>
@@ -211,30 +236,35 @@ export default function CreateDonationItems() {
               </View>
             ))}
         </View>
-
-        <Button
-          onPress={() => {
-            setValue('name', `${Math.random() * 1000}`);
-            setValue(
-              'description',
-              `      Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit odio, placeat temporibus mollitia reprehenderit modi consectetur, officiis, aliquam voluptatum saepe hic rem ratione minima expedita ullam. Deserunt facilis nihil voluptate. ${Math.random() * 1000}`
-            );
-          }}>
-          Random
-        </Button>
       </ScrollView>
 
-      <View className="absolute bottom-4 full items-center justify-center px-2">
+      <View className="w-full p-4">
+        {errors && errors.name && (
+          <Text className="text-red-500 text-center font-kanit">{errors.name.message}</Text>
+        )}
+        {errors && errors.description && (
+          <Text className="text-red-500 text-center font-kanit">{errors.description.message}</Text>
+        )}
+        <Text className="text-red-500 text-center font-kanit">
+          {getValues('image') ? '' : 'Selecione uma imagem'}
+        </Text>
         <Button
+          onPress={open}
           variant="success"
-          className=" w-full"
+          className="w-full mt-2"
+          disabled={
+            errors.name
+              ? true
+              : false || errors.description
+                ? true
+                : false || !getValues('image') || isPending || isPendingAddImage
+          }
           icon={{
             name: 'plus',
             color: 'white',
             size: 15,
           }}
-          isLoading={isPending || isPendingAddImage}
-          onPress={handleSubmit(() => mutate())}>
+          isLoading={isPending || isPendingAddImage}>
           Finalizar
         </Button>
       </View>

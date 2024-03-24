@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
@@ -91,6 +91,28 @@ export default function ViewOneReserveDonation() {
             <View className="w-full flex flex-col gap-2">
               {user?.uid === data.ownerUid && (
                 <>
+                  {data.reserve &&
+                    data.reserve.endDateOfLastReserve &&
+                    new Date() < data.reserve.endDateOfLastReserve && (
+                      <>
+                        <Button
+                          variant="default"
+                          icon={{
+                            name: 'handshake-o',
+                            color: 'white',
+                            size: 15,
+                          }}
+                          href={() => {
+                            const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`;
+                            console.log('link', link);
+
+                            router.push(link as any);
+                          }}>
+                          Entrar no chat
+                        </Button>
+                      </>
+                    )}
+
                   <Button
                     variant="default"
                     icon={{
@@ -128,9 +150,10 @@ export default function ViewOneReserveDonation() {
                       size: 15,
                     }}
                     href={() => {
-                      router.push(
-                        `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data.ownerUid}`
-                      );
+                      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`;
+                      console.log('link', link);
+
+                      router.push(link as any);
                     }}>
                     Entrar em contato
                   </Button>

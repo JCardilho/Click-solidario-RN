@@ -27,6 +27,7 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ color }) => <FontAwesome size={35} name="home" color={color} />,
           tabBarLabel: () => <Text className="font-kanit text-md text-center">Inicio</Text>,
+          headerShown: false,
         }}
       />
       <Tabs.Screen

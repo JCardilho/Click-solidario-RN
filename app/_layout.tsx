@@ -6,6 +6,8 @@ import { Stack } from 'expo-router';
 import { Kanit_400Regular } from './../node_modules/@expo-google-fonts/kanit/index';
 import { Montserrat_400Regular } from './../node_modules/@expo-google-fonts/montserrat/index.d';
 import { FontsLoadProvider } from '~/utils/hooks/fontsLoad';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 export default function Layout() {
   const queryClient = new QueryClient();
@@ -13,11 +15,15 @@ export default function Layout() {
   return (
     <QueryClientProvider client={queryClient}>
       <FontsLoadProvider>
-        <Stack>
-          <Stack.Screen name="registrar" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs-stack)" options={{ headerShown: false }} />
-        </Stack>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <BottomSheetModalProvider>
+            <Stack>
+              <Stack.Screen name="registrar" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs-stack)" options={{ headerShown: false }} />
+            </Stack>
+          </BottomSheetModalProvider>
+        </GestureHandlerRootView>
       </FontsLoadProvider>
     </QueryClientProvider>
   );

@@ -129,7 +129,7 @@ export default function ReserveDonations() {
           <Button
             variant="default"
             icon={{
-              name: 'user',
+              name: 'dropbox',
               color: 'white',
               size: 15,
             }}
@@ -141,7 +141,7 @@ export default function ReserveDonations() {
         )}
 
         <Button
-          variant="default"
+          variant="success"
           icon={{
             name: 'plus',
             color: 'white',

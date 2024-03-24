@@ -19,8 +19,14 @@ interface IReserveOwner {
 }
 
 export interface IReserveDonationMessageRealTime {
-  createdAt: Date;
-  message: string;
-  ownerUid: string;
-  uid: string;
+  createdAt: string;
+  messages: IMessage[];
+  uid_person_reserve: string;
+  uid_person_donation: string;
+}
+
+interface IMessage {
+  text: string;
+  createdAt: string;
+  owner_message_uid: string;
 }

@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
 import { getDatabase, onValue, ref } from 'firebase/database';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
@@ -47,30 +48,68 @@ export default function Chat() {
   const params = useLocalSearchParams<{
     current_user_uid: string;
     reserve_owner_uid: string;
+    receives_donation_uid: string;
+    receives_donation_name: string;
+    reserve_owner_name: string;
   }>();
-  const db = getDatabase(firebase);
+  const [data, setMessages] = useState<IReserveDonationMessageRealTime['messages']>([]);
+  const scrollRef = useRef<ScrollView>(null);
 
-  const { data, refetch } = useQuery<IReserveDonationMessageRealTime[]>({
+  const { refetch } = useQuery<any>({
     queryKey: ['messages', params.reserve_owner_uid],
     queryFn: async () => {
-      if (!user?.uid || !params.reserve_owner_uid) return [];
-      const result = await ReserveDonationsService.GetMyMessages(
-        user?.uid,
-        params.reserve_owner_uid
-      );
-      return result;
+      try {
+        const value = await ReserveDonationsService.GetMyMessages(
+          params?.receives_donation_uid,
+          params.reserve_owner_uid
+        );
+
+        if (!value || (value && value.length < 1)) return [];
+
+        ReserveDonationsService.WatchEventMessage(
+          params?.receives_donation_uid,
+          params.reserve_owner_uid,
+          (data) => {
+            if (data && data.exists() && data.val()) {
+              const value: IReserveDonationMessageRealTime = data.val();
+
+              setMessages(value.messages);
+              return [];
+            }
+            throw new Error('Data not found');
+          }
+        );
+      } catch (err) {
+        console.log('Error', err);
+        return [];
+      }
+
+      return 'OK';
     },
   });
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current!.scrollToEnd();
+    }
+  }, [data]);
 
   const { isPending, mutate } = useMutation({
     mutationKey: ['send-message-to-reserve-owner', params.reserve_owner_uid],
     mutationFn: async (message: string) => {
-      if (!user || !user.uid || !params.reserve_owner_uid) return;
+      if (!user || !user.uid || !params.reserve_owner_uid || !message) return;
       const result = await ReserveDonationsService.CreateMessage({
-        message,
-        uid: user.uid,
-        ownerUid: params.reserve_owner_uid,
+        messages: [
+          {
+            text: message,
+            owner_message_uid: params?.current_user_uid,
+            createdAt: format(new Date(), 'dd-MM-yyyy HH:mm:ss'),
+          },
+        ],
+        uid_person_reserve: params?.receives_donation_uid,
+        uid_person_donation: params.reserve_owner_uid,
       });
+      if (data && data.length === 0) refetch();
       setMessage('');
       return result;
     },
@@ -79,15 +118,6 @@ export default function Chat() {
     },
   });
 
-  useEffect(() => {
-    if (user) {
-      const watch = async () => {
-        await ReserveDonationsService.WatchEventMessage(params.reserve_owner_uid, user.uid);
-      };
-      watch();
-    }
-  }, []);
-
   return (
     params.current_user_uid &&
     params.reserve_owner_uid &&
@@ -95,30 +125,31 @@ export default function Chat() {
     user.uid === params.current_user_uid && (
       <>
         <HeaderBack title="Chat" />
-        <ScrollView className="h-[1500px] w-full px-4 pb-12 flex-col gap-4">
-          <Card ownerName="Você" variant="you">
-            Olá, tudo bem? Gostaria de saber mais sobre o item.
-          </Card>
-          <Card ownerName="Você" variant="you">
-            Olá, tudo bem?
-          </Card>
-          <Card ownerName="Você" variant="you">
-            Gostaria de saber mais sobre o item.
-          </Card>
-          <Card ownerName="Pessoa" variant="other">
-            Gostaria de saber mais sobre o item.
-          </Card>
-          <Card ownerName="Pessoa" variant="other">
-            Gostaria de saber mais sobre o item.
-          </Card>
-          <Card ownerName="Pessoa" variant="other">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Debitis ipsa repellat,
-            assumenda repellendus atque nemo quae nulla minima quod voluptatibus nobis iure totam
-            odio iste numquam voluptas adipisci optio veniam?
-          </Card>
-          <Card ownerName="Você" variant="you">
-            Gostaria de saber mais sobre o item.
-          </Card>
+        <ScrollView className="h-[1500px] w-full px-4 pb-12 flex-col gap-4" ref={scrollRef}>
+          {data &&
+            data.map((messages) =>
+              messages.owner_message_uid === user.uid ? (
+                <Card
+                  ownerName="Você"
+                  variant="you"
+                  key={messages.createdAt + messages.text + messages.owner_message_uid}>
+                  {messages.text}
+                </Card>
+              ) : (
+                <Card
+                  ownerName={
+                    user && user.uid === params.reserve_owner_uid
+                      ? params.reserve_owner_name
+                      : params.reserve_owner_name
+                  }
+                  variant="other"
+                  key={messages.createdAt + messages.text + messages.owner_message_uid}>
+                  {messages.text}
+                </Card>
+              )
+            )}
+
+          <View className="h-[35px] w-full bg-transparent"></View>
         </ScrollView>
         <View className=" w-full items-center justify-center z-20 bg-white px-2 flex-row gap-2 p-2">
           <Input

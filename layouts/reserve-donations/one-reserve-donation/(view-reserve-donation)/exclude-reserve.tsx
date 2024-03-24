@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { useLoaderHook } from '~/components/Loader';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
@@ -41,8 +42,22 @@ export const ExcludeReserve = ({ uid, refetch, data }: IProps) => {
       ...startLoadingForUseMutation,
     });
 
+    const { BottomSheet, open } = useBottomSheetHook({
+      isNeedConfirm: true,
+      button: {
+        onPress: () => {
+          mutateExcludeReserveDonation();
+        },
+        isLoading: isPendingExcludeReserveDonation,
+        variant: 'destructive',
+      },
+      textNeedConfirm: 'Você deseja confirmar essa exclusão?',
+    });
+  
+
   return (
     <>
+      <BottomSheet />
       <Button
         variant="destructive"
         icon={{
@@ -51,7 +66,7 @@ export const ExcludeReserve = ({ uid, refetch, data }: IProps) => {
           size: 15,
         }}
         isLoading={isPendingExcludeReserveDonation}
-        onPress={() => mutateExcludeReserveDonation()}>
+        onPress={() => open()}>
         Excluir
       </Button>
     </>

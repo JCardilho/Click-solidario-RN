@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { useLoaderHook } from '~/components/Loader';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
@@ -14,6 +15,7 @@ interface IProps {
 
 export const ReserveAction = ({ data, uid, refetch }: IProps) => {
   const { user } = useCurrentUserHook();
+
   const {
     stopLoadingForReactQueryError,
     mutation: { startLoadingForUseMutation },
@@ -42,21 +44,36 @@ export const ReserveAction = ({ data, uid, refetch }: IProps) => {
     ...startLoadingForUseMutation,
   });
 
+  const { BottomSheet, open } = useBottomSheetHook({
+    isNeedConfirm: true,
+    button: {
+      onPress: () => {
+        setIsLoading(true);
+        mutate();
+      },
+      isLoading: isPending,
+    },
+    textNeedConfirm: 'Você deseja confirmar essa reserva?',
+  });
+
   return (
     <>
       {(data.reserve.endDateOfLastReserve && new Date() > data.reserve.endDateOfLastReserve) ||
         (!data.reserve.endDateOfLastReserve && (
-          <Button
-            variant="success"
-            icon={{
-              name: 'handshake-o',
-              color: 'white',
-              size: 15,
-            }}
-            isLoading={isPending}
-            onPress={() => mutate()}>
-            Reservar
-          </Button>
+          <>
+            <BottomSheet />
+            <Button
+              variant="success"
+              icon={{
+                name: 'handshake-o',
+                color: 'white',
+                size: 15,
+              }}
+              isLoading={isPending}
+              onPress={() => open()}>
+              Reservar
+            </Button>
+          </>
         ))}
     </>
   );
