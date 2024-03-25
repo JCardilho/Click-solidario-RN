@@ -15,6 +15,8 @@ import { UserService } from '~/utils/services/UserService';
 import { IUser } from '~/utils/services/DTO/user.dto';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
+import * as Burnt from 'burnt';
+import { useNotifications } from 'react-native-notificated';
 
 const SelectedButton = ({
   onPress,
@@ -99,6 +101,7 @@ const CreateTopNavigation = ({
 
 export default function Home() {
   const { user } = useCurrentUserHook();
+  const { notify } = useNotifications();
   const router = useRouter();
   const { BottomSheet, open } = useBottomSheetHook({
     isNeedConfirm: true,

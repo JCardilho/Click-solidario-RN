@@ -19,7 +19,9 @@
             "node_modules/@expo-google-fonts/montserrat/Montserrat_400Regular.ttf"
           ]
         }
-      ]
+      ],
+
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -33,9 +35,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },

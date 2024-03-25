@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { useNotifications } from 'react-native-notificated';
 import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { useLoaderHook } from '~/components/Loader';
@@ -15,6 +16,7 @@ interface IProps {
 
 export const ReserveAction = ({ data, uid, refetch }: IProps) => {
   const { user } = useCurrentUserHook();
+  const { notify } = useNotifications();
 
   const {
     stopLoadingForReactQueryError,
@@ -38,6 +40,12 @@ export const ReserveAction = ({ data, uid, refetch }: IProps) => {
     },
     onSuccess: async (data) => {
       setIsLoading(false);
+      notify('success', {
+        params: {
+          title: 'Reserva confirmada com sucesso!',
+          description: 'A reserva foi confirmada com sucesso',
+        },
+      });
       refetch();
     },
     ...stopLoadingForReactQueryError,

@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { useNotifications } from 'react-native-notificated';
 import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { useLoaderHook } from '~/components/Loader';
@@ -21,6 +22,7 @@ export const CancelReserve = ({ uid, refetch, data }: IProps) => {
     stopLoadingForReactQuerySuccess,
   } = useLoaderHook();
   const { setReserve } = useReserveDonations();
+  const { notify } = useNotifications();
 
   const { mutate: mutateCancelReserve, isPending: isPendinCancelReserve } = useMutation({
     mutationKey: ['cacel-reserve', uid],
@@ -37,6 +39,12 @@ export const CancelReserve = ({ uid, refetch, data }: IProps) => {
         },
         uidFormatted
       );
+      notify('success', {
+        params: {
+          title: 'Reserva cancelada com sucesso!',
+          description: 'A reserva foi cancelada com sucesso',
+        },
+      });
       await refetch();
       return result;
     },

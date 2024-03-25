@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ScrollView, Text, View } from 'react-native';
+import { useNotifications } from 'react-native-notificated';
 import { Badge } from '~/components/Badge';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
@@ -27,6 +28,7 @@ export default function ViewOneReserveDonation() {
   const { setIsLoading } = useLoaderHook();
   const { searchViewReserveDonations, addViewReserveDonations, ViewReserveDonations } =
     useReserveDonations();
+  const { notify } = useNotifications();
 
   const { data, refetch } = useQuery<IReserveDonation>({
     queryKey: ['reserve-donation', uid],
@@ -83,6 +85,12 @@ export default function ViewOneReserveDonation() {
     onSuccess: async () => {
       console.log('Chat foi');
       if (!user) return;
+      notify('warning', {
+        params: {
+          title: 'Um chat foi criado para você e para a outra pessoa!',
+          description: '',
+        },
+      });
       const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data!.ownerUid}&receives_donation_uid=${data!.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data!.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data!.ownerName}`;
       router.push(link as any);
     },

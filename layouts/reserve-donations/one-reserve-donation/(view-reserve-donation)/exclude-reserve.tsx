@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { useNotifications } from 'react-native-notificated';
 import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { useLoaderHook } from '~/components/Loader';
@@ -21,6 +22,7 @@ export const ExcludeReserve = ({ uid, refetch, data }: IProps) => {
     mutation: { startLoadingForUseMutation },
     setIsLoading,
   } = useLoaderHook();
+  const { notify } = useNotifications();
 
   const { mutate: mutateExcludeReserveDonation, isPending: isPendingExcludeReserveDonation } =
     useMutation({
@@ -36,24 +38,29 @@ export const ExcludeReserve = ({ uid, refetch, data }: IProps) => {
       },
       onSuccess: async () => {
         setIsLoading(false);
+        notify('success', {
+          params: {
+            title: 'Reserva excluída com sucesso',
+            description: 'A reserva foi excluída com sucesso!',
+          },
+        });
         router.back();
       },
       ...stopLoadingForReactQueryError,
       ...startLoadingForUseMutation,
     });
 
-    const { BottomSheet, open } = useBottomSheetHook({
-      isNeedConfirm: true,
-      button: {
-        onPress: () => {
-          mutateExcludeReserveDonation();
-        },
-        isLoading: isPendingExcludeReserveDonation,
-        variant: 'destructive',
+  const { BottomSheet, open } = useBottomSheetHook({
+    isNeedConfirm: true,
+    button: {
+      onPress: () => {
+        mutateExcludeReserveDonation();
       },
-      textNeedConfirm: 'Você deseja confirmar essa exclusão?',
-    });
-  
+      isLoading: isPendingExcludeReserveDonation,
+      variant: 'destructive',
+    },
+    textNeedConfirm: 'Você deseja confirmar essa exclusão?',
+  });
 
   return (
     <>
