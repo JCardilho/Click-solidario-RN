@@ -57,25 +57,32 @@ const CreateTopNavigation = ({
   isNotificationConversations,
   isNotificationNotifications,
   isNotificationPostations,
+  isBack,
 }: {
   selected: Selected;
   referencePageview: any;
   isNotificationPostations?: boolean;
   isNotificationConversations?: boolean;
   isNotificationNotifications?: boolean;
+  isBack?: boolean;
 }) => {
   return (
     <>
-      <View className="w-full  rounded-lg flex flex-row gap-2 bg-white p-1 mb-4">
-        <SelectedButton
-          icon="send"
-          isSelected={selected === 'posts'}
-          onPress={() => {
-            if (selected !== 'posts') referencePageview.current?.setPage(0);
-          }}
-          isNotification={isNotificationPostations}>
-          Postagens
-        </SelectedButton>
+      <View
+        className={`w-full ${isBack ? 'justify-between' : 'justify-end'} rounded-lg flex flex-row gap-2  p-1 mb-4`}>
+        {isBack && (
+          <>
+            <SelectedButton
+              isSelected={selected === 'posts'}
+              icon={'arrow-left'}
+              onPress={() => {
+                if (selected !== 'posts') referencePageview.current?.setPage(0);
+              }}
+              isNotification={isNotificationPostations}>
+              Voltar
+            </SelectedButton>
+          </>
+        )}
         <SelectedButton
           isSelected={selected === 'conversations'}
           icon={'envelope'}
@@ -84,15 +91,6 @@ const CreateTopNavigation = ({
           }}
           isNotification={isNotificationConversations}>
           Conversas
-        </SelectedButton>
-        <SelectedButton
-          isSelected={selected === 'notifications'}
-          icon={'bell'}
-          onPress={() => {
-            if (selected !== 'notifications') referencePageview.current?.setPage(2);
-          }}
-          isNotification={isNotificationNotifications}>
-          Notificações
         </SelectedButton>
       </View>
     </>
@@ -162,12 +160,16 @@ export default function Home() {
             referencePageview={ref}
             isNotificationConversations={notificationTopNavigation?.conversations}
           />
+          <View className="w-full flex items-center justify-center">
+            <Text className="font-montserrat font-bold text-4xl text-center mt-2">Postagens</Text>
+          </View>
         </View>
         <View className="w-full h-full p-4 items-start justify-start flex" key="2">
           <CreateTopNavigation
             selected="conversations"
             referencePageview={ref}
             isNotificationConversations={notificationTopNavigation?.conversations}
+            isBack
           />
           <View className="w-full flex flex-col gap-4">
             {data?.map((item) => (
@@ -192,13 +194,6 @@ export default function Home() {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
-        <View className="w-full h-full p-4 items-start justify-start flex" key="3">
-          <CreateTopNavigation
-            selected="notifications"
-            referencePageview={ref}
-            isNotificationConversations={notificationTopNavigation?.conversations}
-          />
         </View>
       </PagerView>
     </>

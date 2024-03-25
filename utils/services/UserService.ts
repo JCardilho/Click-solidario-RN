@@ -45,6 +45,13 @@ const createUser = async (params: CreateUserDTO): Promise<void> => {
   }
 };
 
+const getOneUser = async (uid: string): Promise<IUser> => {
+  const docRef = doc(getFirestore(firebase), 'users', uid);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) throw new Error('Usuário não encontrado');
+  return docSnap.data() as IUser;
+};
+
 const loginUser = async (email: string, password: string): Promise<IUser> => {
   const auth = getAuth(firebase);
   const response = await signInWithEmailAndPassword(auth, email, password);
@@ -138,15 +145,7 @@ const MarkAsReadChatNotification = async ({
   uid: string;
   OtherUserUid: string;
 }) => {
-  const queryForVerifyIfExistConversation = query(
-    collection(getFirestore(firebase), 'users', uid, 'conversations'),
-    where('otherUserUid', '==', OtherUserUid)
-  );
-  const docSnapForVerifyIfExistConversation = await getDocs(queryForVerifyIfExistConversation);
-  console.log('existe', docSnapForVerifyIfExistConversation.empty);
-  if (docSnapForVerifyIfExistConversation.empty) return;
-  const docSnap = docSnapForVerifyIfExistConversation.docs[0];
-  const user = docSnap.data() as IUser;
+  const user = await getOneUser(uid);
   const conversations = user.conversations || [];
   const newConversations = conversations.map((conversation) => {
     if (conversation.otherUserUid === OtherUserUid) {
@@ -154,7 +153,42 @@ const MarkAsReadChatNotification = async ({
     }
     return conversation;
   });
-  await setDoc(docSnap.ref, { conversations: newConversations }, { merge: true });
+  await setDoc(
+    doc(getFirestore(firebase), 'users', uid),
+    { conversations: newConversations },
+    { merge: true }
+  );
+};
+
+const MarkAsUnreadOtherUserChatNotification = async ({
+  uid,
+  OtherUserUid,
+}: {
+  uid: string;
+  OtherUserUid: string;
+}) => {
+  const user = await getOneUser(OtherUserUid);
+  const conversations = user.conversations || [];
+  const verifyIfIsNotificationIsTrue = conversations.find(
+    (conversation) => conversation.otherUserUid === uid && conversation.isNotification
+  );
+  console.log('verifyIfIsNotificationIsTrue', verifyIfIsNotificationIsTrue);
+
+  if (verifyIfIsNotificationIsTrue) return;
+  const newConversations = conversations.map((conversation) => {
+    if (conversation.otherUserUid === uid) {
+      conversation.isNotification = true;
+    }
+    return conversation;
+  });
+
+  console.log('newConversations', newConversations);
+
+  await setDoc(
+    doc(getFirestore(firebase), 'users', OtherUserUid),
+    { conversations: newConversations },
+    { merge: true }
+  );
 };
 
 export const UserService = {
@@ -165,4 +199,5 @@ export const UserService = {
   CreateConversation,
   GetAllConversations,
   MarkAsReadChatNotification,
+  MarkAsUnreadOtherUserChatNotification,
 };

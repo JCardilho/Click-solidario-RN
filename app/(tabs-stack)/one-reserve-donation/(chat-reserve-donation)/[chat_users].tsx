@@ -126,6 +126,16 @@ export default function Chat() {
     onError: (error) => {
       console.log('error', error);
     },
+    onSuccess: async () => {
+      if (!user || !user.uid) return;
+      await UserService.MarkAsUnreadOtherUserChatNotification({
+        uid: user!.uid,
+        OtherUserUid:
+          user!.uid === params.reserve_owner_uid
+            ? params.receives_donation_uid
+            : params.reserve_owner_uid,
+      });
+    },
   });
 
   return (
