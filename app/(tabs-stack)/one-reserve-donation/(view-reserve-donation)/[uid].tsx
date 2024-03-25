@@ -18,6 +18,7 @@ import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { useReserveDonations } from '~/utils/hooks/screens/view-reserve-donation/view-reserve-donation';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
+import { UserService } from '~/utils/services/UserService';
 
 export default function ViewOneReserveDonation() {
   const { uid } = useLocalSearchParams();
@@ -43,6 +44,47 @@ export default function ViewOneReserveDonation() {
       setIsLoading(false);
       addViewReserveDonations(result);
       return result;
+    },
+  });
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationKey: ['create-chat'],
+    mutationFn: async () => {
+      console.log('vai passar pelo uid');
+      if (
+        !user ||
+        !user.uid ||
+        !data ||
+        !data.name ||
+        !data.images ||
+        !data.ownerName ||
+        !data.ownerUid
+      )
+        return;
+
+      console.log('criando chat');
+
+      const result = await UserService.CreateConversation(data.ownerUid, {
+        routeQuery: `?current_user_uid=${data.ownerUid}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`,
+        isNotification: true,
+        otherUserName: data.reserve.endOwnerNameOfLastReserve || '',
+        otherUserUid: data.reserve.endOwnerUidOfLastReserve || '',
+      });
+
+      await UserService.CreateConversation(data.reserve.endOwnerUidOfLastReserve || '', {
+        routeQuery: `?current_user_uid=${data.reserve.endOwnerUidOfLastReserve}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`,
+        isNotification: true,
+        otherUserName: data.ownerName,
+        otherUserUid: data.ownerUid,
+      });
+
+      return result;
+    },
+    onSuccess: async () => {
+      console.log('Chat foi');
+      if (!user) return;
+      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data!.ownerUid}&receives_donation_uid=${data!.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data!.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data!.ownerName}`;
+      router.push(link as any);
     },
   });
 
@@ -102,12 +144,8 @@ export default function ViewOneReserveDonation() {
                             color: 'white',
                             size: 15,
                           }}
-                          href={() => {
-                            const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`;
-                            console.log('link', link);
-
-                            router.push(link as any);
-                          }}>
+                          onPress={async () => await mutateAsync()}
+                          isLoading={isPending}>
                           Entrar no chat
                         </Button>
                       </>
@@ -149,12 +187,8 @@ export default function ViewOneReserveDonation() {
                       color: 'white',
                       size: 15,
                     }}
-                    href={() => {
-                      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`;
-                      console.log('link', link);
-
-                      router.push(link as any);
-                    }}>
+                    onPress={async () => await mutateAsync()}
+                    isLoading={isPending}>
                     Entrar em contato
                   </Button>
                 )}

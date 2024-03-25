@@ -11,6 +11,7 @@ import firebase from '~/utils/firebase';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { IReserveDonationMessageRealTime } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
+import { UserService } from '~/utils/services/UserService';
 
 type IVariant = 'you' | 'other';
 
@@ -59,10 +60,19 @@ export default function Chat() {
     queryKey: ['messages', params.reserve_owner_uid],
     queryFn: async () => {
       try {
+        if (!user) return [];
         const value = await ReserveDonationsService.GetMyMessages(
           params?.receives_donation_uid,
           params.reserve_owner_uid
         );
+
+        await UserService.MarkAsReadChatNotification({
+          uid: user.uid,
+          OtherUserUid:
+            user!.uid === params.reserve_owner_uid
+              ? params.receives_donation_uid
+              : params.reserve_owner_uid,
+        });
 
         if (!value || (value && value.length < 1)) return [];
 

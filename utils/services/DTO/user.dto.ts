@@ -17,6 +17,22 @@ export interface IUser extends Omit<CreateUserDTO, 'password'>, Pick<AuthCredent
   administrator?: boolean;
   image?: string;
   uid: string;
+  conversations?: IConversationsUser[];
+  notifications?: Notifications[];
+}
+
+export interface IConversationsUser {
+  routeQuery: string;
+  otherUserUid: string;
+  otherUserName: string;
+  isNotification: boolean;
+}
+
+interface Notifications {
+  title: string;
+  body: string;
+  date: string;
+  isRead: boolean;
 }
 
 const userSchema = z.object({

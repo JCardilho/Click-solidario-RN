@@ -4,14 +4,14 @@ import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Loader from '~/assets/loader/loader.svg';
 
-interface Icon {
+export interface IconButtonComponent {
   name: keyof typeof IconAwesome.glyphMap;
   color: string;
   size: number;
 }
 
 export interface IPropsButtomComponent {
-  icon?: Icon;
+  icon?: IconButtonComponent;
   children?: React.ReactNode;
   onPress?: () => void;
   variant?: VariantsButtonComponent;

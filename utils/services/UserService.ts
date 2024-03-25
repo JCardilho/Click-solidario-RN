@@ -6,7 +6,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CreateUserDTO, IUser } from './DTO/user.dto';
+import { CreateUserDTO, IConversationsUser, IUser } from './DTO/user.dto';
 
 import {
   collection,
@@ -35,6 +35,8 @@ const createUser = async (params: CreateUserDTO): Promise<void> => {
       administrator: false,
       socialAssistant: false,
       image: '',
+      notifications: [],
+      conversations: [],
     });
     const auth = getAuth(firebase);
     await createUserWithEmailAndPassword(auth, params.email, params.password);
@@ -95,9 +97,72 @@ const deleteOldImageToUserInFirebaseStorage = async (image: string) => {
   await deleteObject(desertRef);
 };
 
+const SendNotificationMessage = async (uid: string, otherUserUid: string): Promise<void> => {};
+
+const CreateConversation = async (uid: string, params: IConversationsUser): Promise<boolean> => {
+  console.log('uid', uid);
+
+  const queryForVerifyIfExistConversation = query(
+    collection(getFirestore(firebase), 'users', uid, 'conversations'),
+    where('otherUserUid', '==', params.otherUserUid)
+  );
+  const docSnapForVerifyIfExistConversation = await getDocs(queryForVerifyIfExistConversation);
+  console.log('existe', docSnapForVerifyIfExistConversation.empty);
+  if (!docSnapForVerifyIfExistConversation.empty) return true;
+
+  const docRef = doc(getFirestore(firebase), 'users', uid);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) throw new Error('Usuário não encontrado');
+  const user = docSnap.data() as IUser;
+  const conversations = user.conversations || [];
+  const newConversation = {
+    ...params,
+  };
+  conversations.push(newConversation);
+  await setDoc(docRef, { conversations }, { merge: true });
+  return true;
+};
+
+const GetAllConversations = async (uid: string): Promise<IConversationsUser[]> => {
+  const docRef = doc(getFirestore(firebase), 'users', uid);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) throw new Error('Usuário não encontrado');
+  const user = docSnap.data() as IUser;
+  return user.conversations || [];
+};
+
+const MarkAsReadChatNotification = async ({
+  uid,
+  OtherUserUid,
+}: {
+  uid: string;
+  OtherUserUid: string;
+}) => {
+  const queryForVerifyIfExistConversation = query(
+    collection(getFirestore(firebase), 'users', uid, 'conversations'),
+    where('otherUserUid', '==', OtherUserUid)
+  );
+  const docSnapForVerifyIfExistConversation = await getDocs(queryForVerifyIfExistConversation);
+  console.log('existe', docSnapForVerifyIfExistConversation.empty);
+  if (docSnapForVerifyIfExistConversation.empty) return;
+  const docSnap = docSnapForVerifyIfExistConversation.docs[0];
+  const user = docSnap.data() as IUser;
+  const conversations = user.conversations || [];
+  const newConversations = conversations.map((conversation) => {
+    if (conversation.otherUserUid === OtherUserUid) {
+      conversation.isNotification = false;
+    }
+    return conversation;
+  });
+  await setDoc(docSnap.ref, { conversations: newConversations }, { merge: true });
+};
+
 export const UserService = {
   createUser,
   loginUser,
   addImageToUserInFirebase,
   deleteOldImageToUserInFirebaseStorage,
+  CreateConversation,
+  GetAllConversations,
+  MarkAsReadChatNotification,
 };
