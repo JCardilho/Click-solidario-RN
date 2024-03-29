@@ -9,24 +9,34 @@ import { FontsLoadProvider } from '~/utils/hooks/fontsLoad';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { createNotifications } from 'react-native-notificated';
-import { Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Dimensions, Text, View } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function Layout() {
   const queryClient = new QueryClient();
   const { NotificationsProvider, useNotifications, ...events } = createNotifications({
     notificationWidth: Dimensions.get('window').width,
     notificationPosition: 'top-left',
+    isNotch: true,
+
+    defaultStylesSettings: {
+      successConfig: {
+        bgColor: '#d5ffd5',
+        defaultIconType: 'no-icon',
+        titleFamily: 'Kanit_400Regular',
+      },
+    },
   });
 
   return (
     <QueryClientProvider client={queryClient}>
       <FontsLoadProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <NotificationsProvider />
           <BottomSheetModalProvider>
+            <NotificationsProvider />
             <Stack>
               <Stack.Screen name="registrar" options={{ headerShown: false }} />
+              <Stack.Screen name="entrar" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs-stack)" options={{ headerShown: false }} />
             </Stack>

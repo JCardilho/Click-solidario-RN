@@ -33,7 +33,7 @@ export default function Profile() {
     mutationKey: ['log-out'],
     mutationFn: async () => {
       await setCache('user', null);
-      router.push('/');
+      router.push('/entrar');
     },
   });
 

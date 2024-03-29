@@ -30,7 +30,7 @@ interface IProps {
 export const Card = (props: IProps) => {
   return (
     <>
-      <View className="w-full border-2 border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4">
+      <View className="w-full border border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4 shadow-xl shadow-zinc-800">
         {props.item.images && props.item.images.length > 0 && (
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
             {props.item.images.map((image: any) => (

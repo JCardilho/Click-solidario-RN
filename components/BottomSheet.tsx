@@ -18,7 +18,6 @@ export const useBottomSheetHook = (props?: IProps) => {
   const snapPoints = useMemo(() => ['25%', '50%'], []);
 
   function open() {
-
     handlePresentModalPress();
     /* bottomSheetRef.current?.expand(); */
   }
@@ -28,13 +27,11 @@ export const useBottomSheetHook = (props?: IProps) => {
   };
 
   const handlePresentModalPress = useCallback(() => {
-   
     bottomSheetRef.current?.present();
   }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
     if (index === -1) {
-      console.log('Modal closed');
       close();
     }
   }, []);
@@ -47,7 +44,15 @@ export const useBottomSheetHook = (props?: IProps) => {
           snapPoints={snapPoints}
           index={0}
           enablePanDownToClose
-          onChange={handleSheetChanges}>
+          enableContentPanningGesture
+          enableDismissOnClose
+          enableHandlePanningGesture
+          onChange={handleSheetChanges}
+          style={{
+            borderWidth: 2,
+            borderColor: '#6993ff',
+            borderRadius: 12,
+          }}>
           <BottomSheetView style={styles.contentContainer}>
             {props && props.isNeedConfirm && props.button ? (
               <View className="w-full flex flex-col gap-4 p-4">
@@ -102,7 +107,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: 'center',
-    backgroundColor: 'grey',
   },
   contentContainer: {
     flex: 1,

@@ -1,4 +1,4 @@
-import { AuthCredential } from 'firebase/auth';
+import { AuthCredential, IdTokenResult } from 'firebase/auth';
 import { z } from 'zod';
 
 export interface CreateUserDTO {
@@ -19,6 +19,7 @@ export interface IUser extends Omit<CreateUserDTO, 'password'>, Pick<AuthCredent
   uid: string;
   conversations?: IConversationsUser[];
   notifications?: Notifications[];
+  token?: IdTokenResult ;
 }
 
 export interface IConversationsUser {

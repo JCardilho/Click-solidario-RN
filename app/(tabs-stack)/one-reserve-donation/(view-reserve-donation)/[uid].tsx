@@ -64,8 +64,6 @@ export default function ViewOneReserveDonation() {
       )
         return;
 
-      console.log('criando chat');
-
       const result = await UserService.CreateConversation(data.ownerUid, {
         routeQuery: `?current_user_uid=${data.ownerUid}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`,
         isNotification: true,
@@ -83,7 +81,6 @@ export default function ViewOneReserveDonation() {
       return result;
     },
     onSuccess: async () => {
-      console.log('Chat foi');
       if (!user) return;
       notify('warning', {
         params: {

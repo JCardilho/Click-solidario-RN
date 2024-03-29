@@ -101,6 +101,11 @@ export default function Home() {
   const { user } = useCurrentUserHook();
   const { notify } = useNotifications();
   const router = useRouter();
+  const [notificationTopNavigation, setNotificationTopNavigation] = useState<{
+    conversations: boolean;
+    notifications: boolean;
+    posts: boolean;
+  }>();
   const { BottomSheet, open } = useBottomSheetHook({
     isNeedConfirm: true,
     button: {
@@ -108,11 +113,6 @@ export default function Home() {
     },
     textNeedConfirm: 'Você deseja confirmar essa alteração? Esse é um caminho sem volta!!',
   });
-  const [notificationTopNavigation, setNotificationTopNavigation] = useState<{
-    conversations: boolean;
-    notifications: boolean;
-    posts: boolean;
-  }>();
 
   const ref = useRef<PagerView>(null);
 
@@ -120,6 +120,8 @@ export default function Home() {
     queryKey: ['conversations'],
     queryFn: async () => {
       if (!user?.uid) throw new Error('Usuário não encontrado');
+      /* router.dismissAll(); */
+/*       router.canGoBack(); */
       const result = await UserService.GetAllConversations(user?.uid);
       return result;
     },
@@ -174,7 +176,7 @@ export default function Home() {
           <View className="w-full flex flex-col gap-4">
             {data?.map((item) => (
               <TouchableOpacity
-                key={item.routeQuery}
+                key={item.routeQuery + Math.random() * 1000}
                 className="w-full p-4 bg-blue-100 border-2 border-blue-200 rounded-lg flex flex-row justify-between items-center"
                 onPress={() => {
                   if (!user) return;

@@ -44,7 +44,6 @@ export default function CreateDonationItems() {
     watch,
   } = useForm<CreateDonationItemsType>({
     resolver: zodResolver(createDonationItemsSchema),
-
   });
 
   const { isPending, mutate } = useMutation<IReserveDonation | undefined>({
@@ -149,118 +148,103 @@ export default function CreateDonationItems() {
 
   return (
     <>
-      <ScrollView className="min-h-screen">
-        {/*  <Button
-          onPress={() => {
-            console.log('teste');
-            open();
-          }}
-          variant="default">
-          <Text>Teste</Text>
-        </Button> */}
-        <BottomSheet />
-        <HeaderBack title="Disponibilizar um item à doação" />
-        <View className="px-2 flex flex-col gap-4">
-          <Controller
-            control={control}
-            name="name"
-            render={({ field, fieldState: { error } }) => (
-              <>
-                <Input
-                  placeholder="Nome"
-                  label="Nome do item: "
-                  onChangeText={field.onChange}
-                  error={error?.message}
-                  value={field.value}
-                />
-              </>
+      <BottomSheet />
+      <HeaderBack title="Disponibilizar um item à doação" />
+      <ScrollView className="w-full flex flex-col">
+        <View className="">
+          <View className="px-2 flex flex-col gap-4">
+            <Controller
+              control={control}
+              name="name"
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  <Input
+                    placeholder="Nome"
+                    label="Nome do item: "
+                    onChangeText={field.onChange}
+                    error={error?.message}
+                    value={field.value}
+                  />
+                </>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="description"
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  <Input
+                    placeholder="Descrição"
+                    label="Descrição do item: "
+                    onChangeText={field.onChange}
+                    isTextArea={true}
+                    error={error?.message}
+                    value={field.value}
+                  />
+                </>
+              )}
+            />
+
+            {watch('image') && watch('image')!.length < 1 && (
+              <Text>Nenhuma imagem selecionada</Text>
             )}
-          />
 
-          <Controller
-            control={control}
-            name="description"
-            render={({ field, fieldState: { error } }) => (
-              <>
-                <Input
-                  placeholder="Descrição"
-                  label="Descrição do item: "
-                  onChangeText={field.onChange}
-                  isTextArea={true}
-                  error={error?.message}
-                  value={field.value}
-                />
-              </>
+            <View>
+              <Button
+                variant="default"
+                className="mb-4"
+                onPress={pickImages}
+                icon={{
+                  name: 'image',
+                  color: 'white',
+                  size: 15,
+                }}>
+                Adicionar Imagem
+              </Button>
+            </View>
+
+            {watch('image') && watch('image')!.length > 0 && (
+              <ScrollView
+                className="flex flex-row gap-4 "
+                horizontal={true}
+                showsHorizontalScrollIndicator={true}>
+                {watch('image')!.map((image, index) => (
+                  <Image
+                    source={{ uri: image }}
+                    className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"
+                    key={index}
+                    alt="image"
+                  />
+                ))}
+              </ScrollView>
             )}
-          />
 
-          {watch('image') && watch('image')!.length < 1 && <Text>Nenhuma imagem selecionada</Text>}
-
-          <View>
-            <Button
-              variant="default"
-              className="mb-4"
-              onPress={pickImages}
-              icon={{
-                name: 'image',
-                color: 'white',
-                size: 15,
-              }}>
-              Adicionar Imagem
-            </Button>
-          </View>
-
-          {watch('image') && watch('image')!.length > 0 && (
-            <ScrollView
-              className="flex flex-row gap-4 "
-              horizontal={true}
-              showsHorizontalScrollIndicator={true}>
-              {watch('image')!.map((image, index) => (
-                <Image
-                  source={{ uri: image }}
-                  className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"
-                  key={index}
-                  alt="image"
-                />
+            {(watch('image') && watch('image')!.length < 1) ||
+              (!watch('image') && (
+                <View className="flex flex-col gap-4 bg-zinc-100 border border-zinc-200 rounded items-center justify-center w-full h-[150px]">
+                  <FontAwesome name="image" size={50} color="#9b9b9b" />
+                  <Text className="text-2xl font-kanit text-zinc-400">
+                    Nenhuma imagem selecionada!!
+                  </Text>
+                </View>
               ))}
-            </ScrollView>
-          )}
-
-          {(watch('image') && watch('image')!.length < 1) ||
-            (!watch('image') && (
-              <View className="flex flex-col gap-4 bg-zinc-100 border border-zinc-200 rounded items-center justify-center w-full h-[150px]">
-                <FontAwesome name="image" size={50} color="#9b9b9b" />
-                <Text className="text-2xl font-kanit text-zinc-400">
-                  Nenhuma imagem selecionada!!
-                </Text>
-              </View>
-            ))}
+          </View>
         </View>
       </ScrollView>
-
-      <View className="w-full p-4">
-        {errors && errors.name && (
-          <Text className="text-red-500 text-center font-kanit">{errors.name.message}</Text>
+      <View className="w-full p-4 fixed bottom-4">
+        {(!getValues('image') || !watch('description') || !watch('name')) && (
+          <>
+            <Text className="text-red-500 text-center font-kanit">Preencha todos os campos!!</Text>
+          </>
         )}
-        {errors && errors.description && (
-          <Text className="text-red-500 text-center font-kanit">{errors.description.message}</Text>
-        )}
-        <Text className="text-red-500 text-center font-kanit">
-          {getValues('image') ? '' : 'Selecione uma imagem'}
-        </Text>
         <Button
           onPress={open}
           variant="success"
           className="w-full mt-2"
-          disabled={
-            errors.name
-              ? true
-              : false || errors.description
-                ? true
-                : false || !getValues('image') || isPending || isPendingAddImage
-          }
+          disabled={!getValues('image') || !watch('name') || !watch('description')}
           icon={{
-            name: 'plus',
+            name: 'check-circle-o',
             color: 'white',
             size: 15,
           }}

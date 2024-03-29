@@ -58,20 +58,20 @@ export const useCurrentUserHook = () => {
       const getAuth = auth.getAuth(firebase);
       const unsubscribe = onAuthStateChanged(getAuth, async (user) => {
         if (!user) {
-          router.push('/');
+          router.push('/entrar');
         }
       });
 
       return () => unsubscribe();
     } catch (err) {
-      router.push('/');
+      router.push('/entrar');
     }
   };
 
   const sendFromHome = (user: IUser) => {
     const verify = verifyUserWithZodSchema(user);
-    console.log(verify);
     if (verify) {
+      console.log('Verificou e está correto!!');
       setUser(user);
       router.push('/home');
       return;
@@ -82,7 +82,8 @@ export const useCurrentUserHook = () => {
 
   const sendFromLogin = () => {
     if (path == '/') return;
-    router.push('/');
+    console.info('Enviando usuário da login');
+    router.push('/entrar');
     return;
   };
 
@@ -90,14 +91,14 @@ export const useCurrentUserHook = () => {
     try {
       if (user && user !== null) return sendFromHome(user);
       const getCachedUser = (await getCache('user')) as IUser | null;
-      console.log('user on cache', getCachedUser);
       if (!getCachedUser || getCachedUser === null) return sendFromLogin();
       if (getCachedUser) {
+        console.info('Enviando usuário da home');
         sendFromHome(getCachedUser);
         return;
       }
     } catch (err) {
-      router.push('/');
+      return router.push('/entrar');
     }
   };
 

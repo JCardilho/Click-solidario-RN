@@ -58,6 +58,7 @@ export default function ReserveDonations() {
             0,
             1000
           );
+
           setDisableLoadMore(true);
           setEndCount(0);
           setEndAt(5);
@@ -67,6 +68,25 @@ export default function ReserveDonations() {
           };
         }
         const result = await ReserveDonationsService.GetAllReserveDonations(user?.uid, 0, endAt);
+
+        if (result.donations.length === 0) {
+          const result = await ReserveDonationsService.GetAllReserveDonations(
+            user?.uid,
+            0,
+            endAt + 10
+          );
+          if (result.donations.length === 0) {
+            setDisableLoadMore(true);
+            return {
+              userReserveCount: 0,
+              donations: [],
+            };
+          }
+          return {
+            userReserveCount: result.userReserveCount,
+            donations: result.donations,
+          };
+        }
 
         return result;
       } catch (err) {
