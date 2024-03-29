@@ -81,7 +81,7 @@ export const useCurrentUserHook = () => {
   };
 
   const sendFromLogin = () => {
-    if (path == '/') return;
+    if (path == '/entrar') return;
     console.info('Enviando usuário da login');
     router.push('/entrar');
     return;
