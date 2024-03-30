@@ -18,6 +18,8 @@ interface IReserveOwner {
   endOwnerNameOfLastReserve?: string;
 }
 
+// Realtime Database
+
 export interface IReserveDonationMessageRealTime {
   createdAt: string;
   messages: IMessage[];
