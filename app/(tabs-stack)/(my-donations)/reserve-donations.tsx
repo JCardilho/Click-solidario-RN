@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { getYear } from 'date-fns';
 import { Stack, useRouter } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 import { Card } from '~/components/Card';
@@ -6,6 +7,7 @@ import { Divider } from '~/components/Divider';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Loader } from '~/components/Loader';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
+import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
 
@@ -13,7 +15,7 @@ export default function MyDonationsInReserveDonationsPage() {
   const { user } = useCurrentUserHook();
   const router = useRouter();
 
-  const { isPending, data } = useQuery<IReserveDonation[]>({
+  const { isPending, data, refetch } = useQuery<IReserveDonation[]>({
     queryKey: ['my-donations-reserve-donations'],
     queryFn: async () => {
       if (!user || !user.uid) return [];
@@ -21,6 +23,8 @@ export default function MyDonationsInReserveDonationsPage() {
       return result;
     },
   });
+
+  useRefreshOnFocus(refetch);
 
   return (
     <>
@@ -46,6 +50,10 @@ export default function MyDonationsInReserveDonationsPage() {
                 createdAt: item.createdAt,
                 id: item.uid,
               }}
+              isFinished={
+                item.reserve.endDateOfLastReserve &&
+                getYear(item.reserve.endDateOfLastReserve) === 2100
+              }
               hidden={{
                 ownerName: true,
                 status: true,

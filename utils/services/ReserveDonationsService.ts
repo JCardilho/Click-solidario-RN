@@ -461,6 +461,56 @@ const CreateChatIfNotExists = async (
   return ref;
 };
 
+const FinishReserve = async ({
+  uid,
+  endOwnerNameOfLastReserve,
+  endOwnerUidOfLastReserve,
+}: {
+  uid: string;
+  endOwnerNameOfLastReserve: string;
+  endOwnerUidOfLastReserve: string;
+}): Promise<Date> => {
+  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const newDate = new Date(2100, 1, 1);
+  await setDoc(
+    docRef,
+    {
+      reserve: {
+        endDateOfLastReserve: newDate,
+        endOwnerNameOfLastReserve: endOwnerNameOfLastReserve,
+        endOwnerUidOfLastReserve: endOwnerUidOfLastReserve,
+      },
+    },
+    { merge: true }
+  );
+  return newDate;
+};
+
+const UnFinishReserve = async ({
+  uid,
+  endOwnerNameOfLastReserve,
+  endOwnerUidOfLastReserve,
+}: {
+  uid: string;
+  endOwnerNameOfLastReserve: string;
+  endOwnerUidOfLastReserve: string;
+}): Promise<Date> => {
+  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const newDate = addDays(new Date(), 1);
+  await setDoc(
+    docRef,
+    {
+      reserve: {
+        endDateOfLastReserve: newDate,
+        endOwnerNameOfLastReserve: endOwnerNameOfLastReserve,
+        endOwnerUidOfLastReserve: endOwnerUidOfLastReserve,
+      },
+    },
+    { merge: true }
+  );
+  return newDate;
+};
+
 export const ReserveDonationsService = {
   CreateReserveDonation,
   GetAllReserveDonations,
@@ -478,4 +528,6 @@ export const ReserveDonationsService = {
   CreateMessage,
   GetMyMessages,
   WatchEventMessage,
+  FinishReserve,
+  UnFinishReserve,
 };

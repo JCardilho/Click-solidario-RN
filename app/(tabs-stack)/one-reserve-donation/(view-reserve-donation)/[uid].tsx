@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
+import { format, getYear } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ScrollView, Text, View } from 'react-native';
@@ -10,6 +10,7 @@ import { HeaderBack } from '~/components/HeaderBack';
 import { Loader, useLoaderHook } from '~/components/Loader';
 import { CancelReserve } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/cancel-reserve';
 import { ExcludeReserve } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/exclude-reserve';
+import { FinishReserveInViewReserveDonation } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/finish-reserve';
 import { ReserveAction } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/reserve-action';
 import {
   ViewDataImageForViewReserveDonation,
@@ -114,10 +115,14 @@ export default function ViewOneReserveDonation() {
                 <>
                   {data.reserve.endDateOfLastReserve &&
                     new Date() < data.reserve.endDateOfLastReserve && (
-                      <View className="w-full flex flex-col p-2 bg-white border-zinc-200 border rounded-lg gap-4">
+                      <View
+                        className={`w-full flex flex-col p-2 border rounded-lg gap-4 ${data.reserve.endDateOfLastReserve && getYear(data.reserve.endDateOfLastReserve) === 2100 ? 'bg-green-100 border-green-500' : 'bg-white border-zinc-200'}`}>
                         <View className="w-fit flex items-center">
                           <Badge icon="handshake-o" colorIcon="white">
-                            Reservado!!
+                            {data.reserve.endDateOfLastReserve &&
+                            getYear(data.reserve.endDateOfLastReserve) === 2100
+                              ? 'Reserva finalizada!!'
+                              : 'Reservado!!'}
                           </Badge>
                         </View>
                         <Text className="font-kanit">
@@ -126,10 +131,15 @@ export default function ViewOneReserveDonation() {
                             {data.reserve.endOwnerNameOfLastReserve}
                           </Text>
                         </Text>
-                        <Text className="font-kanit">
-                          Reserva até:{' '}
-                          {format(data.reserve.endDateOfLastReserve, 'dd-MM-yyyy HH:mm')}
-                        </Text>
+                        {data.reserve.endDateOfLastReserve &&
+                          getYear(data.reserve.endDateOfLastReserve) !== 2100 && (
+                            <>
+                              <Text className="font-kanit">
+                                Reserva até:{' '}
+                                {format(data.reserve.endDateOfLastReserve, 'dd-MM-yyyy HH:mm')}
+                              </Text>
+                            </>
+                          )}
                       </View>
                     )}
                 </>
@@ -170,6 +180,7 @@ export default function ViewOneReserveDonation() {
                     }>
                     Editar
                   </Button>
+                  <FinishReserveInViewReserveDonation uid={uid} refetch={refetch} data={data} />
                   <ExcludeReserve uid={uid} refetch={refetch} data={data} />
                 </>
               )}

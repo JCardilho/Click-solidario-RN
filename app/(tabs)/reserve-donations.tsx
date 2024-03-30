@@ -133,17 +133,29 @@ export default function ReserveDonations() {
 
         <DefaultInformationsForReserveDonationsPage />
 
-        <Button
-          variant="default"
-          icon={{
-            name: 'user',
-            color: 'white',
-            size: 15,
-          }}
-          className="mb-2"
-          href={() => router.push('/(tabs-stack)/(my-donations)/reserve-donations')}>
-          Minhas doações
-        </Button>
+        <View className="w-full flex flex-row gap-2 justify-between items-center">
+          <Button
+            variant="default"
+            icon={{
+              name: 'user',
+              color: 'white',
+              size: 15,
+            }}
+            href={() => router.push('/(tabs-stack)/(my-donations)/reserve-donations')}>
+            Minhas doações
+          </Button>
+
+          <Button
+            variant="default"
+            icon={{
+              name: 'plus',
+              color: 'white',
+              size: 15,
+            }}
+            href={() => router.push('/(tabs-stack)/create-reserve-donation')}>
+            Disponibilizar um item à doação
+          </Button>
+        </View>
 
         {data && data?.userReserveCount > 0 && (
           <Button
@@ -159,18 +171,6 @@ export default function ReserveDonations() {
             {data.userReserveCount === 1 ? 'reserva ativa' : 'reservas ativas'} )
           </Button>
         )}
-
-        <Button
-          variant="success"
-          icon={{
-            name: 'plus',
-            color: 'white',
-            size: 15,
-          }}
-          href={() => router.push('/(tabs-stack)/create-reserve-donation')}
-          className="mb-2">
-          Disponibilizar um item à doação
-        </Button>
 
         <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
         <Text className="text-2xl text-center font-kanit my-6">Itens disponibilizados:</Text>

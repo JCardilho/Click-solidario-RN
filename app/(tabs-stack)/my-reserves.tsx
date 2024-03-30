@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { getYear } from 'date-fns';
 import { useRouter } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 import { Card } from '~/components/Card';
@@ -53,8 +54,11 @@ export default function MyReservers() {
                 createdAt: item.createdAt,
                 id: item.uid,
               }}
+              isFinished={
+                item.reserve.endDateOfLastReserve &&
+                getYear(item.reserve.endDateOfLastReserve) === 2100
+              }
               hidden={{
-                ownerName: true,
                 status: true,
               }}
               href={() => {

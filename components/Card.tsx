@@ -4,6 +4,7 @@ import { Divider } from './Divider';
 import React, { ReactNode } from 'react';
 import { Button } from './Button';
 import { FontAwesome } from '@expo/vector-icons';
+import { Badge } from './Badge';
 
 interface IItem {
   id: string;
@@ -25,18 +26,23 @@ interface IProps {
   hidden?: IHidden;
   href?: () => void;
   status?: React.ReactNode;
+  isFinished?: boolean;
 }
 
 export const Card = (props: IProps) => {
+  const borderContainer = props.isFinished ? 'border-green-500' : 'border-blue-500';
+  const borderImage = props.isFinished ? 'border-green-500' : 'border-primary';
+
   return (
     <>
-      <View className="w-full border border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4 shadow-xl shadow-zinc-800">
+      <View
+        className={`w-full border p-4 rounded-lg  bg-white flex flex-col gap-2 my-4 shadow-xl shadow-zinc-800 ${borderContainer}`}>
         {props.item.images && props.item.images.length > 0 && (
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
             {props.item.images.map((image: any) => (
               <Image
                 source={{ uri: image }}
-                className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"
+                className={`w-[150px] h-[150px] rounded-lg border-2 m-2 ${borderImage}`}
                 key={image}
               />
             ))}
@@ -57,15 +63,22 @@ export const Card = (props: IProps) => {
         </Text>
         <Divider />
 
-        {!props.hidden?.status && (
+        {(!props.hidden?.status || props.isFinished) && (
           <>
             <Text className="text-md font-kanit">Status:</Text>
-            <View className="w-full flex items-center flex-row gap-2">{props.status}</View>
+            <View className="w-full flex items-center flex-row gap-2">
+              {props.status}
+              {props.isFinished && (
+                <Badge icon="hourglass-3" colorIcon="white">
+                  Finalizado!!
+                </Badge>
+              )}
+            </View>
             <Divider />
           </>
         )}
         <Button
-          variant="default"
+          variant={props.isFinished ? 'success' : 'default'}
           icon={{
             name: 'info',
             color: 'white',

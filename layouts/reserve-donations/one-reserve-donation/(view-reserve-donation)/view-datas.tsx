@@ -9,9 +9,10 @@ interface IProps {
 export const ViewDataTextForViewReserveDonation = ({ data }: IProps) => {
   return (
     <>
-      <View className="w-full p-4 border border-primary rounded-lg flex items-center justify-center">
-        <Text className="font-kanit text-2xl">Nome: {data.name}</Text>
-      </View>
+      <Text className="font-kanit text-lg">Nome: </Text>
+      <Text className="font-kanit text-lg text-justify p-2 bg-white border border-zinc-200 rounded-lg">
+        {data.name}
+      </Text>
       <Text className="font-kanit text-lg">Descrição: </Text>
       <Text className="font-kanit text-lg text-justify p-2 bg-white border border-zinc-200 rounded-lg">
         {data.description}
@@ -37,7 +38,7 @@ export const ViewDataImageForViewReserveDonation = ({ data }: IProps) => {
               <TouchableOpacity key={image + Math.random() * 100 + index}>
                 <Image
                   source={{ uri: image }}
-                  className="w-[150px] h-[150px] rounded-lg border-2 border-primary m-2"
+                  className="w-[250px] h-[250px] rounded-lg border-2 border-primary m-2"
                 />
               </TouchableOpacity>
             ))}

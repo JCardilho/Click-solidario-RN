@@ -11,11 +11,13 @@ interface IProps {
   children?: React.ReactNode;
   textNeedConfirmButton?: string;
   textNeedConfirm?: string;
+  descriptionNeedConfirm?: string;
+  snapPoints?: string[];
 }
 
 export const useBottomSheetHook = (props?: IProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
+  const snapPoints = useMemo(() => props?.snapPoints || ['35%', '50%', "90%", "100%"], []);
 
   function open() {
     handlePresentModalPress();
@@ -50,7 +52,7 @@ export const useBottomSheetHook = (props?: IProps) => {
           onChange={handleSheetChanges}
           style={{
             borderWidth: 2,
-            borderColor: '#6993ff',
+            borderColor: '#bdbdbd',
             borderRadius: 12,
           }}>
           <BottomSheetView style={styles.contentContainer}>
@@ -62,6 +64,11 @@ export const useBottomSheetHook = (props?: IProps) => {
                       ? props.textNeedConfirm
                       : 'Você deseja confirmar essa alteração?'}
                   </Text>
+                  {props.descriptionNeedConfirm && (
+                    <Text className="font-kanit text-center text-sm mb-4">
+                      {props.descriptionNeedConfirm}
+                    </Text>
+                  )}
                 </View>
                 <Button
                   variant={props.button.variant}
