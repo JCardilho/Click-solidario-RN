@@ -210,7 +210,8 @@ export default function ViewOneReserveDonation() {
                 )}
 
               {data.reserve.endDateOfLastReserve &&
-                new Date() < data.reserve.endDateOfLastReserve && (
+                new Date() < data.reserve.endDateOfLastReserve &&
+                getYear(data.reserve.endDateOfLastReserve) !== 2100 && (
                   <CancelReserve uid={uid} refetch={refetch} data={data} />
                 )}
             </View>
