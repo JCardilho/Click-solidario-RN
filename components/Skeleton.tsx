@@ -49,5 +49,5 @@ export const SkeletonRect = (
 ) => {
   const { width, height } = useWindowDimensions();
 
-  return <Rect {...props} width={width} rx="4" ry="4" />;
+  return <Rect width={width} {...props} rx="4" ry="4" />;
 };

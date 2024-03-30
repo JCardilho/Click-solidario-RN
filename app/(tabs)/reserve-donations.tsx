@@ -33,7 +33,7 @@ export default function ReserveDonations() {
   const { getCache, setCache } = useCacheHook();
   const [search, setSearch] = useState('');
   const { user } = useCurrentUserHook();
-  const [endAt, setEndAt] = useState<number>(5);
+  const [endAt, setEndAt] = useState<number>(10);
   const [endCount, setEndCount] = useState<number>(0);
   const [disableLoadMore, setDisableLoadMore] = useState<boolean>(false);
   const scrollRef = useRef<ScrollView>(null);
@@ -61,7 +61,7 @@ export default function ReserveDonations() {
 
           setDisableLoadMore(true);
           setEndCount(0);
-          setEndAt(5);
+          setEndAt(10);
           return {
             userReserveCount: result.userReserveCount,
             donations: result.donations,
@@ -102,7 +102,7 @@ export default function ReserveDonations() {
   useRefreshOnFocus(refetch);
 
   useEffect(() => {
-    if (endAt && endAt != 5 && data) {
+    if (endAt && endAt != 10 && data) {
       refetch();
       if (data.donations.length != endCount) {
         setEndCount(data.donations.length);
@@ -238,7 +238,7 @@ export default function ReserveDonations() {
                 size: 15,
               }}
               onPress={() => {
-                setEndAt(endAt + 5);
+                setEndAt(endAt + 10);
               }}>
               Carregar mais
             </Button>

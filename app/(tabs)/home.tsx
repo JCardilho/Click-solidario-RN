@@ -126,7 +126,7 @@ export default function Home() {
 
   const ref = useRef<PagerView>(null);
 
-  const { data, refetch } = useQuery<IUser['conversations']>({
+  const { data, refetch, isLoading } = useQuery<IUser['conversations']>({
     queryKey: ['conversations'],
     queryFn: async () => {
       if (!user?.uid) throw new Error('Usuário não encontrado');
@@ -199,29 +199,52 @@ export default function Home() {
             isNotificationConversations={notificationTopNavigation?.conversations}
             isBack
           />
-          <View className="w-full flex flex-col gap-4">
-            {data?.map((item) => (
-              <TouchableOpacity
-                key={item.routeQuery + Math.random() * 1000}
-                className="w-full p-4 bg-blue-100 border-2 border-blue-200 rounded-lg flex flex-row justify-between items-center"
-                onPress={() => {
-                  if (!user) return;
-                  const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${user.uid}${item.routeQuery}`;
-                  router.push(link as any);
+
+          {isLoading && (
+            <>
+              <View
+                className="w-full h-screen"
+                style={{
+                  height: WD.height,
                 }}>
-                <Text className="font-kanit text-blue-600 text-lg">{item.otherUserName}</Text>
-                <View className="flex flex-col gap-2 items-end justify-end">
-                  {item.isNotification && (
-                    <Text className="font-kanit text-red-500 text-md">
-                      {' '}
-                      Você tem uma nova mensagem
-                    </Text>
-                  )}
-                  <Text className="font-kanit text-zinc-600">Clique</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+                <SkeletonContent>
+                  <SkeletonRect height={85} y={0 * 95} />
+                  <SkeletonRect height={85} y={1 * 95} />
+                  <SkeletonRect height={85} y={2 * 95} />
+                  <SkeletonRect height={85} y={3 * 95} />
+                  <SkeletonRect height={85} y={4 * 95} />
+                  <SkeletonRect height={85} y={5 * 95} />
+                  <SkeletonRect height={85} y={6 * 95} />
+                </SkeletonContent>
+              </View>
+            </>
+          )}
+
+          {!isLoading && (
+            <ScrollView className="w-full flex flex-col gap-4">
+              {data?.map((item) => (
+                <TouchableOpacity
+                  key={item.routeQuery + Math.random() * 1000}
+                  className="w-full p-4 bg-blue-100 border-2 border-blue-200 rounded-lg flex flex-row justify-between items-center"
+                  onPress={() => {
+                    if (!user) return;
+                    const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${user.uid}${item.routeQuery}`;
+                    router.push(link as any);
+                  }}>
+                  <Text className="font-kanit text-blue-600 text-lg">{item.otherUserName}</Text>
+                  <View className="flex flex-col gap-2 items-end justify-end">
+                    {item.isNotification && (
+                      <Text className="font-kanit text-red-500 text-md">
+                        {' '}
+                        Você tem uma nova mensagem
+                      </Text>
+                    )}
+                    <Text className="font-kanit text-zinc-600">Clique</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
         </View>
       </PagerView>
     </>

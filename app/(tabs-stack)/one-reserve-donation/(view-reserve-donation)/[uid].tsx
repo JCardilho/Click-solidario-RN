@@ -166,20 +166,24 @@ export default function ViewOneReserveDonation() {
                       </>
                     )}
 
-                  <Button
-                    variant="default"
-                    icon={{
-                      name: 'paint-brush',
-                      color: 'white',
-                      size: 15,
-                    }}
-                    href={() =>
-                      router.push(
-                        `/(tabs-stack)/one-reserve-donation/(edit-reserve-donation)/${uid}`
-                      )
-                    }>
-                    Editar
-                  </Button>
+                  {data.reserve &&
+                    data.reserve.endDateOfLastReserve &&
+                    getYear(data.reserve.endDateOfLastReserve) !== 2100 && (
+                      <Button
+                        variant="default"
+                        icon={{
+                          name: 'paint-brush',
+                          color: 'white',
+                          size: 15,
+                        }}
+                        href={() =>
+                          router.push(
+                            `/(tabs-stack)/one-reserve-donation/(edit-reserve-donation)/${uid}`
+                          )
+                        }>
+                        Editar
+                      </Button>
+                    )}
                   <FinishReserveInViewReserveDonation uid={uid} refetch={refetch} data={data} />
                   <ExcludeReserve uid={uid} refetch={refetch} data={data} />
                 </>

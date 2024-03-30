@@ -2,11 +2,12 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
 import { getDatabase, onValue, ref } from 'firebase/database';
-import { useEffect, useRef, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Input } from '~/components/Input';
+import { SkeletonContent, SkeletonRect } from '~/components/Skeleton';
 import firebase from '~/utils/firebase';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { IReserveDonationMessageRealTime } from '~/utils/services/DTO/reserve-donation.dto';
@@ -56,7 +57,7 @@ export default function Chat() {
   const [data, setMessages] = useState<IReserveDonationMessageRealTime['messages']>([]);
   const scrollRef = useRef<ScrollView>(null);
 
-  const { refetch } = useQuery<any>({
+  const { refetch, isPending: isPendingMessage } = useQuery<any>({
     queryKey: ['messages', params.reserve_owner_uid],
     queryFn: async () => {
       try {
@@ -138,6 +139,10 @@ export default function Chat() {
     },
   });
 
+  const { width } = useWindowDimensions();
+
+  const GapPerMessage = 10;
+
   return (
     params.current_user_uid &&
     params.reserve_owner_uid &&
@@ -145,32 +150,89 @@ export default function Chat() {
     user.uid === params.current_user_uid && (
       <>
         <HeaderBack title="Chat" />
-        <ScrollView className="h-[1500px] w-full px-4 pb-12 flex-col gap-4" ref={scrollRef}>
-          {data &&
-            data.map((messages) =>
-              messages.owner_message_uid === user.uid ? (
-                <Card
-                  ownerName="Você"
-                  variant="you"
-                  key={messages.createdAt + messages.text + messages.owner_message_uid}>
-                  {messages.text}
-                </Card>
-              ) : (
-                <Card
-                  ownerName={
-                    user && user.uid === params.reserve_owner_uid
-                      ? params.reserve_owner_name
-                      : params.reserve_owner_name
-                  }
-                  variant="other"
-                  key={messages.createdAt + messages.text + messages.owner_message_uid}>
-                  {messages.text}
-                </Card>
-              )
-            )}
+        {isPendingMessage && (
+          <View className="w-full h-screen p-4">
+            <SkeletonContent>
+              <SkeletonRect width={Math.floor(Math.random() * 50) + 200} height={50} y={0} />
+              <SkeletonRect
+                width={Math.floor(Math.random() * 50) + 200}
+                height={20}
+                y={(50 + GapPerMessage) * 1}
+              />
+              <SkeletonRect
+                width={Math.floor(Math.random() * 50) + 200}
+                height={30}
+                y={(50 + 20 + GapPerMessage) * 1.1}
+                x={width - 300}
+              />
+              <SkeletonRect
+                width={Math.floor(Math.random() * 50) + 150}
+                height={70}
+                y={(50 + 20 + 30 + GapPerMessage) * 1.2}
+              />
+              <SkeletonRect
+                width={Math.floor(Math.random() * 50) + 200}
+                height={20}
+                y={(50 + 20 + 30 + 70 + GapPerMessage) * 1.25}
+                x={width - 300}
+              />
+              <SkeletonRect
+                width={Math.floor(Math.random() * 50) + 300}
+                height={50}
+                y={(50 + 20 + 30 + 70 + 20 + GapPerMessage) * 1.3}
+                x={width - 300}
+              />
+              <SkeletonRect
+                width={Math.floor(Math.random() * 50) + 300}
+                height={20}
+                y={(50 + 20 + 30 + 70 + 20 + 50 + GapPerMessage) * 1.35}
+                x={width - 300}
+              />
+              <SkeletonRect
+                width={Math.floor(Math.random() * 50) + 150}
+                height={70}
+                y={(50 + 20 + 30 + 70 + 20 + 50 + 20 + GapPerMessage) * 1.4}
+              />
+              <SkeletonRect
+                width={Math.floor(Math.random() * 50) + 150}
+                height={45}
+                y={(50 + 20 + 30 + 70 + 20 + 50 + 20 + 70 + GapPerMessage) * 1.45}
+              />
+            </SkeletonContent>
+          </View>
+        )}
 
-          <View className="h-[35px] w-full bg-transparent"></View>
-        </ScrollView>
+        {!isPendingMessage && (
+          <>
+            <ScrollView className="h-[1500px] w-full px-4 pb-12 flex-col gap-4" ref={scrollRef}>
+              {data &&
+                data.map((messages) =>
+                  messages.owner_message_uid === user.uid ? (
+                    <Card
+                      ownerName="Você"
+                      variant="you"
+                      key={messages.createdAt + messages.text + messages.owner_message_uid}>
+                      {messages.text}
+                    </Card>
+                  ) : (
+                    <Card
+                      ownerName={
+                        user && user.uid === params.reserve_owner_uid
+                          ? params.reserve_owner_name
+                          : params.reserve_owner_name
+                      }
+                      variant="other"
+                      key={messages.createdAt + messages.text + messages.owner_message_uid}>
+                      {messages.text}
+                    </Card>
+                  )
+                )}
+
+              <View className="h-[35px] w-full bg-transparent"></View>
+            </ScrollView>
+          </>
+        )}
+
         <View className=" w-full items-center justify-center z-20 bg-white px-2 flex-row gap-2 p-2">
           <Input
             placeholder="Digite sua mensagem"

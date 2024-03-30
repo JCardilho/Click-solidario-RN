@@ -28,7 +28,7 @@
       "tsconfigPaths": true
     },
     "orientation": "portrait",
-    "icon": "./assets/favicon.png",
+    "icon": "./assets/favicon1.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -41,7 +41,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/favicon.png",
+        "foregroundImage": "./assets/favicon1.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.kyoudan.clicksolidarioo"
