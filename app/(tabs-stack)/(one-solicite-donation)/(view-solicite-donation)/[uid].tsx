@@ -66,22 +66,21 @@ export default function ViewOneSoliciteDonation() {
       )
         return 'ERR';
 
-     /*  const result = await UserService.CreateConversation(data.ownerUid, {
-        routeQuery: `?current_user_uid=${data.ownerUid}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`,
-        isNotification: true,
-        otherUserName: data.reserve.endOwnerNameOfLastReserve || '',
-        otherUserUid: data.reserve.endOwnerUidOfLastReserve || '',
-      });
-
-      await UserService.CreateConversation(data.reserve.endOwnerUidOfLastReserve || '', {
-        routeQuery: `?current_user_uid=${data.reserve.endOwnerUidOfLastReserve}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`,
+      const result = await UserService.CreateConversation(user.uid, {
+        routeQuery: `?current_user_uid=${user.uid}&donation_owner_uid=${user.uid}&receives_donation_uid=${data.ownerUid}&receives_donation_name=${data.ownerName}&donation_owner_name=${user.name}`,
         isNotification: true,
         otherUserName: data.ownerName,
         otherUserUid: data.ownerUid,
       });
 
-      return result; */
-      return 'OK';
+      await UserService.CreateConversation(data.ownerUid || '', {
+        routeQuery: `?current_user_uid=${data.ownerUid}&donation_owner_uid=${user.uid}&receives_donation_uid=${data.ownerUid}&receives_donation_name=${data.ownerName}&donation_owner_name=${user.name}`,
+        isNotification: true,
+        otherUserName: user.name!,
+        otherUserUid: user.uid,
+      });
+
+      return result;
     },
     onSuccess: async () => {
       if (!user) return;
@@ -91,8 +90,8 @@ export default function ViewOneSoliciteDonation() {
           description: '',
         },
       });
-      /*  const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data!.ownerUid}&receives_donation_uid=${data!.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data!.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data!.ownerName}`;
-      router.push(link as any); */
+      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&donation_owner_uid=${user.uid}&receives_donation_uid=${data!.ownerUid}&receives_donation_name=${data!.ownerName}&donation_owner_name=${user.name}`;
+      router.push(link as any);
     },
   });
 
@@ -124,11 +123,7 @@ export default function ViewOneSoliciteDonation() {
                         color: 'white',
                         size: 15,
                       }}
-                      href={() =>
-                        router.push(
-                          `/(tabs-stack)/one-reserve-donation/(edit-reserve-donation)/${uid}`
-                        )
-                      }>
+                      href={() => {}}>
                       Editar
                     </Button>
                   )}

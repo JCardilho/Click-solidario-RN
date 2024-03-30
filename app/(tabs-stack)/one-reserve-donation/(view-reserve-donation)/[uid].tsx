@@ -66,14 +66,14 @@ export default function ViewOneReserveDonation() {
         return;
 
       const result = await UserService.CreateConversation(data.ownerUid, {
-        routeQuery: `?current_user_uid=${data.ownerUid}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`,
+        routeQuery: `?current_user_uid=${data.ownerUid}&donation_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&donation_owner_name=${data.ownerName}`,
         isNotification: true,
         otherUserName: data.reserve.endOwnerNameOfLastReserve || '',
         otherUserUid: data.reserve.endOwnerUidOfLastReserve || '',
       });
 
       await UserService.CreateConversation(data.reserve.endOwnerUidOfLastReserve || '', {
-        routeQuery: `?current_user_uid=${data.reserve.endOwnerUidOfLastReserve}&reserve_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data.ownerName}`,
+        routeQuery: `?current_user_uid=${data.reserve.endOwnerUidOfLastReserve}&donation_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&donation_owner_name=${data.ownerName}`,
         isNotification: true,
         otherUserName: data.ownerName,
         otherUserUid: data.ownerUid,
@@ -89,7 +89,7 @@ export default function ViewOneReserveDonation() {
           description: '',
         },
       });
-      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&reserve_owner_uid=${data!.ownerUid}&receives_donation_uid=${data!.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data!.reserve.endOwnerNameOfLastReserve}&reserve_owner_name=${data!.ownerName}`;
+      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&donation_owner_uid=${data!.ownerUid}&receives_donation_uid=${data!.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data!.reserve.endOwnerNameOfLastReserve}&donation_owner_name=${data!.ownerName}`;
       router.push(link as any);
     },
   });

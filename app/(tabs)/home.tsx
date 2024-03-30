@@ -225,7 +225,7 @@ export default function Home() {
               {data?.map((item) => (
                 <TouchableOpacity
                   key={item.routeQuery + Math.random() * 1000}
-                  className="w-full p-4 bg-blue-100 border-2 border-blue-200 rounded-lg flex flex-row justify-between items-center"
+                  className="w-full p-4 bg-blue-100 border-2 border-blue-200 rounded-lg flex flex-row justify-between items-center mb-4"
                   onPress={() => {
                     if (!user) return;
                     const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${user.uid}${item.routeQuery}`;

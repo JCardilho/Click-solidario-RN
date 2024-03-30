@@ -49,37 +49,37 @@ export default function Chat() {
   const { user } = useCurrentUserHook();
   const params = useLocalSearchParams<{
     current_user_uid: string;
-    reserve_owner_uid: string;
+    donation_owner_uid: string;
     receives_donation_uid: string;
     receives_donation_name: string;
-    reserve_owner_name: string;
+    donation_owner_name: string;
   }>();
   const [data, setMessages] = useState<IReserveDonationMessageRealTime['messages']>([]);
   const scrollRef = useRef<ScrollView>(null);
 
   const { refetch, isPending: isPendingMessage } = useQuery<any>({
-    queryKey: ['messages', params.reserve_owner_uid],
+    queryKey: ['messages', params.donation_owner_uid],
     queryFn: async () => {
       try {
         if (!user) return [];
         const value = await ReserveDonationsService.GetMyMessages(
           params?.receives_donation_uid,
-          params.reserve_owner_uid
+          params.donation_owner_uid
         );
 
         await UserService.MarkAsReadChatNotification({
           uid: user.uid,
           OtherUserUid:
-            user!.uid === params.reserve_owner_uid
+            user!.uid === params.donation_owner_uid
               ? params.receives_donation_uid
-              : params.reserve_owner_uid,
+              : params.donation_owner_uid,
         });
 
         if (!value || (value && value.length < 1)) return [];
 
         ReserveDonationsService.WatchEventMessage(
           params?.receives_donation_uid,
-          params.reserve_owner_uid,
+          params.donation_owner_uid,
           (data) => {
             if (data && data.exists() && data.val()) {
               const value: IReserveDonationMessageRealTime = data.val();
@@ -106,9 +106,9 @@ export default function Chat() {
   }, [data]);
 
   const { isPending, mutate } = useMutation({
-    mutationKey: ['send-message-to-reserve-owner', params.reserve_owner_uid],
+    mutationKey: ['send-message-to-reserve-owner', params.donation_owner_uid],
     mutationFn: async (message: string) => {
-      if (!user || !user.uid || !params.reserve_owner_uid || !message) return;
+      if (!user || !user.uid || !params.donation_owner_uid || !message) return;
       const result = await ReserveDonationsService.CreateMessage({
         messages: [
           {
@@ -118,7 +118,7 @@ export default function Chat() {
           },
         ],
         uid_person_reserve: params?.receives_donation_uid,
-        uid_person_donation: params.reserve_owner_uid,
+        uid_person_donation: params.donation_owner_uid,
       });
       if (data && data.length === 0) refetch();
       setMessage('');
@@ -132,9 +132,9 @@ export default function Chat() {
       await UserService.MarkAsUnreadOtherUserChatNotification({
         uid: user!.uid,
         OtherUserUid:
-          user!.uid === params.reserve_owner_uid
+          user!.uid === params.donation_owner_uid
             ? params.receives_donation_uid
-            : params.reserve_owner_uid,
+            : params.donation_owner_uid,
       });
     },
   });
@@ -145,7 +145,7 @@ export default function Chat() {
 
   return (
     params.current_user_uid &&
-    params.reserve_owner_uid &&
+    params.donation_owner_uid &&
     user &&
     user.uid === params.current_user_uid && (
       <>
@@ -217,9 +217,9 @@ export default function Chat() {
                   ) : (
                     <Card
                       ownerName={
-                        user && user.uid === params.reserve_owner_uid
-                          ? params.reserve_owner_name
-                          : params.reserve_owner_name
+                        user && user.uid === params.donation_owner_uid
+                          ? params.donation_owner_name
+                          : params.donation_owner_name
                       }
                       variant="other"
                       key={messages.createdAt + messages.text + messages.owner_message_uid}>

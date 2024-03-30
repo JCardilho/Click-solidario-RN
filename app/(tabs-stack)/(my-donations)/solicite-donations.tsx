@@ -63,7 +63,11 @@ export default function MyDonationsInSoliciteDonationsPage() {
                 ownerName: true,
                 status: true,
               }}
-              href={() => {}}
+              href={() => {
+                router.push(
+                  `/(tabs-stack)/(one-solicite-donation)/(view-solicite-donation)/${item.uid}`
+                );
+              }}
             />
           ))}
       </ScrollView>
