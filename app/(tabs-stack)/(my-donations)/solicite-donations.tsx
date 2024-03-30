@@ -37,7 +37,13 @@ export default function MyDonationsInSoliciteDonationsPage() {
           <Text className="text-4xl font-kanit">Minhas doações</Text>
           <Divider />
         </View> */}
-        <Loader hiddenLoaderActive center isLoader={isPending} />
+        {/*  <Loader hiddenLoaderActive center isLoader={isPending} /> */}
+
+        {isPending && (
+          <View className="w-full mt-4">
+            <Card isLoading={true} />
+          </View>
+        )}
 
         {data &&
           data.length > 0 &&

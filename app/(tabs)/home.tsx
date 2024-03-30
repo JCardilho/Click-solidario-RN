@@ -1,6 +1,14 @@
 import { Link, Stack, useRouter } from 'expo-router';
 import _default from 'react-hook-form/dist/utils/get';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { useCacheHook } from '~/utils/hooks/cacheHook';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
@@ -17,6 +25,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import * as Burnt from 'burnt';
 import { useNotifications } from 'react-native-notificated';
+import { Skeleton, SkeletonContent, SkeletonRect } from '~/components/Skeleton';
+import { Circle } from 'react-native-svg';
 
 const SelectedButton = ({
   onPress,
@@ -121,7 +131,7 @@ export default function Home() {
     queryFn: async () => {
       if (!user?.uid) throw new Error('Usuário não encontrado');
       /* router.dismissAll(); */
-/*       router.canGoBack(); */
+      /*       router.canGoBack(); */
       const result = await UserService.GetAllConversations(user?.uid);
       return result;
     },
@@ -143,6 +153,8 @@ export default function Home() {
     });
   }, [data]);
 
+  const WD = useWindowDimensions();
+
   useRefreshOnFocus(refetch);
 
   return (
@@ -156,16 +168,30 @@ export default function Home() {
         onPageSelected={(e) => {
           console.log(`Active page is ${e.nativeEvent.position}`);
         }}>
-        <View className="w-full h-full p-4 items-start justify-start flex" key="1">
+        <ScrollView className="p-4" key="1">
           <CreateTopNavigation
             selected="posts"
             referencePageview={ref}
             isNotificationConversations={notificationTopNavigation?.conversations}
           />
+
           <View className="w-full flex items-center justify-center">
             <Text className="font-montserrat font-bold text-4xl text-center mt-2">Postagens</Text>
           </View>
-        </View>
+          {/*  <View
+            className="w-full border"
+            style={{
+              height: WD.height,
+            }}>
+            <SkeletonContent>
+              <SkeletonRect height={300} y={0 * 310} />
+              <SkeletonRect height={300} y={1 * 310} />
+              <SkeletonRect height={300} y={2 * 310} />
+              <SkeletonRect height={300} y={3 * 310} />
+              <SkeletonRect height={300} y={4 * 310} />
+            </SkeletonContent>
+          </View> */}
+        </ScrollView>
         <View className="w-full h-full p-4 items-start justify-start flex" key="2">
           <CreateTopNavigation
             selected="conversations"

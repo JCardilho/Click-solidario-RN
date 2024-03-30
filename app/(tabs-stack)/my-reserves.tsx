@@ -14,7 +14,7 @@ export default function MyReservers() {
   const { user } = useCurrentUserHook();
   const router = useRouter();
 
-  const { isPending, data, refetch } = useQuery<IReserveDonation[]>({
+  const { isPending, data, refetch, isRefetching } = useQuery<IReserveDonation[]>({
     queryKey: ['my-reservers-reserve-donations-page'],
     queryFn: async () => {
       if (!user || !user.uid) return [];
@@ -39,7 +39,13 @@ export default function MyReservers() {
             <Text className="text-4xl font-kanit">Minhas doações</Text>
             <Divider />
           </View> */}
-        <Loader hiddenLoaderActive center isLoader={isPending} />
+        {/*   <Loader hiddenLoaderActive center isLoader={isPending} /> */}
+
+        {isPending && (
+          <View className="w-full mt-4">
+            <Card isLoading={true} />
+          </View>
+        )}
 
         {data &&
           data.length > 0 &&

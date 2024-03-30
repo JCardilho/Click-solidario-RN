@@ -195,8 +195,8 @@ export default function ReserveDonations() {
         </View>
 
         {isLoading && (
-          <View className="w-full flex items-center justify-center my-6">
-            <ActivityIndicator size="large" color={'#023E8A'} />
+          <View className="w-full mt-4">
+            <Card isLoading={true} />
           </View>
         )}
 
