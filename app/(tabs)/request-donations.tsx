@@ -181,7 +181,9 @@ export default function RequestDonationsScreen() {
               images: item.images as string[],
               ownerName: item.ownerName,
             }}
-            href={() => {}}
+            href={() => {
+              router.push(`/(tabs-stack)/(one-solicite-donation)/(view-solicite-donation)/${item.uid}`);
+            }}
             status={
               <>
                 <Badge>Aguardando</Badge>

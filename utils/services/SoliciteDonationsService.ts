@@ -139,10 +139,40 @@ const SearchSoliciteDonations = async (
   return result;
 };
 
+const ExcludeSoliciteDonation = async (uid: string): Promise<void> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
+  await deleteDoc(docRef);
+};
+
+const FinishSolicite = async ({ uid }: { uid: string }): Promise<void> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
+  await setDoc(
+    docRef,
+    {
+      isFinished: true,
+    },
+    { merge: true }
+  );
+};
+
+const UnFinishSolicite = async ({ uid }: { uid: string }): Promise<void> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
+  await setDoc(
+    docRef,
+    {
+      isFinished: false,
+    },
+    { merge: true }
+  );
+};
+
 export const SoliciteDonationsSerivce = {
   CreateSoliciteDonation,
   GetAllSoliciteDonations,
   GetMySoliciteDonations,
   GetOneSoliciteDonations,
   SearchSoliciteDonations,
+  FinishSolicite,
+  UnFinishSolicite,
+  ExcludeSoliciteDonation,
 };
