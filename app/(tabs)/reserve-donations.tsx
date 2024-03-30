@@ -128,12 +128,12 @@ export default function ReserveDonations() {
           <FontAwesome name="dropbox" size={50} />
           {/*  <Image source={Logo} className="w-20 h-20 rounded-full" alt="background-image" /> */}
 
-          <Text className="text-2xl font-kanit text-center">Reservar / Disponibilizar doação</Text>
+          <Text className="text-2xl font-kanit text-center">Reservar ou Disponibilizar doação</Text>
         </View>
 
         <DefaultInformationsForReserveDonationsPage />
 
-        <View className="w-full flex flex-row gap-2 justify-between items-center">
+        <View className="w-full flex flex-col gap-2">
           <Button
             variant="default"
             icon={{
@@ -142,7 +142,7 @@ export default function ReserveDonations() {
               size: 15,
             }}
             href={() => router.push('/(tabs-stack)/(my-donations)/reserve-donations')}>
-            Minhas doações
+            Meus itens disponibilizados
           </Button>
 
           <Button
@@ -155,22 +155,22 @@ export default function ReserveDonations() {
             href={() => router.push('/(tabs-stack)/create-reserve-donation')}>
             Disponibilizar um item à doação
           </Button>
-        </View>
 
-        {data && data?.userReserveCount > 0 && (
-          <Button
-            variant="default"
-            icon={{
-              name: 'dropbox',
-              color: 'white',
-              size: 15,
-            }}
-            className="mb-2"
-            href={() => router.push('/(tabs-stack)/my-reserves')}>
-            Minhas reservas (Você tem {data?.userReserveCount}{' '}
-            {data.userReserveCount === 1 ? 'reserva ativa' : 'reservas ativas'} )
-          </Button>
-        )}
+          {data && data?.userReserveCount > 0 && (
+            <Button
+              variant="default"
+              icon={{
+                name: 'dropbox',
+                color: 'white',
+                size: 15,
+              }}
+              className="mb-2"
+              href={() => router.push('/(tabs-stack)/my-reserves')}>
+              Minhas reservas (Você tem {data?.userReserveCount}{' '}
+              {data.userReserveCount === 1 ? 'reserva ativa' : 'reservas ativas'} )
+            </Button>
+          )}
+        </View>
 
         <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
         <Text className="text-2xl text-center font-kanit my-6">Itens disponibilizados:</Text>

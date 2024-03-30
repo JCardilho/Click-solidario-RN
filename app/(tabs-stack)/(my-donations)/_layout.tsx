@@ -10,6 +10,7 @@ export default function StackLayout() {
         headerShown: false,
       }}>
       <Stack.Screen name="reserve-donations" />
+      <Stack.Screen name="solicite-donations" />
     </Stack>
   );
 }

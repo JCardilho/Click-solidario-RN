@@ -1,15 +1,104 @@
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useEffect } from 'react';
-import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '~/components/Button';
 import firebase from '~/utils/firebase';
 import { useCacheHook } from '~/utils/hooks/cacheHook';
 import Logo from '~/assets/icon/logo.png';
+import { useQuery } from '@tanstack/react-query';
+import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
+import { addMilliseconds, format, set } from 'date-fns';
+import { DefaultInformationsForReserveDonationsPage } from '~/layouts/reserve-donations/default-informations';
+import { Input } from '~/components/Input';
+import { Card } from '~/components/Card';
+import { useFocusEffect } from '@react-navigation/native';
+import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
+import { useCurrentUserHook } from './../../utils/hooks/currentUser';
+import { SoliciteDonationsSerivce } from '~/utils/services/SoliciteDonationsService';
+import { ISoliciteDonation } from '~/utils/services/DTO/solicite-donation.dto';
+import { DefaultInformationsForSoliciteDonationsPage } from '~/layouts/solicite-donations/default-infromations';
+import { Badge } from '~/components/Badge';
 
 export default function RequestDonationsScreen() {
+  const { name } = useLocalSearchParams();
+  const router = useRouter();
+  const { getCache, setCache } = useCacheHook();
+  const [search, setSearch] = useState('');
+  const { user } = useCurrentUserHook();
+  const [endAt, setEndAt] = useState<number>(5);
+  const [endCount, setEndCount] = useState<number>(0);
+  const [disableLoadMore, setDisableLoadMore] = useState<boolean>(false);
+  const scrollRef = useRef<ScrollView>(null);
+
+  const { data, isLoading, refetch, isRefetching } = useQuery<ISoliciteDonation[]>({
+    queryKey: ['solicite-donations'],
+    queryFn: async () => {
+      if (!user || !user.uid) return [];
+
+      try {
+        if (search && search.length > 2) {
+          const result = await SoliciteDonationsSerivce.SearchSoliciteDonations(
+            search,
+            user?.uid,
+            0,
+            1000
+          );
+
+          setDisableLoadMore(true);
+          setEndCount(0);
+          setEndAt(5);
+          return result;
+        }
+        const result = await SoliciteDonationsSerivce.GetAllSoliciteDonations(user?.uid, 0, endAt);
+
+        if (result.length === 0) {
+          const result = await SoliciteDonationsSerivce.GetAllSoliciteDonations(
+            user?.uid,
+            0,
+            endAt + 10
+          );
+          if (result.length === 0) {
+            setDisableLoadMore(true);
+            return [];
+          }
+          return result;
+        }
+
+        return result;
+      } catch (err) {
+        console.log('err', err);
+        return [];
+      }
+    },
+  });
+
+  useRefreshOnFocus(refetch);
+
+  useEffect(() => {
+    if (endAt && endAt != 5 && data) {
+      refetch();
+      if (data.length != endCount) {
+        setEndCount(data.length);
+      }
+      if (data.length === endCount) {
+        setDisableLoadMore(true);
+      } else {
+        setDisableLoadMore(false);
+      }
+    }
+  }, [endAt]);
+
   return (
     <ScrollView
       className="w-full p-4 flex flex-col gap-4"
@@ -19,72 +108,87 @@ export default function RequestDonationsScreen() {
       <SafeAreaView />
       <View className="w-full  rounded-xl flex flex-col gap-4 p-4 items-center justify-center my-4">
         <FontAwesome name="plus" size={50} />
-        {/*  <Image source={Logo} className="w-20 h-20 rounded-full" alt="background-image" /> */}
-
         <Text className="text-4xl font-kanit ">Solicitar ou Doar</Text>
         <Text className="text-xl font-kanit text-center">
           Solicite ou doe um item para quem precisa
         </Text>
       </View>
 
-      <Button
-        variant="default"
-        icon={{
-          name: 'user',
-          color: 'white',
-          size: 15,
-        }}
-        className="mb-2">
-        Minhas doações
-      </Button>
-      <Button
-        variant="default"
-        icon={{
-          name: 'plus',
-          color: 'white',
-          size: 15,
-        }}>
-        Solicitar doação
-      </Button>
+      <DefaultInformationsForSoliciteDonationsPage />
 
-      <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
-      <Text className="text-4xl font-kanit">Outros itens doados:</Text>
-
-      <View className="w-full flex flex-row gap-1 justify-around">
-        <TextInput
-          placeholder="Pesquisar doações"
-          className="border-2 border-blue-500 p-2 rounded-lg w-[84%]"
-        />
-        <Button variant="default">
-          <FontAwesome name="search" size={15} color="white" />
+      <View className="w-full flex flex-col gap-2 ">
+        <Button
+          icon={{
+            name: 'user',
+            color: 'white',
+            size: 15,
+          }}
+          onPress={() => router.push('/(tabs-stack)/(my-donations)/solicite-donations')}>
+          Minhas solicitações
+        </Button>
+        <Button
+          icon={{
+            name: 'plus',
+            color: 'white',
+            size: 15,
+          }}
+          onPress={() => router.push('/(tabs-stack)/create-solicite-donation')}>
+          Solicitar doação
         </Button>
       </View>
 
-      {[1, 2, 3, 4].map((item, index) => (
-        <TouchableOpacity
-          className="w-full border-2 border-blue-500 p-4 rounded-lg  bg-white flex flex-col gap-2 my-4"
-          key={index}>
-          <Text className="text-xl font-bold underline">Doação de Sofá</Text>
-          <Text className="font-kanit text-lg text-justify">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit ipsam perferendis commodi
-            quas deserunt quam illo laudantium voluptatem in delectus quae sequi nobis numquam sunt
-            obcaecati, odio, corrupti aut tempora!
-          </Text>
-          <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
-          <View className="w-full">
-            <Text className="text-md ">Proprietário da doação: Gustavo Rafael</Text>
-          </View>
-          <Text className="text-md font-kanit">Criado em: 11/06/2007</Text>
-          <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>
-          <Text className="text-md font-kanit">Status:</Text>
-          <View className="w-full flex items-center flex-row gap-2">
-            <View className="rounded-[50px] w-fit flex flex-row gap-4 bg-green-500 px-4 py-1 items-center justify-center">
-              <FontAwesome name="check" color={'white'} size={10}></FontAwesome>
-              <Text className="text-white">Verificado pela assistente social</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      ))}
+      <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
+      <Text className="text-2xl text-center font-kanit my-6">Itens solicitados:</Text>
+
+      <View className="w-full flex flex-row gap-1 ">
+        <Input
+          placeholder="Pesquisar"
+          className="w-[85%]"
+          onChangeText={(text) => setSearch(text)}
+          value={search}
+        />
+        <Button
+          variant="default"
+          className="h-full px-6"
+          onPress={() => refetch()}
+          isLoading={isRefetching}
+          icon={{
+            name: 'search',
+            color: 'white',
+            size: 16,
+          }}></Button>
+      </View>
+
+      {isLoading && (
+        <View className="w-full flex items-center justify-center my-6">
+          <ActivityIndicator size="large" color={'#023E8A'} />
+        </View>
+      )}
+
+      {!isLoading &&
+        data &&
+        data.map((item, index) => (
+          <Card
+            key={`${item.uid}-solicite-donations-${index}`}
+            item={{
+              createdAt: item.createdAt,
+              id: item.uid,
+              name: item.name,
+              description:
+                item.description && item.description.length > 300
+                  ? item.description.substring(0, 300) + '...'
+                  : item.description,
+              images: item.images as string[],
+              ownerName: item.ownerName,
+            }}
+            href={() => {}}
+            status={
+              <>
+                <Badge>Aguardando</Badge>
+              </>
+            }
+          />
+        ))}
 
       <View className="my-12"></View>
     </ScrollView>

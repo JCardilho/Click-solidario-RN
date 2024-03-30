@@ -51,6 +51,7 @@ const CreateSoliciteDonation = async (
 };
 
 const GetAllSoliciteDonations = async (
+  uid: string,
   startAtParam: number,
   endAtParam: number
 ): Promise<ISoliciteDonation[]> => {
@@ -58,17 +59,20 @@ const GetAllSoliciteDonations = async (
   const query1 = query(
     ref,
     where('isFinished', '==', false),
+    orderBy('isFinished', 'desc'),
     startAt(startAtParam),
     limit(endAtParam)
   );
   const snapshot = await getDocs(query1);
-  const result: ISoliciteDonation[] = snapshot.docs.map((doc) => {
-    return {
-      ...(doc.data() as any),
-      uid: doc.id,
-      createdAt: doc.data().createdAt.toDate(),
-    };
-  });
+  const result: ISoliciteDonation[] = snapshot.docs
+    .map((doc) => {
+      return {
+        ...(doc.data() as any),
+        uid: doc.id,
+        createdAt: doc.data().createdAt.toDate(),
+      };
+    })
+    .filter((donation) => donation.ownerUid !== uid);
 
   return result;
 };
@@ -105,9 +109,40 @@ const GetOneSoliciteDonations = async (uid: string): Promise<ISoliciteDonation |
   return result[0];
 };
 
+const SearchSoliciteDonations = async (
+  search: string,
+  uid: string,
+  startAtParam: number,
+  endAtParam: number
+): Promise<ISoliciteDonation[]> => {
+  const ref = collection(getFirestore(firebase), CollectionName);
+  const query1 = query(
+    ref,
+    where('isFinished', '==', false),
+    orderBy('isFinished', 'desc'),
+    startAt(startAtParam),
+    limit(endAtParam)
+  );
+  const snapshot = await getDocs(query1);
+  const result = snapshot.docs
+    .map((doc) => {
+      const data = doc.data();
+      return {
+        ...(data as any),
+        uid: doc.id,
+        createdAt: data.created.toDate(),
+      };
+    })
+    .filter((data) => data.ownerUid !== uid)
+    .filter((data) => data.name.includes(search) || data.description.includes(search));
+
+  return result;
+};
+
 export const SoliciteDonationsSerivce = {
   CreateSoliciteDonation,
   GetAllSoliciteDonations,
   GetMySoliciteDonations,
   GetOneSoliciteDonations,
+  SearchSoliciteDonations,
 };
