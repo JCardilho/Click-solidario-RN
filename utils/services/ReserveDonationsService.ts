@@ -34,7 +34,7 @@ import {
   set,
 } from 'firebase/database';
 import { MessagesService } from './MessagesService';
-import { IUser } from './DTO/user.dto';
+import { IPostSaved, IUser } from './DTO/user.dto';
 
 const CollectionName = 'reserve-donations';
 
@@ -520,7 +520,7 @@ const SaveReserveDonation = async ({
 }: {
   donation: IReserveDonation;
   user_uid: string;
-}): Promise<void> => {
+}): Promise<IPostSaved> => {
   const getUser = await getDoc(doc(getFirestore(firebase), 'users', user_uid));
   const data = getUser.data() as IUser;
   if (!data) throw new Error('Usuário não encontrado');
@@ -540,6 +540,12 @@ const SaveReserveDonation = async ({
     },
     { merge: true }
   );
+  return {
+    type: 'reserve',
+    postId: donation.uid,
+    postTitle: donation.name,
+    postDescription: donation.description,
+  };
 };
 
 const RemoveSavedReserveDonation = async ({

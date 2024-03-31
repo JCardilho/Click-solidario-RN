@@ -12,6 +12,7 @@ import { CancelReserve } from '~/layouts/reserve-donations/one-reserve-donation/
 import { ExcludeReserve } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/exclude-reserve';
 import { FinishReserveInViewReserveDonation } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/finish-reserve';
 import { ReserveAction } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/reserve-action';
+import { SavePostReserveDonationPage } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/save-post';
 import {
   ViewDataImageForViewReserveDonation,
   ViewDataTextForViewReserveDonation,
@@ -147,6 +148,9 @@ export default function ViewOneReserveDonation() {
                 </>
               )}
             </View>
+
+            <SavePostReserveDonationPage data={data} />
+
             <View className="w-full flex flex-col gap-2">
               {user?.uid === data.ownerUid && (
                 <>
