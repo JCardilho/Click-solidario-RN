@@ -5,6 +5,7 @@ import PagerView from 'react-native-pager-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { InitialPageView } from '~/layouts/home/initial-page-view';
 import { ConversationsPageView } from '~/layouts/home/conversations-page-view';
+import { SavedsPageViewHomePage } from '~/layouts/home/saveds-page-view';
 
 export default function Home() {
   const [notificationTopNavigation, setNotificationTopNavigation] = useState<{
@@ -18,7 +19,12 @@ export default function Home() {
   return (
     <>
       <SafeAreaView />
-      <PagerView style={stylesPageView.viewPager} initialPage={0} ref={ref}>
+      <PagerView style={stylesPageView.viewPager} initialPage={1} ref={ref}>
+        <SavedsPageViewHomePage
+          referencePageview={ref}
+          notificationTopNavigation={notificationTopNavigation}
+          setNotificationTopNavigation={setNotificationTopNavigation}
+        />
         <InitialPageView
           referencePageview={ref}
           notificationTopNavigation={notificationTopNavigation}

@@ -13,6 +13,7 @@ import { create } from 'zustand';
 import { useCacheHook } from './cacheHook';
 import { IConversationsUser, IUser, verifyUserWithZodSchema } from '../services/DTO/user.dto';
 import { UserService } from '../services/UserService';
+import { format } from 'date-fns';
 
 interface Types {
   user: IUser | null | undefined;
@@ -95,6 +96,7 @@ export const useCurrentUserHook = () => {
       if (getCachedUser) {
         try {
           const updateData = await UserService.UpdateDataUser(getCachedUser.uid);
+         
           if (updateData) return sendFromHome(updateData);
           return sendFromLogin();
         } catch (err) {

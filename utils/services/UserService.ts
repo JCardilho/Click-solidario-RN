@@ -147,7 +147,12 @@ const GetAllConversations = async (uid: string): Promise<IConversationsUser[]> =
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) throw new Error('Usuário não encontrado');
   const user = docSnap.data() as IUser;
-  return user.conversations || [];
+  const newConversations = user.conversations?.map((conv: any) => ({
+    ...conv,
+    createdAt: conv.createdAt.toDate(),
+  }));
+
+  return newConversations || [];
 };
 
 const MarkAsReadChatNotification = async ({
@@ -208,15 +213,25 @@ const UpdateDataUser = async (uid: string): Promise<IUser> => {
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) throw new Error('Usuário não encontrado');
   const data = docSnap.data() as IUser;
+  const newConversations = data.conversations?.map((conv: any) => ({
+    ...conv,
+    createdAt: conv.createdAt.toDate(),
+  }));
+  console.log('newConversations', newConversations);
+
   return {
     ...data,
     uid: docSnap.id,
-    conversations:
-      data.conversations?.map((conv) => ({
-        ...conv,
-        createdAt: new Date(conv.createdAt),
-      })) || undefined,
+    conversations: newConversations,
   };
+};
+
+const GetAllPostsSaved = async (uid: string): Promise<IUser['posts_saved']> => {
+  const docRef = doc(getFirestore(firebase), 'users', uid);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) throw new Error('Usuário não encontrado');
+  const user = docSnap.data() as IUser;
+  return user.posts_saved || [];
 };
 
 export const UserService = {
@@ -230,4 +245,5 @@ export const UserService = {
   MarkAsUnreadOtherUserChatNotification,
   getOneUser,
   UpdateDataUser,
+  GetAllPostsSaved,
 };

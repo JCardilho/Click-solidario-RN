@@ -1,16 +1,14 @@
-import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { CreateTopNavigationHome } from './create-top-navigation';
-import { SkeletonContent, SkeletonRect } from '~/components/Skeleton';
-import { TouchableOpacity } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
-import { IUser } from '~/utils/services/DTO/user.dto';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { useNotifications } from 'react-native-notificated';
 import { useRouter } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
+import { IUser } from '~/utils/services/DTO/user.dto';
 import { UserService } from '~/utils/services/UserService';
-import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
-import { format } from 'date-fns';
+import { SkeletonContent, SkeletonRect } from '~/components/Skeleton';
 
 interface IProps {
   referencePageview: any;
@@ -22,52 +20,36 @@ interface IProps {
   setNotificationTopNavigation: Dispatch<SetStateAction<IProps['notificationTopNavigation']>>;
 }
 
-export const ConversationsPageView = (props: IProps) => {
+export const SavedsPageViewHomePage = (props: IProps) => {
   const { user, setUser } = useCurrentUserHook();
   const { notify } = useNotifications();
   const router = useRouter();
   const WD = useWindowDimensions();
 
-  const { data, refetch, isLoading } = useQuery<IUser['conversations']>({
-    queryKey: ['conversations'],
+  const { data, refetch, isLoading } = useQuery<IUser['posts_saved']>({
+    queryKey: ['posts-saved'],
     queryFn: async () => {
       if (!user?.uid) throw new Error('Usuário não encontrado');
-      const result = await UserService.GetAllConversations(user?.uid);
+      const result = await UserService.GetAllPostsSaved(user?.uid);
       setUser({
         ...user,
-        conversations: result,
+        posts_saved: result,
       });
       return result;
     },
     retry: 10,
   });
 
-  const verifyNotificationConversations = (conversation: IUser['conversations']) => {
-    if (!conversation || !conversation) return false;
-    const isNotification = conversation.some((message) => message.isNotification);
-    return isNotification;
-  };
-
-  useEffect(() => {
-    if (!data) return;
-    props.setNotificationTopNavigation({
-      conversations: verifyNotificationConversations(data),
-      notifications: false,
-      posts: false,
-    });
-  }, [data]);
-
   useRefreshOnFocus(refetch);
 
   return (
-    <View className="w-full h-full p-4 items-start justify-start flex" key="2">
+    <ScrollView key={'0'} className="p-4">
       <CreateTopNavigationHome
-        selected="conversations"
+        selected="posts"
         referencePageview={props.referencePageview}
-        isNotificationConversations={props.notificationTopNavigation?.conversations}
         isBack
+        isBackRight
       />
-
       {isLoading && (
         <>
           <View
@@ -92,32 +74,28 @@ export const ConversationsPageView = (props: IProps) => {
         <ScrollView className="w-full flex flex-col gap-4">
           {data?.map((item) => (
             <TouchableOpacity
-              key={item.routeQuery + Math.random() * 1000}
+              key={item.postId + item.type + Math.random() * 1000}
               className="w-full p-4 bg-blue-100 border-2 border-blue-200 rounded-lg flex flex-row justify-between items-center mb-4"
               onPress={() => {
                 if (!user) return;
-                const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${user.uid}${item.routeQuery}`;
+                const link =
+                  item.type === 'solicite'
+                    ? `/(tabs-stack)/(one-solicite-donation)/(view-solicite-donation)/${item.postId}`
+                    : `/(tabs-stack)/one-reserve-donation/(view-reserve-donation)/${item.postId}`;
                 router.push(link as any);
               }}>
               <View className=" flex flex-col gap-2">
-                <Text className="font-kanit text-blue-600 text-lg">{item.otherUserName}</Text>
-                <Text className="font-kanit text-zinc-600">
-                  Criado em: {format(item.createdAt, 'dd/MM/yyyy')}
+                <Text className="font-kanit text-blue-600 text-lg">{item.postTitle}</Text>
+                <Text className="font-kanit text-blue-600 text-lg">
+                  {item.postDescription && item.postDescription.length > 200
+                    ? item.postDescription.substr(0, 200) + '...'
+                    : item.postDescription}
                 </Text>
-              </View>
-              <View className="flex flex-col gap-2 items-end justify-end">
-                {item.isNotification && (
-                  <Text className="font-kanit text-red-500 text-md">
-                    {' '}
-                    Você tem uma nova mensagem
-                  </Text>
-                )}
-                <Text className="font-kanit text-zinc-600">Clique</Text>
               </View>
             </TouchableOpacity>
           ))}
         </ScrollView>
       )}
-    </View>
+    </ScrollView>
   );
 };

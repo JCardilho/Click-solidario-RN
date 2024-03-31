@@ -16,7 +16,7 @@ export const InitialPageView = (props: IProps) => {
   return (
     <ScrollView className="p-4" key="1">
       <CreateTopNavigationHome
-        selected="posts"
+        selected="undefined"
         referencePageview={props.referencePageview}
         isNotificationConversations={props.notificationTopNavigation?.conversations}
       />

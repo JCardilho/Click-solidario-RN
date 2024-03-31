@@ -67,6 +67,7 @@ const userSchema = z.object({
         otherUserUid: z.string(),
         otherUserName: z.string(),
         isNotification: z.boolean(),
+        createdAt: z.date(),
         fromMessage: z.string().optional(),
       })
     )
