@@ -4,6 +4,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { getDatabase, onValue, ref } from 'firebase/database';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Input } from '~/components/Input';
@@ -163,15 +164,74 @@ export default function Chat() {
 
   const GapPerMessage = 10;
 
+  const InformationsBottomSheet = useBottomSheetHook({
+    children: (
+      <>
+        <View className="w-full flex p-4">
+          <Text className="font-kanit text-center">Informações</Text>
+          {otherUserData && (
+            <View className="w-full flex flex-col gap-4">
+              {otherUserData.image && (
+                <View className="w-full items-center justify-center my-4">
+                  <Image
+                    source={{ uri: otherUserData.image }}
+                    className={`w-40 h-40 rounded-full ${imageLoaded ? 'block' : 'absolute'}`}
+                    onLoadEnd={() => setImageLoaded(true)}
+                  />
+                </View>
+              )}
+              {!imageLoaded && (
+                <View className="w-full h-[120px]">
+                  <SkeletonContent>
+                    <SkeletorCircle r={50} cx={width / 2 - 17} cy={50} />
+                  </SkeletonContent>
+                </View>
+              )}
+              <View className="w-full flex flex-col gap-1 items-center">
+                <Text className="font-kanit">{otherUserData.name}</Text>
+                <Text>
+                  Motivo da conexão:{' '}
+                  {user &&
+                    user.conversations &&
+                    user?.conversations.find((conversation) =>
+                      user && conversation.otherUserUid === params.donation_owner_uid
+                        ? params.receives_donation_name
+                        : params.donation_owner_name
+                    )?.fromMessage}
+                </Text>
+                <Text>
+                  Conversa criada em:{' '}
+                  {user &&
+                    user.conversations &&
+                    format(
+                      user?.conversations.find((conversation) =>
+                        user && conversation.otherUserUid === params.donation_owner_uid
+                          ? params.receives_donation_name
+                          : params.donation_owner_name
+                      )!.createdAt,
+                      'dd/MM/yyyy HH:mm:ss'
+                    )}
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
+      </>
+    ),
+  });
+
   return (
     params.current_user_uid &&
     params.donation_owner_uid &&
     user &&
     user.uid === params.current_user_uid && (
       <>
+        <InformationsBottomSheet.BottomSheet />
         <HeaderBack hiddenDescriptionReturn buttonRounded>
           {otherUserData && (
-            <TouchableOpacity className="w-full flex flex-row gap-2">
+            <TouchableOpacity
+              className="w-full flex flex-row gap-2"
+              onPress={InformationsBottomSheet.open}>
               {otherUserData.image && (
                 <Image
                   source={{ uri: otherUserData.image }}
