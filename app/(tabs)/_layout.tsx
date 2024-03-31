@@ -11,13 +11,12 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: 'white',
           height: 70,
-          marginLeft: 10,
+          /*   marginLeft: 10,
           marginRight: 10,
           borderRadius: 10,
-          marginBottom: 10,
+          marginBottom: 10, */
         },
         tabBarItemStyle: {
-         
           borderRadius: 10,
           padding: 4,
         },
@@ -25,8 +24,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          tabBarIcon: ({ color }) => <FontAwesome size={35} name="home" color={color} />,
-          tabBarLabel: () => <Text className="font-kanit text-md text-center">Inicio</Text>,
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome size={focused ? 35 : 30} name="home" color={color} />
+          ),
+          tabBarLabel: ({ color, focused }) => (
+            <Text
+              className={`font-kanit text-sm text-center ${focused ? 'text-primary font-bold text-lg' : 'text-gray-400'}`}>
+              Inicio
+            </Text>
+          ),
           headerShown: false,
         }}
       />
@@ -34,11 +40,19 @@ export default function TabLayout() {
         name="reserve-donations"
         options={{
           title: 'Donations',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="dropbox" color={color} />,
-          tabBarLabel: () => (
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome size={focused ? 35 : 30} name="dropbox" color={color} />
+          ),
+          tabBarLabel: ({ color, focused }) => (
             <View className="w-auto flex flex-col items-center justify-center">
-              <Text className="font-kanit text-xs text-center">Reservar ou</Text>
-              <Text className="font-kanit text-xs text-center">Disponibilizar</Text>
+              <Text
+                className={`font-kanit text-xs text-center ${focused ? 'text-primary font-bold text-sm' : 'text-gray-400'}`}>
+                Reservar ou
+              </Text>
+              <Text
+                className={`font-kanit text-xs text-center ${focused ? 'text-primary font-bold text-sm' : 'text-gray-400'}`}>
+                Disponibilizar
+              </Text>
             </View>
           ),
           headerShown: false,
@@ -48,13 +62,19 @@ export default function TabLayout() {
         name="request-donations"
         options={{
           title: 'Request-Donations',
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="plus" color={color} className="overflow-visible" />
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome size={focused ? 35 : 30} name="plus" color={color} />
           ),
-          tabBarLabel: () => (
+          tabBarLabel: ({ color, focused }) => (
             <View className="w-auto flex flex-col items-center justify-center">
-              <Text className="font-kanit text-xs text-center">Solicitar ou</Text>
-              <Text className="font-kanit text-xs text-center">Doar</Text>
+              <Text
+                className={`font-kanit text-xs text-center ${focused ? 'text-primary font-bold text-sm' : 'text-gray-400'}`}>
+                Solicitar ou
+              </Text>
+              <Text
+                className={`font-kanit text-xs text-center ${focused ? 'text-primary font-bold text-sm' : 'text-gray-400'}`}>
+                Doar
+              </Text>
             </View>
           ),
           headerShown: false,
@@ -64,8 +84,15 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
-          tabBarLabel: () => <Text className="font-kanit text-md text-center">Perfil</Text>,
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome size={focused ? 35 : 30} name="user" color={color} />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <Text
+              className={`font-kanit text-sm text-center ${focused ? 'text-primary font-bold text-lg' : 'text-gray-400'}`}>
+              Perfil
+            </Text>
+          ),
           headerShown: false,
         }}
       />

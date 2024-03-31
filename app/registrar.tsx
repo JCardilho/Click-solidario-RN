@@ -183,7 +183,7 @@ export default function Registrar() {
               className="text-lg bg-zinc-100 p-5 rounded-lg border border-primary"
               text="Selecione se você deseja receber doações!!"
               fillColor="##3b82f6"
-              unfillColor="#FFFFFF"
+              unfillColor="#3b82f6"
               iconStyle={{ borderColor: 'blue' }}
               onPress={(isChecked: boolean) => setValue('isReceptor', isChecked)}
             />

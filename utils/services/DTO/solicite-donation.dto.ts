@@ -19,7 +19,7 @@ export interface ISoliciteDonationHelpedList {
   name: string;
   message?: string;
   type: 'partial' | 'total';
-  isVerifed: boolean;
+  isVerified: boolean;
 }
 
 // Realtime Database

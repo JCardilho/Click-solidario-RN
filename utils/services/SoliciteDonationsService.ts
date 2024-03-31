@@ -22,6 +22,7 @@ import { deleteObject, ref, getStorage, uploadBytes, getDownloadURL } from 'fire
 import {
   CreateSoliciteDonationDTO,
   ISoliciteDonation,
+  ISoliciteDonationHelpedList,
   ISoliciteDonationMessageRealTime,
 } from './DTO/solicite-donation.dto';
 import { MessagesService } from './MessagesService';
@@ -311,6 +312,106 @@ const DeleteImage = async (image: string, uid: string): Promise<void> => {
   await setDoc(getDocrSnap.ref, { images: newImages }, { merge: true });
 };
 
+const RegisterAssistence = async ({
+  assistence,
+  solicite_donation_uid,
+}: {
+  assistence: ISoliciteDonationHelpedList;
+  solicite_donation_uid: string;
+}): Promise<void> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, solicite_donation_uid);
+  const getDocRef = await getDoc(docRef);
+  const data = getDocRef.data() as ISoliciteDonation;
+  if (!data) throw new Error('Reserva não encontrada');
+  const newAssistence = [...data.helpedList, assistence];
+  await setDoc(
+    docRef,
+    {
+      helpedList: newAssistence,
+    },
+    { merge: true }
+  );
+};
+
+const RemoveAssistence = async ({
+  user_uid,
+  solicite_donation_uid,
+}: {
+  solicite_donation_uid: string;
+  user_uid: string;
+}): Promise<void> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, solicite_donation_uid);
+  const getDocRef = await getDoc(docRef);
+  const data = getDocRef.data() as ISoliciteDonation;
+  if (!data) throw new Error('Reserva não encontrada');
+  const newAssistence = data.helpedList.filter((list) => list.uid !== user_uid);
+  await setDoc(
+    docRef,
+    {
+      helpedList: newAssistence,
+    },
+    { merge: true }
+  );
+};
+
+const VerifiedAssistence = async ({
+  user_uid,
+  solicite_donation_uid,
+}: {
+  solicite_donation_uid: string;
+  user_uid: string;
+}): Promise<void> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, solicite_donation_uid);
+  const getDocRef = await getDoc(docRef);
+  const data = getDocRef.data() as ISoliciteDonation;
+  if (!data) throw new Error('Reserva não encontrada');
+  const newAssistence = data.helpedList.map((list) => {
+    if (list.uid === user_uid) {
+      return {
+        ...list,
+        isVerified: true,
+      };
+    }
+    return list;
+  });
+  await setDoc(
+    docRef,
+    {
+      helpedList: newAssistence,
+    },
+    { merge: true }
+  );
+};
+
+const UnVerifiedAssistence = async ({
+  user_uid,
+  solicite_donation_uid,
+}: {
+  solicite_donation_uid: string;
+  user_uid: string;
+}): Promise<void> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, solicite_donation_uid);
+  const getDocRef = await getDoc(docRef);
+  const data = getDocRef.data() as ISoliciteDonation;
+  if (!data) throw new Error('Reserva não encontrada');
+  const newAssistence = data.helpedList.map((list) => {
+    if (list.uid === user_uid) {
+      return {
+        ...list,
+        isVerified: false,
+      };
+    }
+    return list;
+  });
+  await setDoc(
+    docRef,
+    {
+      helpedList: newAssistence,
+    },
+    { merge: true }
+  );
+};
+
 export const SoliciteDonationsSerivce = {
   CreateSoliciteDonation,
   GetAllSoliciteDonations,
@@ -327,5 +428,8 @@ export const SoliciteDonationsSerivce = {
   AddImages,
   DeleteImages,
   DeleteImage,
-  
+  RegisterAssistence,
+  RemoveAssistence,
+  VerifiedAssistence,
+  UnVerifiedAssistence,
 };

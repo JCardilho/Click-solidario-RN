@@ -8,10 +8,12 @@ import { Loader, useLoaderHook } from '~/components/Loader';
 import { ExcludeSoliccite } from '~/layouts/solicite-donations/(view-solicite-donation)/exclude-solicite';
 import { FinishReserveInViewSoliciteDonation } from '~/layouts/solicite-donations/(view-solicite-donation)/finish-solicite';
 import {
+  ViewDataHelpedListForViewSoliciteDonation,
   ViewDataImageForViewSoliciteDonation,
   ViewDataTextForViewSoliciteDonation,
 } from '~/layouts/solicite-donations/one-solicite-donation/view-data';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
+import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import { ISoliciteDonation } from '~/utils/services/DTO/solicite-donation.dto';
 import { SoliciteDonationsSerivce } from '~/utils/services/SoliciteDonationsService';
 import { UserService } from '~/utils/services/UserService';
@@ -24,8 +26,8 @@ export default function ViewOneSoliciteDonation() {
 
   const { notify } = useNotifications();
 
-  const { data, refetch } = useQuery<ISoliciteDonation>({
-    queryKey: ['reserve-donation', uid],
+  const { data, refetch, isLoading, isRefetching } = useQuery<ISoliciteDonation>({
+    queryKey: ['solicite-donation', uid],
     queryFn: async () => {
       setIsLoading(true);
       const uidFormatted = Array.isArray(uid) ? uid[0] : uid;
@@ -89,18 +91,23 @@ export default function ViewOneSoliciteDonation() {
     }
   }, [ViewReserveDonations.find((item) => item.uid === uid)]); */
 
+  useRefreshOnFocus(refetch);
+
   return (
     <>
       <HeaderBack title={`Reserva: ${data?.name}`} />
       <Loader fullscreen activeHook />
       <ScrollView className="w-full p-2 flex flex-col gap-4 pb-12">
-        {data && (
+        {data && !isLoading && !isRefetching && (
           <>
             <ViewDataImageForViewSoliciteDonation data={data} />
-            <View className="w-full flex flex-col gap-2 mb-4">
+            <View className="w-full flex flex-col gap-2 ">
               <ViewDataTextForViewSoliciteDonation data={data} />
             </View>
-            <View className="w-full flex flex-col gap-2">
+
+            <ViewDataHelpedListForViewSoliciteDonation data={data} />
+
+            <View className="w-full flex flex-col gap-2 mt-4">
               {user?.uid === data.ownerUid && (
                 <>
                   {!data.isFinished && (
@@ -137,32 +144,38 @@ export default function ViewOneSoliciteDonation() {
                     isLoading={isPending}>
                     Entrar em contato
                   </Button>
-                  <Button
-                    variant="default"
-                    icon={{
-                      name: 'handshake-o',
-                      color: 'white',
-                      size: 15,
-                    }}
-                    onPress={async () => {
-                      if (!user) return;
-                      const verifyConversation = await findOneConversation(data.ownerUid);
-                      if (!verifyConversation) {
-                        notify('warning', {
-                          params: {
-                            title: 'Você precisa conversar antes de registrar a sua assistência!',
-                            description: '',
-                          },
-                        });
-                        return;
-                      }
-                      router.push(
-                        `/(tabs-stack)/(one-solicite-donation)/(register-assistence)/${uid}`
-                      );
-                    }}
-                    isLoading={isPending}>
-                    Registrar assistência
-                  </Button>
+                  {user &&
+                    user.uid &&
+                    data.helpedList &&
+                    !data.helpedList.find((item) => item.uid === user.uid) && (
+                      <Button
+                        variant="default"
+                        icon={{
+                          name: 'handshake-o',
+                          color: 'white',
+                          size: 15,
+                        }}
+                        onPress={async () => {
+                          if (!user) return;
+                          const verifyConversation = await findOneConversation(data.ownerUid);
+                          if (!verifyConversation) {
+                            notify('warning', {
+                              params: {
+                                title:
+                                  'Você precisa conversar antes de registrar a sua assistência!',
+                                description: '',
+                              },
+                            });
+                            return;
+                          }
+                          router.push(
+                            `/(tabs-stack)/(one-solicite-donation)/(register-assistence)/${uid}`
+                          );
+                        }}
+                        isLoading={isPending}>
+                        Registrar assistência
+                      </Button>
+                    )}
                 </>
               )}
             </View>
