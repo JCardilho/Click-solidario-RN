@@ -1,21 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { format, getYear } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useNotifications } from 'react-native-notificated';
-import { Badge } from '~/components/Badge';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Loader, useLoaderHook } from '~/components/Loader';
-import { CancelReserve } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/cancel-reserve';
-import { ExcludeReserve } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/exclude-reserve';
-import { FinishReserveInViewReserveDonation } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/finish-reserve';
-import { ReserveAction } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/reserve-action';
-import {
-  ViewDataImageForViewReserveDonation,
-  ViewDataTextForViewReserveDonation,
-} from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/view-datas';
 import { ExcludeSoliccite } from '~/layouts/solicite-donations/(view-solicite-donation)/exclude-solicite';
 import { FinishReserveInViewSoliciteDonation } from '~/layouts/solicite-donations/(view-solicite-donation)/finish-solicite';
 import {
@@ -23,16 +12,13 @@ import {
   ViewDataTextForViewSoliciteDonation,
 } from '~/layouts/solicite-donations/one-solicite-donation/view-data';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
-import { useReserveDonations } from '~/utils/hooks/screens/view-reserve-donation/view-reserve-donation';
-import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ISoliciteDonation } from '~/utils/services/DTO/solicite-donation.dto';
-import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
 import { SoliciteDonationsSerivce } from '~/utils/services/SoliciteDonationsService';
 import { UserService } from '~/utils/services/UserService';
 
 export default function ViewOneSoliciteDonation() {
   const { uid } = useLocalSearchParams();
-  const { user } = useCurrentUserHook();
+  const { user, findOneConversation } = useCurrentUserHook();
   const router = useRouter();
   const { setIsLoading } = useLoaderHook();
 
@@ -137,17 +123,45 @@ export default function ViewOneSoliciteDonation() {
               )}
 
               {user && user.uid !== data.ownerUid && (
-                <Button
-                  variant="default"
-                  icon={{
-                    name: 'handshake-o',
-                    color: 'white',
-                    size: 15,
-                  }}
-                  onPress={async () => await mutateAsync()}
-                  isLoading={isPending}>
-                  Entrar em contato
-                </Button>
+                <>
+                  <Button
+                    variant="default"
+                    icon={{
+                      name: 'comment',
+                      color: 'white',
+                      size: 15,
+                    }}
+                    onPress={async () => await mutateAsync()}
+                    isLoading={isPending}>
+                    Entrar em contato
+                  </Button>
+                  <Button
+                    variant="default"
+                    icon={{
+                      name: 'handshake-o',
+                      color: 'white',
+                      size: 15,
+                    }}
+                    onPress={async () => {
+                      if (!user) return;
+                      const verifyConversation = await findOneConversation(data.ownerUid);
+                      if (!verifyConversation) {
+                        notify('warning', {
+                          params: {
+                            title: 'Você precisa conversar antes de registrar a sua assistência!',
+                            description: '',
+                          },
+                        });
+                        return;
+                      }
+                      router.push(
+                        `/(tabs-stack)/(one-solicite-donation)/(register-assistence)/${uid}`
+                      );
+                    }}
+                    isLoading={isPending}>
+                    Registrar assistência
+                  </Button>
+                </>
               )}
             </View>
           </>

@@ -11,7 +11,7 @@ import firebase from '../firebase';
 import { usePathname, useRouter } from 'expo-router';
 import { create } from 'zustand';
 import { useCacheHook } from './cacheHook';
-import { IUser, verifyUserWithZodSchema } from '../services/DTO/user.dto';
+import { IConversationsUser, IUser, verifyUserWithZodSchema } from '../services/DTO/user.dto';
 import { UserService } from '../services/UserService';
 
 interface Types {
@@ -107,5 +107,18 @@ export const useCurrentUserHook = () => {
     await UserService.addImageToUserInFirebase(image);
   };
 
-  return { user, verifyUser, verifyUserAndSendUserFromHome, setUser, addImageToUserAndSetCache };
+  const findOneConversation = async (uid: string): Promise<IConversationsUser | undefined> => {
+    if (!user?.conversations) return;
+    const conversation = user.conversations.find((conv) => conv.otherUserUid === uid);
+    return conversation;
+  };
+
+  return {
+    user,
+    verifyUser,
+    verifyUserAndSendUserFromHome,
+    setUser,
+    addImageToUserAndSetCache,
+    findOneConversation,
+  };
 };

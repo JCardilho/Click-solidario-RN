@@ -19,7 +19,7 @@ export interface IUser extends Omit<CreateUserDTO, 'password'>, Pick<AuthCredent
   uid: string;
   conversations?: IConversationsUser[];
   notifications?: Notifications[];
-  token?: IdTokenResult ;
+  token?: IdTokenResult;
 }
 
 export interface IConversationsUser {
@@ -27,6 +27,7 @@ export interface IConversationsUser {
   otherUserUid: string;
   otherUserName: string;
   isNotification: boolean;
+  createdAt: Date;
 }
 
 interface Notifications {

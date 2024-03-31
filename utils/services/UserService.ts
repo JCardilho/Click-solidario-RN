@@ -109,7 +109,10 @@ const deleteOldImageToUserInFirebaseStorage = async (image: string) => {
 
 const SendNotificationMessage = async (uid: string, otherUserUid: string): Promise<void> => {};
 
-const CreateConversation = async (uid: string, params: IConversationsUser): Promise<boolean> => {
+const CreateConversation = async (
+  uid: string,
+  params: Omit<IConversationsUser, 'createdAt'>
+): Promise<boolean> => {
   try {
     const queryForVerifyIfExistConversation = doc(getFirestore(firebase), 'users', uid);
     const docSnapForVerifyIfExistConversation = await getDoc(queryForVerifyIfExistConversation);
@@ -125,8 +128,9 @@ const CreateConversation = async (uid: string, params: IConversationsUser): Prom
     if (!docSnap.exists()) throw new Error('Usuário não encontrado');
     const user = docSnap.data() as IUser;
     const conversations = user.conversations || [];
-    const newConversation = {
+    const newConversation: IConversationsUser = {
       ...params,
+      createdAt: new Date(),
     };
     conversations.push(newConversation);
     console.log('criou!!');
