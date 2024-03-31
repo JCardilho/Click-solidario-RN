@@ -234,6 +234,83 @@ const WatchEventMessage = (
   }
 };
 
+const UpdateUpdateDonation = async (
+  uid: string,
+  donation: CreateSoliciteDonationDTO
+): Promise<ISoliciteDonation> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
+  await setDoc(
+    docRef,
+    {
+      name: donation.name,
+      description: donation.description,
+      images: donation.images,
+    },
+    { merge: true }
+  );
+  const getResult = await GetOneSoliciteDonations(uid);
+  if (!getResult) throw new Error('Donation not found');
+  return getResult;
+};
+
+const AddImages = async (uid: string, images: string): Promise<string | undefined> => {
+  try {
+    const response = await fetch(images);
+    const blob = await response.blob();
+    const fileName = images.substring(images.lastIndexOf('/') + 1);
+    const storage = getStorage();
+    const mountainsRef = ref(
+      storage,
+      `images/${CollectionName}/${uid}/${fileName + Date.now().toString()}`
+    );
+
+    const result = await uploadBytes(mountainsRef, blob).then(async (snapshot) => {
+      const downloadUrl = await getDownloadURL(snapshot.ref).then(async (url) => {
+        const updateDoc = doc(getFirestore(firebase), CollectionName, uid);
+        const oldValue = await getDoc(updateDoc);
+        const data = oldValue.data();
+        await setDoc(updateDoc, { images: [...(data?.images || []), url] }, { merge: true });
+        return url;
+      });
+      return downloadUrl;
+    });
+
+    return result;
+  } catch (err) {
+    console.log('err', err);
+  }
+};
+
+const DeleteImages = async (images: string[], uid: string): Promise<void> => {
+  const storage = getStorage();
+  const result = images.map(async (url) => {
+    if (!url) return;
+    const desertRef = ref(storage, url);
+    await deleteObject(desertRef);
+    console.log('deletado', url);
+  });
+  const getReserveRef = collection(getFirestore(firebase), CollectionName, uid);
+  const getDoc = await getDocs(getReserveRef);
+  const data = getDoc.docs[0].data();
+  const newImages = data.images.filter((image: string) => !images.includes(image));
+  await setDoc(getDoc.docs[0].ref, { images: newImages }, { merge: true });
+  await Promise.all(result);
+};
+
+const DeleteImage = async (image: string, uid: string): Promise<void> => {
+  const storage = getStorage();
+  const desertRef = ref(storage, image);
+  await deleteObject(desertRef);
+  console.log('deletou', image);
+  const getReserveRef = doc(getFirestore(firebase), CollectionName, uid);
+  const getDocrSnap = await getDoc(getReserveRef);
+  const data = getDocrSnap.data();
+  if (!data) throw new Error('Reserva não encontrada');
+  const newImages = data.images.filter((img: string) => img !== image);
+  console.log('ref', getDocrSnap.ref);
+  await setDoc(getDocrSnap.ref, { images: newImages }, { merge: true });
+};
+
 export const SoliciteDonationsSerivce = {
   CreateSoliciteDonation,
   GetAllSoliciteDonations,
@@ -246,4 +323,9 @@ export const SoliciteDonationsSerivce = {
   CreateMessage,
   GetMyMessages,
   WatchEventMessage,
+  UpdateUpdateDonation,
+  AddImages,
+  DeleteImages,
+  DeleteImage,
+  
 };

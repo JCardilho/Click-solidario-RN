@@ -123,7 +123,11 @@ export default function ViewOneSoliciteDonation() {
                         color: 'white',
                         size: 15,
                       }}
-                      href={() => {}}>
+                      href={() => {
+                        router.push(
+                          `/(tabs-stack)/(one-solicite-donation)/(edit-solicite-donation)/${uid}`
+                        );
+                      }}>
                       Editar
                     </Button>
                   )}

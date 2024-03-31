@@ -9,8 +9,7 @@ export default function StackLayout() {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="(view-solicite-donation)" />
-      <Stack.Screen name="(edit-solicite-donation)" />
+      <Stack.Screen name="[uid]" getId={({ params }) => String(Date.now())} />
     </Stack>
   );
 }

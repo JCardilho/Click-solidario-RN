@@ -17,6 +17,7 @@ export interface ISoliciteDonation extends CreateSoliciteDonationDTO {
 export interface ISoliciteDonationHelpedList {
   uid: string;
   name: string;
+  message?: string;
 }
 
 // Realtime Database
