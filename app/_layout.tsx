@@ -25,6 +25,21 @@ export default function Layout() {
         defaultIconType: 'no-icon',
         titleFamily: 'Kanit_400Regular',
       },
+      infoConfig: {
+        bgColor: '#f8ffd5',
+        defaultIconType: 'no-icon',
+        titleFamily: 'Kanit_400Regular',
+      },
+      errorConfig: {
+        bgColor: '#ffd5d5',
+        defaultIconType: 'no-icon',
+        titleFamily: 'Kanit_400Regular',
+      },
+      warningConfig: {
+        bgColor: '#f8ffd5',
+        defaultIconType: 'no-icon',
+        titleFamily: 'Kanit_400Regular',
+      },
     },
   });
 

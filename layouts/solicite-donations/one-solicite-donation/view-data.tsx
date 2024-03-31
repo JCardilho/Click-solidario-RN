@@ -224,7 +224,7 @@ export const ViewDataHelpedListForViewSoliciteDonation = ({ data }: IProps) => {
                 {user.isVerified && (
                   <View className="w-fit items-center justify-center my-4">
                     <Badge colorIcon="white" icon="check">
-                      Verificado pelo proprietário da doação
+                      Confirmado pelo proprietário da doação
                     </Badge>
                   </View>
                 )}
@@ -250,7 +250,7 @@ export const ViewDataHelpedListForViewSoliciteDonation = ({ data }: IProps) => {
                 {user.isVerified && (
                   <View className="w-fit items-center justify-center my-4">
                     <Badge colorIcon="white" icon="check">
-                      Verificado pelo proprietário da doação
+                      Confirmado pelo proprietário da doação
                     </Badge>
                   </View>
                 )}

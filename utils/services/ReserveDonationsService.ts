@@ -34,11 +34,14 @@ import {
   set,
 } from 'firebase/database';
 import { MessagesService } from './MessagesService';
+import { IUser } from './DTO/user.dto';
+
+const CollectionName = 'reserve-donations';
 
 const CreateReserveDonation = async (
   donation: CreateReserveDonationDTO
 ): Promise<IReserveDonation> => {
-  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const ref = collection(getFirestore(firebase), CollectionName);
   const date = new Date();
 
   const doc = await addDoc(ref, {
@@ -75,7 +78,7 @@ const GetAllReserveDonations = async (
   userReserveCount: number;
   donations: IReserveDonation[];
 }> => {
-  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const ref = collection(getFirestore(firebase), CollectionName);
   const query1 = query(
     ref,
     or(
@@ -124,7 +127,7 @@ const GetAllReserveDonations = async (
 };
 
 const GetMyReserveDonations = async (uid: string): Promise<IReserveDonation[]> => {
-  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const ref = collection(getFirestore(firebase), CollectionName);
   const snapshot = await getDocs(ref);
   return snapshot.docs
     .map((doc) => {
@@ -151,7 +154,7 @@ const GetMyReserveDonations = async (uid: string): Promise<IReserveDonation[]> =
 };
 
 const GetOneReserveDonation = async (uid: string): Promise<IReserveDonation | undefined> => {
-  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const ref = collection(getFirestore(firebase), CollectionName);
   const snapshot = await getDocs(ref);
   const result = snapshot.docs
     .map((doc) => {
@@ -182,7 +185,7 @@ const ReserveDonationAction = async (
   uid: string,
   owner: Omit<IReserveDonation['reserve'], 'endDateOfLastReserve'>
 ): Promise<IReserveDonation['reserve']> => {
-  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
   const endDateOfLastReserve = addDays(new Date(), 1);
   await setDoc(
     docRef,
@@ -203,7 +206,7 @@ const ReserveDonationAction = async (
 };
 
 const RemoveReserveAction = async (uid: string): Promise<void> => {
-  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
   await setDoc(
     docRef,
     {
@@ -218,7 +221,7 @@ const RemoveReserveAction = async (uid: string): Promise<void> => {
 };
 
 const ExcludeReserveDonation = async (uid: string): Promise<void> => {
-  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
   await deleteDoc(docRef);
 };
 
@@ -226,7 +229,7 @@ const UpdateReserveDonation = async (
   uid: string,
   donation: CreateReserveDonationDTO
 ): Promise<IReserveDonation> => {
-  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
   await setDoc(
     docRef,
     {
@@ -250,7 +253,7 @@ const DeleteImages = async (images: string[], uid: string): Promise<void> => {
     await deleteObject(desertRef);
     console.log('deletado', url);
   });
-  const getReserveRef = collection(getFirestore(firebase), 'reserve-donations', uid);
+  const getReserveRef = collection(getFirestore(firebase), CollectionName, uid);
   const getDoc = await getDocs(getReserveRef);
   const data = getDoc.docs[0].data();
   const newImages = data.images.filter((image: string) => !images.includes(image));
@@ -263,7 +266,7 @@ const DeleteImage = async (image: string, uid: string): Promise<void> => {
   const desertRef = ref(storage, image);
   await deleteObject(desertRef);
   console.log('deletou', image);
-  const getReserveRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const getReserveRef = doc(getFirestore(firebase), CollectionName, uid);
   const getDocrSnap = await getDoc(getReserveRef);
   const data = getDocrSnap.data();
   if (!data) throw new Error('Reserva não encontrada');
@@ -285,7 +288,7 @@ const AddImages = async (uid: string, images: string): Promise<string | undefine
 
     const result = await uploadBytes(mountainsRef, blob).then(async (snapshot) => {
       const downloadUrl = await getDownloadURL(snapshot.ref).then(async (url) => {
-        const updateDoc = doc(getFirestore(firebase), 'reserve-donations', uid);
+        const updateDoc = doc(getFirestore(firebase), CollectionName, uid);
         const oldValue = await getDoc(updateDoc);
         const data = oldValue.data();
         await setDoc(updateDoc, { images: [...(data?.images || []), url] }, { merge: true });
@@ -309,7 +312,7 @@ const SearchReserveDonations = async (
   userReserveCount: number;
   donations: IReserveDonation[];
 }> => {
-  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const ref = collection(getFirestore(firebase), CollectionName);
   const q = query(
     ref,
 
@@ -355,7 +358,7 @@ const SearchReserveDonations = async (
 };
 
 const GetMyReserves = async (uid: string): Promise<IReserveDonation[]> => {
-  const ref = collection(getFirestore(firebase), 'reserve-donations');
+  const ref = collection(getFirestore(firebase), CollectionName);
   const queryRef = query(ref, where('reserve.endOwnerUidOfLastReserve', '==', uid));
   const querySnapshot = await getDocs(queryRef);
   return querySnapshot.docs
@@ -470,7 +473,7 @@ const FinishReserve = async ({
   endOwnerNameOfLastReserve: string;
   endOwnerUidOfLastReserve: string;
 }): Promise<Date> => {
-  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
   const newDate = new Date(2100, 1, 1);
   await setDoc(
     docRef,
@@ -495,7 +498,7 @@ const UnFinishReserve = async ({
   endOwnerNameOfLastReserve: string;
   endOwnerUidOfLastReserve: string;
 }): Promise<Date> => {
-  const docRef = doc(getFirestore(firebase), 'reserve-donations', uid);
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
   const newDate = addDays(new Date(), 1);
   await setDoc(
     docRef,
@@ -509,6 +512,54 @@ const UnFinishReserve = async ({
     { merge: true }
   );
   return newDate;
+};
+
+const SaveReserveDonation = async ({
+  donation,
+  user_uid,
+}: {
+  donation: IReserveDonation;
+  user_uid: string;
+}): Promise<void> => {
+  const getUser = await getDoc(doc(getFirestore(firebase), 'users', user_uid));
+  const data = getUser.data() as IUser;
+  if (!data) throw new Error('Usuário não encontrado');
+  const newList = [
+    ...(data.posts_saved || []),
+    {
+      type: 'reserve',
+      postId: donation.uid,
+      postTitle: donation.name,
+      postDescription: donation.description,
+    },
+  ];
+  await setDoc(
+    doc(getFirestore(firebase), 'users', user_uid),
+    {
+      posts_saved: newList,
+    },
+    { merge: true }
+  );
+};
+
+const RemoveSavedReserveDonation = async ({
+  donation,
+  user_uid,
+}: {
+  donation: IReserveDonation;
+  user_uid: string;
+}): Promise<void> => {
+  const getUser = await getDoc(doc(getFirestore(firebase), 'users', user_uid));
+  const data = getUser.data() as IUser;
+  if (!data) throw new Error('Usuário não encontrado');
+  const newList = (data.posts_saved || []).filter((list) => list.postId !== donation.uid);
+  await setDoc(
+    doc(getFirestore(firebase), 'users', user_uid),
+    {
+      posts_saved: newList,
+    },
+    { merge: true }
+  );
 };
 
 export const ReserveDonationsService = {
@@ -530,4 +581,6 @@ export const ReserveDonationsService = {
   WatchEventMessage,
   FinishReserve,
   UnFinishReserve,
+  SaveReserveDonation,
+  RemoveSavedReserveDonation,
 };

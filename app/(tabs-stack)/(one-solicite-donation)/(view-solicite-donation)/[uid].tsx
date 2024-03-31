@@ -7,6 +7,7 @@ import { HeaderBack } from '~/components/HeaderBack';
 import { Loader, useLoaderHook } from '~/components/Loader';
 import { ExcludeSoliccite } from '~/layouts/solicite-donations/(view-solicite-donation)/exclude-solicite';
 import { FinishReserveInViewSoliciteDonation } from '~/layouts/solicite-donations/(view-solicite-donation)/finish-solicite';
+import { SavePostSoliciteDonationPage } from '~/layouts/solicite-donations/one-solicite-donation/save-post';
 import {
   ViewDataHelpedListForViewSoliciteDonation,
   ViewDataImageForViewSoliciteDonation,
@@ -107,7 +108,9 @@ export default function ViewOneSoliciteDonation() {
 
             <ViewDataHelpedListForViewSoliciteDonation data={data} />
 
-            <View className="w-full flex flex-col gap-2 mt-4">
+            <SavePostSoliciteDonationPage data={data} />
+
+            <View className="w-full flex flex-col gap-2 ">
               {user?.uid === data.ownerUid && (
                 <>
                   {!data.isFinished && (

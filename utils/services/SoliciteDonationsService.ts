@@ -27,6 +27,7 @@ import {
 } from './DTO/solicite-donation.dto';
 import { MessagesService } from './MessagesService';
 import { DataSnapshot, Unsubscribe } from 'firebase/database';
+import { IPostSaved, IUser } from './DTO/user.dto';
 
 const CollectionName = 'solicite-donations';
 
@@ -412,6 +413,64 @@ const UnVerifiedAssistence = async ({
   );
 };
 
+const SaveSoliciteDonation = async ({
+  donation,
+  user_uid,
+}: {
+  donation: ISoliciteDonation;
+  user_uid: string;
+}): Promise<IPostSaved> => {
+  const getUser = await getDoc(doc(getFirestore(firebase), 'users', user_uid));
+  const data = getUser.data() as IUser;
+  if (!data) throw new Error('Usuário não encontrado');
+  const newList = [
+    ...(data.posts_saved || []),
+    {
+      type: 'solicite',
+      postId: donation.uid,
+      postTitle: donation.name,
+      postDescription: donation.description,
+    },
+  ];
+  await setDoc(
+    doc(getFirestore(firebase), 'users', user_uid),
+    {
+      posts_saved: newList,
+    },
+    { merge: true }
+  );
+  return {
+    type: 'solicite',
+    postId: donation.uid,
+    postTitle: donation.name,
+    postDescription: donation.description,
+  };
+};
+
+const RemoveSavedSoliciteDonation = async ({
+  donation,
+  user_uid,
+}: {
+  donation: ISoliciteDonation;
+  user_uid: string;
+}): Promise<void> => {
+  const getUser = await getDoc(doc(getFirestore(firebase), 'users', user_uid));
+  const data = getUser.data() as IUser;
+  if (!data) throw new Error('Usuário não encontrado');
+  const verifyIfAlreadySaved = (data.posts_saved || []).find(
+    (list) => list.postId === donation.uid
+  );
+  if (!verifyIfAlreadySaved) return;
+  const newList = (data.posts_saved || []).filter((list) => list.postId !== donation.uid);
+  await setDoc(
+    doc(getFirestore(firebase), 'users', user_uid),
+    {
+      posts_saved: newList,
+    },
+    { merge: true }
+  );
+};
+
 export const SoliciteDonationsSerivce = {
   CreateSoliciteDonation,
   GetAllSoliciteDonations,
@@ -432,4 +491,6 @@ export const SoliciteDonationsSerivce = {
   RemoveAssistence,
   VerifiedAssistence,
   UnVerifiedAssistence,
+  SaveSoliciteDonation,
+  RemoveSavedSoliciteDonation,
 };

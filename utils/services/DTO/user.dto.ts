@@ -20,6 +20,7 @@ export interface IUser extends Omit<CreateUserDTO, 'password'>, Pick<AuthCredent
   conversations?: IConversationsUser[];
   notifications?: Notifications[];
   token?: IdTokenResult;
+  posts_saved?: IPostSaved[];
 }
 
 export interface IConversationsUser {
@@ -38,6 +39,13 @@ interface Notifications {
   isRead: boolean;
 }
 
+export interface IPostSaved {
+  type: 'reserve' | 'solicite';
+  postId: string;
+  postTitle: string;
+  postDescription: string;
+}
+
 const userSchema = z.object({
   email: z.string().email(),
   cpf: z.string().optional(),
@@ -50,13 +58,44 @@ const userSchema = z.object({
     .optional(),
   socialAssistant: z.boolean().optional(),
   administrator: z.boolean().optional(),
-  providerId: z.string(),
   image: z.string().optional(),
   uid: z.string(),
+  conversations: z
+    .array(
+      z.object({
+        routeQuery: z.string(),
+        otherUserUid: z.string(),
+        otherUserName: z.string(),
+        isNotification: z.boolean(),
+        fromMessage: z.string().optional(),
+      })
+    )
+    .optional(),
+  notifications: z
+    .array(
+      z.object({
+        title: z.string(),
+        body: z.string(),
+        date: z.string(),
+        isRead: z.boolean(),
+      })
+    )
+    .optional(),
+  posts_saved: z
+    .array(
+      z.object({
+        type: z.string(),
+        postId: z.string(),
+        postTitle: z.string(),
+        postDescription: z.string(),
+      })
+    )
+    .optional(),
 });
 
 export const verifyUserWithZodSchema = (user: IUser | null): boolean => {
   if (!user) return false;
   const verify = userSchema.safeParse(user);
+  if (!verify.success) console.log(verify.error);
   return verify.success;
 };

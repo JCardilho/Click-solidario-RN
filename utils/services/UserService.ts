@@ -203,6 +203,22 @@ const MarkAsUnreadOtherUserChatNotification = async ({
   );
 };
 
+const UpdateDataUser = async (uid: string): Promise<IUser> => {
+  const docRef = doc(getFirestore(firebase), 'users', uid);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) throw new Error('Usuário não encontrado');
+  const data = docSnap.data() as IUser;
+  return {
+    ...data,
+    uid: docSnap.id,
+    conversations:
+      data.conversations?.map((conv) => ({
+        ...conv,
+        createdAt: new Date(conv.createdAt),
+      })) || undefined,
+  };
+};
+
 export const UserService = {
   createUser,
   loginUser,
@@ -213,4 +229,5 @@ export const UserService = {
   MarkAsReadChatNotification,
   MarkAsUnreadOtherUserChatNotification,
   getOneUser,
+  UpdateDataUser,
 };

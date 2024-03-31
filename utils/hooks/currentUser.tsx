@@ -93,9 +93,13 @@ export const useCurrentUserHook = () => {
       const getCachedUser = (await getCache('user')) as IUser | null;
       if (!getCachedUser || getCachedUser === null) return sendFromLogin();
       if (getCachedUser) {
-        console.info('Enviando usuário da home');
-        sendFromHome(getCachedUser);
-        return;
+        try {
+          const updateData = await UserService.UpdateDataUser(getCachedUser.uid);
+          if (updateData) return sendFromHome(updateData);
+          return sendFromLogin();
+        } catch (err) {
+          return sendFromLogin();
+        }
       }
     } catch (err) {
       return router.push('/entrar');
