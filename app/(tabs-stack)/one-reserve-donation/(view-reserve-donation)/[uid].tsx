@@ -70,6 +70,7 @@ export default function ViewOneReserveDonation() {
         isNotification: true,
         otherUserName: data.reserve.endOwnerNameOfLastReserve || '',
         otherUserUid: data.reserve.endOwnerUidOfLastReserve || '',
+        fromMessage: `${data.name}`,
       });
 
       await UserService.CreateConversation(data.reserve.endOwnerUidOfLastReserve || '', {
@@ -77,6 +78,7 @@ export default function ViewOneReserveDonation() {
         isNotification: true,
         otherUserName: data.ownerName,
         otherUserUid: data.ownerUid,
+        fromMessage: `${data.name}`,
       });
 
       return result;

@@ -1,6 +1,7 @@
 import { ScrollView, Text } from 'react-native';
 import { CreateTopNavigationHome } from './create-top-navigation';
 import { View } from 'react-native';
+import { SkeletonContent, SkeletorCircle } from '~/components/Skeleton';
 
 interface IProps {
   referencePageview: any;

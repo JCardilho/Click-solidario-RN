@@ -212,4 +212,5 @@ export const UserService = {
   GetAllConversations,
   MarkAsReadChatNotification,
   MarkAsUnreadOtherUserChatNotification,
+  getOneUser,
 };

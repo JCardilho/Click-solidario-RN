@@ -57,6 +57,7 @@ export default function ViewOneSoliciteDonation() {
         isNotification: true,
         otherUserName: data.ownerName,
         otherUserUid: data.ownerUid,
+        fromMessage: `${data.name}`,
       });
 
       await UserService.CreateConversation(data.ownerUid || '', {
@@ -64,6 +65,7 @@ export default function ViewOneSoliciteDonation() {
         isNotification: true,
         otherUserName: user.name!,
         otherUserUid: user.uid,
+        fromMessage: `${data.name}`,
       });
 
       return result;

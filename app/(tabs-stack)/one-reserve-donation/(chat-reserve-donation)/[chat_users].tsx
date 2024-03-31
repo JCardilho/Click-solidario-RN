@@ -3,14 +3,15 @@ import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
 import { getDatabase, onValue, ref } from 'firebase/database';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Input } from '~/components/Input';
-import { SkeletonContent, SkeletonRect } from '~/components/Skeleton';
+import { SkeletonContent, SkeletonRect, SkeletorCircle } from '~/components/Skeleton';
 import firebase from '~/utils/firebase';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { IReserveDonationMessageRealTime } from '~/utils/services/DTO/reserve-donation.dto';
+import { IUser } from '~/utils/services/DTO/user.dto';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
 import { UserService } from '~/utils/services/UserService';
 
@@ -56,6 +57,7 @@ export default function Chat() {
   }>();
   const [data, setMessages] = useState<IReserveDonationMessageRealTime['messages']>([]);
   const scrollRef = useRef<ScrollView>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const { refetch, isPending: isPendingMessage } = useQuery<any>({
     queryKey: ['messages', params.donation_owner_uid],
@@ -96,6 +98,24 @@ export default function Chat() {
       }
 
       return 'OK';
+    },
+  });
+
+  const { data: otherUserData } = useQuery<IUser | undefined>({
+    queryKey: ['get-other-user', params.donation_owner_uid],
+    queryFn: async () => {
+      try {
+        if (!user) return;
+        const value = await UserService.getOneUser(
+          user!.uid === params.donation_owner_uid
+            ? params.receives_donation_uid
+            : params.donation_owner_uid
+        );
+        return value;
+      } catch (err) {
+        console.log('Error', err);
+        return;
+      }
     },
   });
 
@@ -149,7 +169,35 @@ export default function Chat() {
     user &&
     user.uid === params.current_user_uid && (
       <>
-        <HeaderBack title="Chat" />
+        <HeaderBack hiddenDescriptionReturn buttonRounded>
+          {otherUserData && (
+            <TouchableOpacity className="w-full flex flex-row gap-2">
+              {otherUserData.image && (
+                <Image
+                  source={{ uri: otherUserData.image }}
+                  className={`w-12 h-12 rounded-full ${imageLoaded ? 'block' : 'absolute'}`}
+                  onLoadEnd={() => setImageLoaded(true)}
+                />
+              )}
+              {!imageLoaded && (
+                <View className="w-[40px] h-[40px]">
+                  <SkeletonContent>
+                    <SkeletorCircle r={18} cx={18} cy={21} />
+                  </SkeletonContent>
+                </View>
+              )}
+              <View className="w-full flex flex-col gap-1">
+                <Text className="font-kanit">{otherUserData.name}</Text>
+                <Text className="font-kanit text-sm text-zinc-500">Clique para saber mais!!</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          {!otherUserData && (
+            <View>
+              <Text>Chat</Text>
+            </View>
+          )}
+        </HeaderBack>
         {isPendingMessage && (
           <View className="w-full h-screen p-4">
             <SkeletonContent>
@@ -218,7 +266,7 @@ export default function Chat() {
                     <Card
                       ownerName={
                         user && user.uid === params.donation_owner_uid
-                          ? params.donation_owner_name
+                          ? params.receives_donation_name
                           : params.donation_owner_name
                       }
                       variant="other"

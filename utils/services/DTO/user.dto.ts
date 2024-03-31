@@ -28,6 +28,7 @@ export interface IConversationsUser {
   otherUserName: string;
   isNotification: boolean;
   createdAt: Date;
+  fromMessage: string;
 }
 
 interface Notifications {

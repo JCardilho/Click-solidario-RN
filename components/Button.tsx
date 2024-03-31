@@ -22,6 +22,7 @@ export interface IPropsButtomComponent {
   borderVariant?: string;
   classNameText?: string;
   disabled?: boolean;
+  hiddenChildren?: boolean;
 }
 
 export type VariantsButtonComponent =
@@ -30,11 +31,13 @@ export type VariantsButtonComponent =
   | 'primary'
   | 'ghost'
   | 'success'
-  | 'borded';
+  | 'borded'
+  | 'rounded';
 
 export const Button = (props: IPropsButtomComponent) => {
   const createClassnameForTouchableOpacity = (variant?: VariantsButtonComponent) => {
     const styleDefault = ` flex flex-row gap-4 items-center  p-4 rounded-lg  border-2`;
+    const styleDefaultWithoutRounded = ` flex flex-row gap-4 items-center  p-4 border-2`;
     switch (variant) {
       case 'destructive':
         return `${styleDefault} bg-red-500 border-red-300 ${disabledClass} ${props.className}`;
@@ -48,6 +51,8 @@ export const Button = (props: IPropsButtomComponent) => {
         return `${styleDefault} bg-green-500 border-green-400 ${disabledClass} ${props.className}`;
       case 'borded':
         return `${styleDefault} bg-transparent ${props.borderVariant ? props.borderVariant : 'border-zinc-500'} ${disabledClass} ${props.className}`;
+      case 'rounded':
+        return `${styleDefaultWithoutRounded} bg-blue-500 border-blue-300 rounded-full ${disabledClass} ${props.className}`;
       default:
         return `${styleDefault} bg-blue-500 border-blue-300 ${disabledClass} ${props.className}`;
     }
@@ -75,7 +80,7 @@ export const Button = (props: IPropsButtomComponent) => {
         {props.icon && props.isLoading && (
           <ActivityIndicator size="small" color={props.loaderColor ? props.loaderColor : '#fff'} />
         )}
-        {props.children && (
+        {props.children && !props.hiddenChildren && (
           <Text
             className={`
           font-kanit ${props.variant == 'ghost' || props.variant == 'borded' ? 'text-black' : 'text-white'} ${props.classNameText}

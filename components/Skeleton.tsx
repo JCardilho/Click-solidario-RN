@@ -51,3 +51,9 @@ export const SkeletonRect = (
 
   return <Rect width={width} {...props} rx="4" ry="4" />;
 };
+
+export const SkeletorCircle = (
+  props?: typeof Circle extends React.ComponentType<infer P> ? P : never
+) => {
+  return <Circle {...props} />;
+};
