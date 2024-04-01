@@ -54,18 +54,18 @@ export const useCurrentUserHook = () => {
       const getCachedUser: any = await getCache('user');
       if (getCachedUser) {
         setUser(getCachedUser);
-        router.push('/home');
+        router.replace('/home');
       }
       const getAuth = auth.getAuth(firebase);
       const unsubscribe = onAuthStateChanged(getAuth, async (user) => {
         if (!user) {
-          router.push('/entrar');
+          router.replace('/entrar');
         }
       });
 
       return () => unsubscribe();
     } catch (err) {
-      router.push('/entrar');
+      router.replace('/entrar');
     }
   };
 
@@ -74,7 +74,7 @@ export const useCurrentUserHook = () => {
     if (verify) {
       console.log('Verificou e está correto!!');
       setUser(user);
-      router.push('/home');
+      router.replace('/home');
       return;
     }
     console.log('não passou');
@@ -84,7 +84,7 @@ export const useCurrentUserHook = () => {
   const sendFromLogin = () => {
     if (path == '/entrar') return;
     console.info('Enviando usuário da login');
-    router.push('/entrar');
+    router.replace('/entrar');
     return;
   };
 
@@ -96,7 +96,7 @@ export const useCurrentUserHook = () => {
       if (getCachedUser) {
         try {
           const updateData = await UserService.UpdateDataUser(getCachedUser.uid);
-         
+
           if (updateData) return sendFromHome(updateData);
           return sendFromLogin();
         } catch (err) {
@@ -104,7 +104,7 @@ export const useCurrentUserHook = () => {
         }
       }
     } catch (err) {
-      return router.push('/entrar');
+      return router.replace('/entrar');
     }
   };
 

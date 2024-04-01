@@ -78,7 +78,7 @@ export default function ReserveDonations() {
           if (result.donations.length === 0) {
             setDisableLoadMore(true);
             return {
-              userReserveCount: 0,
+              userReserveCount: result.userReserveCount,
               donations: [],
             };
           }

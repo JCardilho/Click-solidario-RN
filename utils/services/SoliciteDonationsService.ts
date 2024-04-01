@@ -196,8 +196,8 @@ const CreateMessage = async ({
 
   return ref; */
   await MessagesService.CreateMessage({
-    uid_person_necessary: uid_person_reserve,
-    uid_person_donation,
+    uid_person_necessary: uid_person_donation,
+    uid_person_donation: uid_person_reserve,
     messages,
   });
 };
@@ -212,7 +212,7 @@ const GetMyMessages = async (
   const data = snapshot.val();
   if (!data) return [];
   return data.messages; */
-  const response = await MessagesService.GetMyMessages(uid_person_reserve, uid_person_donation);
+  const response = await MessagesService.GetMyMessages(uid_person_donation, uid_person_reserve);
   return response;
 };
 
@@ -229,7 +229,7 @@ const WatchEventMessage = (
     const ref = refDatabase(db, `messages/${uid_person_reserve}/${uid_person_donation}`);
 
     return onValue(ref, (snapshot) => func(snapshot)); */
-    return MessagesService.WatchEventMessage(uid_person_reserve, uid_person_donation, func);
+    return MessagesService.WatchEventMessage(uid_person_donation, uid_person_reserve, func);
   } catch (err) {
     console.log('err', err);
     return () => {};

@@ -55,8 +55,18 @@ export default function ViewOneSoliciteDonation() {
       )
         return 'ERR';
 
+      // donation owner = dono da doação
+      // receives donation = quem recebe a doação
+      // Os papeis são trocados aqui para que fique certo na hora de criar a conversa
+
+      const currentUser = `?current_user_uid=${user.uid}`;
+      const donationOwner = `&donation_owner_uid=${data.ownerUid}`;
+      const receivesDonation = `&receives_donation_uid=${user.uid}`;
+      const receivesDonationName = `&receives_donation_name=${user.name}`;
+      const donationOwnerName = `&donation_owner_name=${data.ownerName}`;
+
       const result = await UserService.CreateConversation(user.uid, {
-        routeQuery: `?current_user_uid=${user.uid}&donation_owner_uid=${user.uid}&receives_donation_uid=${data.ownerUid}&receives_donation_name=${data.ownerName}&donation_owner_name=${user.name}`,
+        routeQuery: `${currentUser}${donationOwner}${receivesDonation}${receivesDonationName}${donationOwnerName}`,
         isNotification: true,
         otherUserName: data.ownerName,
         otherUserUid: data.ownerUid,
@@ -64,7 +74,7 @@ export default function ViewOneSoliciteDonation() {
       });
 
       await UserService.CreateConversation(data.ownerUid || '', {
-        routeQuery: `?current_user_uid=${data.ownerUid}&donation_owner_uid=${user.uid}&receives_donation_uid=${data.ownerUid}&receives_donation_name=${data.ownerName}&donation_owner_name=${user.name}`,
+        routeQuery: `?current_user_uid=${data.ownerUid}`,
         isNotification: true,
         otherUserName: user.name!,
         otherUserUid: user.uid,
@@ -74,14 +84,29 @@ export default function ViewOneSoliciteDonation() {
       return result;
     },
     onSuccess: async () => {
-      if (!user) return;
+      if (
+        !user ||
+        !user.uid ||
+        !data ||
+        !data.name ||
+        !data.images ||
+        !data.ownerName ||
+        !data.ownerUid
+      )
+        return;
       notify('warning', {
         params: {
           title: 'Um chat foi criado para você e para a outra pessoa!',
           description: '',
         },
       });
-      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&donation_owner_uid=${user.uid}&receives_donation_uid=${data!.ownerUid}&receives_donation_name=${data!.ownerName}&donation_owner_name=${user.name}`;
+
+      const currentUser = `?current_user_uid=${user.uid}`;
+      const donationOwner = `&donation_owner_uid=${data.ownerUid}`;
+      const receivesDonation = `&receives_donation_uid=${user.uid}`;
+      const receivesDonationName = `&receives_donation_name=${user.name}`;
+      const donationOwnerName = `&donation_owner_name=${data.ownerName}`;
+      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}${currentUser}${donationOwner}${receivesDonation}${receivesDonationName}${donationOwnerName}`;
       router.push(link as any);
     },
   });

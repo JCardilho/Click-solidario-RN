@@ -98,7 +98,6 @@ const GetAllReserveDonations = async (
       doc.data().reserve.endDateOfLastReserve &&
       doc.data().reserve.endDateOfLastReserve.toDate() > new Date()
   );
-  console.log('removeIfDateIsBefore', removeIfDateIsBefore.length);
 
   return {
     userReserveCount: removeIfDateIsBefore.length,

@@ -100,99 +100,106 @@ export default function RequestDonationsScreen() {
   }, [endAt]);
 
   return (
-    <ScrollView
-      className="w-full p-4 flex flex-col gap-4"
-      style={{
-        gap: 4,
-      }}>
+    <>
       <SafeAreaView />
-      <View className="w-full  rounded-xl flex flex-col gap-4 p-4 items-center justify-center my-4">
-        <FontAwesome name="plus" size={50} />
-        <Text className="text-4xl font-kanit ">Solicitar ou Doar</Text>
-        <Text className="text-xl font-kanit text-center">
-          Solicite ou doe um item para quem precisa
-        </Text>
-      </View>
-
-      <DefaultInformationsForSoliciteDonationsPage />
-
-      <View className="w-full flex flex-col gap-2 ">
-        <Button
-          icon={{
-            name: 'user',
-            color: 'white',
-            size: 15,
-          }}
-          onPress={() => router.push('/(tabs-stack)/(my-donations)/solicite-donations')}>
-          Minhas solicitações
-        </Button>
-        <Button
-          icon={{
-            name: 'plus',
-            color: 'white',
-            size: 15,
-          }}
-          onPress={() => router.push('/(tabs-stack)/create-solicite-donation')}>
-          Solicitar doação
-        </Button>
-      </View>
-
-      <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
-      <Text className="text-2xl text-center font-kanit my-6">Itens solicitados:</Text>
-
-      <View className="w-full flex flex-row gap-1 ">
-        <Input
-          placeholder="Pesquisar"
-          className="w-[85%]"
-          onChangeText={(text) => setSearch(text)}
-          value={search}
-        />
-        <Button
-          variant="default"
-          className="h-full px-6"
-          onPress={() => refetch()}
-          isLoading={isRefetching}
-          icon={{
-            name: 'search',
-            color: 'white',
-            size: 16,
-          }}></Button>
-      </View>
-
-      {isLoading && (
-        <View className="w-full mt-4">
-          <Card isLoading={true} />
+      <ScrollView
+        className="w-full p-4 flex flex-col gap-4"
+        style={{
+          gap: 4,
+        }}>
+        <View className="w-full  rounded-xl flex flex-col gap-4 p-4 items-center justify-center my-4">
+          <FontAwesome name="plus" size={50} />
+          <Text className="text-4xl font-kanit ">Solicitar ou Doar</Text>
+          <Text className="text-xl font-kanit text-center">
+            Solicite ou doe um item para quem precisa
+          </Text>
         </View>
-      )}
 
-      {!isLoading &&
-        data &&
-        data.map((item, index) => (
-          <Card
-            key={`${item.uid}-solicite-donations-${index}`}
-            item={{
-              createdAt: item.createdAt,
-              id: item.uid,
-              name: item.name,
-              description:
-                item.description && item.description.length > 300
-                  ? item.description.substring(0, 300) + '...'
-                  : item.description,
-              images: item.images as string[],
-              ownerName: item.ownerName,
+        <DefaultInformationsForSoliciteDonationsPage />
+
+        <View className="w-full flex flex-col gap-2 ">
+          <Button
+            icon={{
+              name: 'user',
+              color: 'white',
+              size: 15,
             }}
-            href={() => {
-              router.push(`/(tabs-stack)/(one-solicite-donation)/(view-solicite-donation)/${item.uid}`);
+            onPress={() => router.push('/(tabs-stack)/(my-donations)/solicite-donations')}>
+            Minhas solicitações
+          </Button>
+          <Button
+            icon={{
+              name: 'plus',
+              color: 'white',
+              size: 15,
             }}
-            status={
+            onPress={() => router.push('/(tabs-stack)/create-solicite-donation')}>
+            Solicitar doação
+          </Button>
+        </View>
+
+        <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
+        <Text className="text-2xl text-center font-kanit my-6">Itens solicitados:</Text>
+
+        <View className="w-full flex flex-row gap-1 ">
+          <Input
+            placeholder="Pesquisar"
+            className="w-[85%]"
+            onChangeText={(text) => setSearch(text)}
+            value={search}
+          />
+          <Button
+            variant="default"
+            className="h-full px-6"
+            onPress={() => refetch()}
+            isLoading={isRefetching}
+            icon={{
+              name: 'search',
+              color: 'white',
+              size: 16,
+            }}></Button>
+        </View>
+
+        {isLoading && (
+          <View className="w-full mt-4">
+            <Card isLoading={true} />
+          </View>
+        )}
+
+        {!isLoading &&
+          data &&
+          data.map((item, index) => (
+            <Card
+              key={`${item.uid}-solicite-donations-${index}`}
+              item={{
+                createdAt: item.createdAt,
+                id: item.uid,
+                name: item.name,
+                description:
+                  item.description && item.description.length > 300
+                    ? item.description.substring(0, 300) + '...'
+                    : item.description,
+                images: item.images as string[],
+                ownerName: item.ownerName,
+              }}
+              href={() => {
+                router.push(
+                  `/(tabs-stack)/(one-solicite-donation)/(view-solicite-donation)/${item.uid}`
+                );
+              }}
+              hidden={{
+                status: true,
+              }}
+              /*  status={
               <>
                 <Badge>Aguardando</Badge>
               </>
-            }
-          />
-        ))}
+            } */
+            />
+          ))}
 
-      <View className="my-12"></View>
-    </ScrollView>
+        <View className="my-12"></View>
+      </ScrollView>
+    </>
   );
 }

@@ -39,6 +39,7 @@ const InitialPageContet = () => {
   const verifyNetwork = async () => {
     const result = await Network.getNetworkStateAsync();
     if (!result.isConnected) return 'Sem conexão com a internet';
+
     return 'OK';
   };
 
@@ -46,34 +47,26 @@ const InitialPageContet = () => {
     refetch: verifyUser,
     data,
     isLoading,
+    isError,
+    isSuccess,
+    isRefetching,
   } = useQuery({
-    queryKey: ['verify-user-funcction'],
+    queryKey: ['verify-user-function'],
     queryFn: async () => {
-      /*    const teste = async () => {
-          try {
-            await DeleteCache('user');
-            if (await getCache('user')) return;
-            await DeleteCache('user');
-          } catch (err) {
-            await DeleteCache('user');
-          }
-        };
-        teste();  */
       if (user) return verifyNetwork();
       const result = await verifyNetwork();
       if (result !== 'OK') return result;
-      verify();
+      await verify();
 
       return 'OK';
     },
-    enabled: true,
   });
 
   useRefreshOnFocus(verifyUser);
 
   return (
     <>
-      {isLoading && (
+      {(isLoading || isRefetching) && (
         <View className="w-full h-screen items-center justify-center">
           <Loader />
         </View>
@@ -82,7 +75,18 @@ const InitialPageContet = () => {
       {data === 'Sem conexão com a internet' && (
         <View className="w-full h-screen items-center justify-center">
           <Text className="font-kanit">Sem conexão com a internet</Text>
-          <Button onPress={verifyUser}>Tentar novamente</Button>
+          <Button onPress={() => verifyUser()} isLoading={isRefetching}>
+            Tentar novamente
+          </Button>
+        </View>
+      )}
+
+      {(isError || isSuccess) && (
+        <View className="w-full h-screen items-center justify-center">
+          <Text className="font-kanit text-2xl">Erro ao entrar!!</Text>
+          <Button onPress={() => verifyUser()} isLoading={isRefetching}>
+            Tentar novamente
+          </Button>
         </View>
       )}
     </>
@@ -93,14 +97,20 @@ const SplashScreen = () => {
   const translateY = useSharedValue(100);
   const opacityRef = useSharedValue(0);
 
-  useEffect(() => {
-    translateY.value = withDelay(500, withSpring(0));
-    opacityRef.value = withDelay(500, withSpring(1));
-    setTimeout(() => {
-      translateY.value = withSpring(100);
-      opacityRef.value = withSpring(0);
-    }, 2000);
-  }, []);
+  const query = useQuery({
+    queryKey: ['splash-screen'],
+    queryFn: async () => {
+      translateY.value = withDelay(500, withSpring(0));
+      opacityRef.value = withDelay(500, withSpring(1));
+      setTimeout(() => {
+        translateY.value = withSpring(100);
+        opacityRef.value = withSpring(0);
+      }, 2000);
+      return 'OK';
+    },
+  });
+
+  useRefreshOnFocus(query.refetch);
 
   return (
     <View className="w-full h-screen items-center justify-center">

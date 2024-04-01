@@ -199,7 +199,7 @@ export default function Chat() {
                         : params.donation_owner_name
                     )?.fromMessage}
                 </Text>
-                <Text>
+                {/*  <Text>
                   Conversa criada em:{' '}
                   {user &&
                     user.conversations &&
@@ -208,10 +208,16 @@ export default function Chat() {
                         user && conversation.otherUserUid === params.donation_owner_uid
                           ? params.receives_donation_name
                           : params.donation_owner_name
-                      )!.createdAt,
+                      )!.createdAt
+                        ? user?.conversations.find((conversation) =>
+                            user && conversation.otherUserUid === params.donation_owner_uid
+                              ? params.receives_donation_name
+                              : params.donation_owner_name
+                          )!.createdAt
+                        : new Date(),
                       'dd/MM/yyyy HH:mm:ss'
                     )}
-                </Text>
+                </Text> */}
               </View>
             </View>
           )}
@@ -319,7 +325,7 @@ export default function Chat() {
                     <Card
                       ownerName="Você"
                       variant="you"
-                      key={messages.createdAt + messages.text + messages.owner_message_uid}>
+                      key={messages.text + messages.owner_message_uid}>
                       {messages.text}
                     </Card>
                   ) : (
@@ -330,7 +336,7 @@ export default function Chat() {
                           : params.donation_owner_name
                       }
                       variant="other"
-                      key={messages.createdAt + messages.text + messages.owner_message_uid}>
+                      key={messages.text + messages.owner_message_uid}>
                       {messages.text}
                     </Card>
                   )

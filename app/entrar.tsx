@@ -16,6 +16,9 @@ import PagerView from 'react-native-pager-view';
 import { Divider } from '~/components/Divider';
 import PersonDonationStoryset from '~/assets/background/PersonDonationStoryset.png';
 import QuestionStoryset from '~/assets/background/QuestionsStoryset.png';
+import Logo from '~/assets/icon/logo.png';
+import { useBottomSheetHook } from '~/components/BottomSheet';
+import { useNotifications } from 'react-native-notificated';
 
 const criarUserSchema = z.object({
   email: z
@@ -176,8 +179,8 @@ export default function LoginPage() {
 
 const LoginComponent = () => {
   const router = useRouter();
-  const { verifyUserAndSendUserFromHome, user, setUser } = useCurrentUserHook();
-  const { setCache, getCache, DeleteCache } = useCacheHook();
+  const { setUser } = useCurrentUserHook();
+  const { notify } = useNotifications();
 
   const { isPending, isError, mutate } = useMutation({
     mutationKey: ['loginUser'],
@@ -190,13 +193,21 @@ const LoginComponent = () => {
     onError: (err) => {
       console.log('Erro ao criar usuário');
       console.log('err', err);
+      notify('error', {
+        params: {
+          title: err.message,
+        },
+      /*   config: {
+          notificationPosition: 'bottom-left',
+        }, */
+      });
     },
     onSuccess: (data) => {
       console.log('Usuário criado com sucesso');
       console.log('data', data.email);
       setUser(data);
       console.log('setou o usuario');
-      router.push('/home');
+      router.replace('/home');
     },
   });
 
@@ -210,25 +221,49 @@ const LoginComponent = () => {
     resolver: zodResolver(criarUserSchema),
   });
 
+  const Atalho = useBottomSheetHook({
+    children: (
+      <View className="p-4">
+        <Button
+          variant="default"
+          onPress={() => {
+            setValue('email', 'Gustavo@gmail.com');
+            setValue('senha', 'Gustavo1');
+          }}
+          isLoading={isPending}>
+          <Text> Entrar com usuario</Text>
+        </Button>
 
-
- 
+        <Button
+          variant="default"
+          onPress={() => {
+            setValue('email', 'admin@admin.com');
+            setValue('senha', 'admin123');
+          }}
+          isLoading={isPending}>
+          <Text>Entrar com administrador</Text>
+        </Button>
+      </View>
+    ),
+  });
 
   return (
     <>
+      <Atalho.BottomSheet />
       <View className={styles.container}>
         <View className={styles.main}>
-          <View className="absolute  left-[-150px] bottom-[-50px] opacity-50 rounded-full  overflow-hidden">
+          {/* <View className="absolute  left-[-150px] bottom-[-50px] opacity-50 rounded-full  overflow-hidden">
             <Image
               source={BackgroundImage}
               className="object-cover w-[500px] h-[500px]"
               alt="background-image"
             />
-          </View>
+          </View> */}
 
-          <View className="w-auto flex flex-col gap-4 border border-zinc-400 rounded-lg p-4 shadow-xl shadow-zinc-600 bg-white">
-            <View className="w-auto flex flex-row gap-4  m-4 items-center justify-center">
-              <Text className="text-center text-6xl font-bold uppercase">ENTRAR</Text>
+          <View className="w-auto flex flex-col gap-4   rounded-lg p-4 ">
+            <View className="w-auto flex flex-col gap-4  m-4 items-center justify-center">
+              {/*   <Image source={Logo} className="w-20 h-20 " alt="background-image" /> */}
+              <Text className="text-center text-6xl font-bold">Entrar</Text>
             </View>
             <View>
               <Controller
@@ -251,7 +286,7 @@ const LoginComponent = () => {
                 name="senha"
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    placeholder="senha"
+                    placeholder="Senha"
                     onChangeText={onChange}
                     label="Digite sua senha"
                     value={value}
@@ -260,12 +295,12 @@ const LoginComponent = () => {
                 )}
               />
             </View>
-            {isError && <Text>Erro ao cadastrar</Text>}
 
             <Button
               variant="default"
               onPress={handleSubmit(() => mutate())}
               isLoading={isPending}
+              className="items-center justify-center"
               icon={{
                 name: 'sign-in',
                 color: 'white',
@@ -273,43 +308,26 @@ const LoginComponent = () => {
               }}>
               Entrar
             </Button>
-            <Button
-              variant="default"
-              onPress={() => {
-                setValue('email', 'Gustavo@gmail.com');
-                setValue('senha', 'Gustavo1');
-              }}
-              isLoading={isPending}>
-              <Text> Entrar com usuario</Text>
-            </Button>
 
-            <Button
-              variant="default"
-              onPress={() => {
-                setValue('email', 'admin@admin.com');
-                setValue('senha', 'admin123');
-              }}
-              isLoading={isPending}>
-              <Text>Entrar com administrador</Text>
-            </Button>
+            <Divider />
 
-            <View className="w-full h-[0.10px] bg-zinc-900 my-4"></View>
-            <View className="w-full flex items-center justify-center gap-2">
-              <Text>Não tem uma conta?</Text>
+            <View className="w-full flex items-center justify-center ">
+              <Text className="font-kanit text-sm">Não tem uma conta?</Text>
               <Link
                 href={'/registrar'}
-                className="  p-2  rounded-lg text-blue-300 underline font-bold">
+                className="p-2  rounded-lg text-blue-500 underline font-bold">
                 <Text className="text-center  text-2xl">Registre-se</Text>
               </Link>
             </View>
 
-            <View className="w-full flex items-center justify-center" gap-2>
-              <Text>Esqueceu sua senha?</Text>
-              <Link
-                href={'/registrar'}
-                className="  p-2  rounded-lg text-blue-300 underline font-bold">
-                <Text className="text-center  text-2xl">Recuperar-senha</Text>
-              </Link>
+            <View className="w-full flex items-center justify-center">
+              <Text className="font-kanit text-sm">Esqueceu sua senha?</Text>
+
+              <TouchableOpacity onPress={() => Atalho.open()} className="  p-2  rounded-lg ">
+                <Text className="text-center text-blue-500 underline font-bold text-2xl">
+                  Recuperar-senha
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -321,7 +339,7 @@ const LoginComponent = () => {
 const styles = {
   button: 'items-center bg-indigo-500 rounded-[28px] shadow-md p-4',
   buttonText: 'text-white text-lg font-semibold text-center',
-  container: 'flex-1 p-6 ',
+  container: 'flex-1 p-6 bg-white',
   main: 'flex-1 max-w-[960] justify-center relative',
   title: 'text-[64px] font-bold',
   subtitle: 'text-4xl text-gray-700',

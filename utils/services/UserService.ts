@@ -23,10 +23,17 @@ import { getStorage, ref, uploadBytes, deleteObject } from 'firebase/storage';
 
 const createUser = async (params: CreateUserDTO): Promise<void> => {
   try {
+    if (!params.email || !params.password) throw new Error('Email ou senha não informados');
+
+    const verifyLastLetterEmailIfIsSpace =
+      params.email[params.email.length - 1] === ' ' ? params.email.slice(0, -1) : params.email;
+
+    params.email = verifyLastLetterEmailIfIsSpace.toLowerCase();
+
     const ref = collection(getFirestore(firebase), 'users');
     await addDoc(ref, {
       name: params.name || '',
-      email: params.email.toLowerCase(),
+      email: params.email,
       cpf: params.cpf || '',
       pix: {
         key: params.pix?.key || '',
@@ -49,35 +56,59 @@ const getOneUser = async (uid: string): Promise<IUser> => {
   const docRef = doc(getFirestore(firebase), 'users', uid);
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) throw new Error('Usuário não encontrado');
-  return docSnap.data() as IUser;
+  const data = docSnap.data() as IUser;
+  return {
+    ...data,
+    conversations: data.conversations?.map((conv: any) => ({
+      ...conv,
+      createdAt: conv.createdAt.toDate(),
+    })),
+  };
 };
 
 const loginUser = async (email: string, password: string): Promise<IUser> => {
   const auth = getAuth(firebase);
-  const response = await signInWithEmailAndPassword(auth, email, password);
 
-  const getDocRef = query(collection(getFirestore(firebase), 'users'), where('email', '==', email));
-  const docSnap = await getDocs(getDocRef);
-  if (docSnap.empty) throw new Error('Usuário não encontrado');
-  const user = docSnap.docs[0].data() as IUser;
+  if (!email || !password) throw new Error('Email ou senha não informados');
 
-  const getToken = await response.user.getIdTokenResult();
+  const verifyLastLetterEmailIfIsSpace =
+    email[email.length - 1] === ' ' ? email.slice(0, -1) : email;
 
-  const saveUserForApplication = {
-    ...user,
-    providerId: response.user.providerId,
-    uid: docSnap.docs[0].id,
-    token: getToken,
-  };
+  email = verifyLastLetterEmailIfIsSpace.toLowerCase();
 
   try {
-    console.log('setou no cache');
-    await AsyncStorage.setItem('user', JSON.stringify(saveUserForApplication));
-  } catch (err: any) {
-    console.log('Erro ao salvar usuário no AsyncStorage');
-    throw new Error(err);
+    const response = await signInWithEmailAndPassword(auth, email, password);
+    try {
+      const getDocRef = query(
+        collection(getFirestore(firebase), 'users'),
+        where('email', '==', email)
+      );
+      const docSnap = await getDocs(getDocRef);
+      if (docSnap.empty) throw new Error('Usuário não encontrado');
+      const user = docSnap.docs[0].data() as IUser;
+
+      const getToken = await response.user.getIdTokenResult();
+
+      const saveUserForApplication = {
+        ...user,
+        providerId: response.user.providerId,
+        uid: docSnap.docs[0].id,
+        token: getToken,
+      };
+      try {
+        console.log('setou no cache');
+        await AsyncStorage.setItem('user', JSON.stringify(saveUserForApplication));
+      } catch (err: any) {
+        console.log('Erro ao salvar usuário no AsyncStorage');
+        throw new Error('Erro ao entrar!!');
+      }
+      return saveUserForApplication;
+    } catch (err) {
+      throw new Error('Erro ao entrar!!');
+    }
+  } catch (err) {
+    throw new Error('Email ou senha incorretos');
   }
-  return saveUserForApplication;
 };
 
 const addImageToUserInFirebase = async (image: string) => {

@@ -125,7 +125,7 @@ export default function Registrar() {
       setValue('pix.key', '');
       setValue('pix.type_pix', '');
       setValue('isReceptor', false);
-      router.push('/');
+      router.replace('/entrar');
     },
   });
 
@@ -180,11 +180,12 @@ export default function Registrar() {
             </View>
 
             <BouncyCheckbox
-              className="text-lg bg-zinc-100 p-5 rounded-lg border border-primary"
+              className="text-lg  p-5 rounded-lg border border-primary"
               text="Selecione se você deseja receber doações!!"
               fillColor="##3b82f6"
-              unfillColor="#3b82f6"
-              iconStyle={{ borderColor: 'blue' }}
+              unfillColor="#ffffff"
+              iconStyle={{ borderColor: 'blue', backgroundColor: '#3b82f6' }}
+              innerIconStyle={{ borderColor: 'blue', backgroundColor: '#3b82f6' }}
               onPress={(isChecked: boolean) => setValue('isReceptor', isChecked)}
             />
 
