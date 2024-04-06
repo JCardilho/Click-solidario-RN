@@ -1,4 +1,4 @@
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, Text, Dimensions } from 'react-native';
 import { CreateTopNavigationHome } from './create-top-navigation';
 import { View } from 'react-native';
 import { SkeletonContent, SkeletorCircle } from '~/components/Skeleton';
@@ -13,6 +13,8 @@ interface IProps {
 }
 
 export const InitialPageView = (props: IProps) => {
+  const width = Dimensions.get('window').width;
+
   return (
     <ScrollView className="p-4" key="1">
       <CreateTopNavigationHome
@@ -22,7 +24,8 @@ export const InitialPageView = (props: IProps) => {
       />
 
       <View className="w-full flex items-center justify-center">
-        <Text className="font-montserrat font-bold text-4xl text-center mt-2">Postagens</Text>
+        <Text className="font-montserrat font-bold text-4xl text-center mt-2">Postagenss</Text>
+        
       </View>
     </ScrollView>
   );

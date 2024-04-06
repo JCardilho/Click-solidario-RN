@@ -8,6 +8,7 @@ import { Badge } from '~/components/Badge';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Loader, useLoaderHook } from '~/components/Loader';
+import { useZoom } from '~/components/Zoom';
 import { CancelReserve } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/cancel-reserve';
 import { ExcludeReserve } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/exclude-reserve';
 import { FinishReserveInViewReserveDonation } from '~/layouts/reserve-donations/one-reserve-donation/(view-reserve-donation)/finish-reserve';
@@ -31,6 +32,7 @@ export default function ViewOneReserveDonation() {
   const { searchViewReserveDonations, addViewReserveDonations, ViewReserveDonations } =
     useReserveDonations();
   const { notify } = useNotifications();
+  const { ZoomView, ZoomTrigger } = useZoom();
 
   const { data, refetch } = useQuery<IReserveDonation>({
     queryKey: ['reserve-donation', uid],
@@ -66,8 +68,15 @@ export default function ViewOneReserveDonation() {
       )
         return;
 
+      const donation_owner_uid = `&donation_owner_uid=${data.ownerUid}`;
+      const receives_donation_uid = `&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}`;
+      const receives_donation_name = `&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}`;
+      const donation_owner_name = `&donation_owner_name=${data.ownerName}`;
+
+      const routeQueryWithoutCurrentUser = `${donation_owner_uid}${receives_donation_uid}${receives_donation_name}${donation_owner_name}`;
+
       const result = await UserService.CreateConversation(data.ownerUid, {
-        routeQuery: `?current_user_uid=${data.ownerUid}&donation_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&donation_owner_name=${data.ownerName}`,
+        routeQuery: `?current_user_uid=${data.ownerUid}${routeQueryWithoutCurrentUser}`,
         isNotification: true,
         otherUserName: data.reserve.endOwnerNameOfLastReserve || '',
         otherUserUid: data.reserve.endOwnerUidOfLastReserve || '',
@@ -75,7 +84,7 @@ export default function ViewOneReserveDonation() {
       });
 
       await UserService.CreateConversation(data.reserve.endOwnerUidOfLastReserve || '', {
-        routeQuery: `?current_user_uid=${data.reserve.endOwnerUidOfLastReserve}&donation_owner_uid=${data.ownerUid}&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}&donation_owner_name=${data.ownerName}`,
+        routeQuery: `?current_user_uid=${data.reserve.endOwnerUidOfLastReserve}${routeQueryWithoutCurrentUser}`,
         isNotification: true,
         otherUserName: data.ownerName,
         otherUserUid: data.ownerUid,
@@ -86,13 +95,30 @@ export default function ViewOneReserveDonation() {
     },
     onSuccess: async () => {
       if (!user) return;
+      if (
+        !user ||
+        !user.uid ||
+        !data ||
+        !data.name ||
+        !data.images ||
+        !data.ownerName ||
+        !data.ownerUid
+      )
+        return;
+
+      const donation_owner_uid = `&donation_owner_uid=${data.ownerUid}`;
+      const receives_donation_uid = `&receives_donation_uid=${data.reserve.endOwnerUidOfLastReserve}`;
+      const receives_donation_name = `&receives_donation_name=${data.reserve.endOwnerNameOfLastReserve}`;
+      const donation_owner_name = `&donation_owner_name=${data.ownerName}`;
+
+      const routeQueryWithoutCurrentUser = `${donation_owner_uid}${receives_donation_uid}${receives_donation_name}${donation_owner_name}`;
       notify('warning', {
         params: {
           title: 'Um chat foi criado para você e para a outra pessoa!',
           description: '',
         },
       });
-      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}&donation_owner_uid=${data!.ownerUid}&receives_donation_uid=${data!.reserve.endOwnerUidOfLastReserve}&receives_donation_name=${data!.reserve.endOwnerNameOfLastReserve}&donation_owner_name=${data!.ownerName}`;
+      const link = `/(tabs-stack)/one-reserve-donation/(chat-reserve-donation)/${uid}?current_user_uid=${user.uid}${routeQueryWithoutCurrentUser}`;
       router.push(link as any);
     },
   });
@@ -107,10 +133,11 @@ export default function ViewOneReserveDonation() {
     <>
       <HeaderBack title={`Reserva: ${data?.name}`} />
       <Loader fullscreen activeHook />
+      <ZoomView />
       <ScrollView className="w-full p-2 flex flex-col gap-4 pb-12">
         {data && (
           <>
-            <ViewDataImageForViewReserveDonation data={data} />
+            <ViewDataImageForViewReserveDonation data={data} ZoomTrigger={ZoomTrigger} />
             <View className="w-full flex flex-col gap-2 mb-4">
               <ViewDataTextForViewReserveDonation data={data} />
 

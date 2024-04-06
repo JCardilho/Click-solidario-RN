@@ -1,11 +1,12 @@
 import { format } from 'date-fns';
 import { Image, ScrollView, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Divider } from './Divider';
-import React, { ReactNode } from 'react';
+import React, { Fragment, ReactNode } from 'react';
 import { Button } from './Button';
 import { FontAwesome } from '@expo/vector-icons';
 import { Badge } from './Badge';
 import { Skeleton, SkeletonContent, SkeletonRect } from './Skeleton';
+import Carousel from 'react-native-reanimated-carousel';
 
 interface IItem {
   id: string;
@@ -57,16 +58,27 @@ export const Card = (props: IProps) => {
         <View
           className={`w-full border p-4 rounded-lg  bg-white flex flex-col gap-2 my-4 shadow-xl shadow-zinc-800 ${borderContainer}`}>
           {props.item.images && props.item.images.length > 0 && (
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
-              {props.item.images.map((image: any) => (
-                <Image
-                  source={{ uri: image }}
-                  className={`w-[150px] h-[150px] rounded-lg border-2 m-2 ${borderImage}`}
-                  key={image}
+            <>
+              <View style={{ flex: 1 }}>
+                <Carousel
+                  mode="parallax"
+                  width={WD.width - 50}
+                  height={WD.width / 2}
+                  
+                  data={props!.item!.images!}
+                  scrollAnimationDuration={1000}
+                  renderItem={({ index, item }) => (
+                    <Image
+                      source={{ uri: item }}
+                      className={`w-full h-full rounded-lg border-2 ${borderImage}`}
+                      key={item + index}
+                    />
+                  )}
                 />
-              ))}
-            </ScrollView>
+              </View>
+            </>
           )}
+
           <Text className="text-xl font-bold underline">{props.item.name}</Text>
           <Text className="font-kanit text-lg text-justify">{props.item.description}</Text>
           <View className="h-[0.9px] w-full bg-zinc-300 rounded-lg my-2"></View>

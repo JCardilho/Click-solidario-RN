@@ -91,7 +91,7 @@ export const Loader = (props: IProps) => {
       )}
 
       {props.fullscreen && !props.center && isLoading && (
-        <View className="absolute z-50 w-screen h-screen bg-black/20 bg-opacity-50 flex-1 items-center justify-center">
+        <View className="absolute z-50 w-screen h-screen bg-black/20 bg-opacity-50 flex-1 items-center justify-center top-12">
           <ActivityIndicator size="large" color={'#023E8A'} />
         </View>
       )}

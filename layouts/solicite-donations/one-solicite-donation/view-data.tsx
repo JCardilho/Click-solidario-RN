@@ -1,16 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Fragment, useEffect, useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useNotifications } from 'react-native-notificated';
+import Carousel from 'react-native-reanimated-carousel';
 import { Badge } from '~/components/Badge';
 import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Divider } from '~/components/Divider';
+import { IZoomTrigger } from '~/components/Zoom';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { ISoliciteDonation } from '~/utils/services/DTO/solicite-donation.dto';
 import { SoliciteDonationsSerivce } from '~/utils/services/SoliciteDonationsService';
 
 interface IProps {
   data: ISoliciteDonation;
+}
+
+interface IPropsImage extends IProps {
+  ZoomTrigger: ({ uri, children }: IZoomTrigger) => JSX.Element;
 }
 
 export const ViewDataTextForViewSoliciteDonation = ({ data }: IProps) => {
@@ -34,22 +40,30 @@ export const ViewDataTextForViewSoliciteDonation = ({ data }: IProps) => {
   );
 };
 
-export const ViewDataImageForViewSoliciteDonation = ({ data }: IProps) => {
+export const ViewDataImageForViewSoliciteDonation = ({ data, ZoomTrigger }: IPropsImage) => {
+  const WD = useWindowDimensions();
   return (
     <>
       {data.images && data.images.length > 0 && (
         <>
-          <Text className="font-kanit">Imagens: </Text>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
-            {data.images.map((image: any, index) => (
-              <TouchableOpacity key={image + Math.random() * 100 + index}>
-                <Image
-                  source={{ uri: image }}
-                  className="w-[250px] h-[250px] rounded-lg border-2 border-primary m-2"
-                />
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <View style={{ flex: 1 }}>
+            <Carousel
+              mode="parallax"
+              width={WD.width - 10}
+              height={WD.width / 2}
+              data={data.images}
+              scrollAnimationDuration={1000}
+              renderItem={({ index, item }) => (
+                <ZoomTrigger uri={item as any}>
+                  <Image
+                    source={{ uri: item as any }}
+                    className={`w-full h-full rounded-lg border-2`}
+                    key={`${item}-${index}`}
+                  />
+                </ZoomTrigger>
+              )}
+            />
+          </View>
         </>
       )}
     </>
