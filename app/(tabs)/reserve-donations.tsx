@@ -26,6 +26,7 @@ import { Card } from '~/components/Card';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import { useCurrentUserHook } from './../../utils/hooks/currentUser';
+import { useZoom } from '~/components/Zoom';
 
 export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
@@ -37,6 +38,7 @@ export default function ReserveDonations() {
   const [endCount, setEndCount] = useState<number>(0);
   const [disableLoadMore, setDisableLoadMore] = useState<boolean>(false);
   const scrollRef = useRef<ScrollView>(null);
+  const { ZoomView, ZoomTrigger } = useZoom();
 
   const { data, isLoading, refetch, isRefetching } = useQuery<{
     userReserveCount: number;
@@ -118,6 +120,7 @@ export default function ReserveDonations() {
   return (
     <>
       <SafeAreaView />
+      <ZoomView />
       <ScrollView
         ref={scrollRef}
         className="w-full p-4 flex flex-col gap-4"
@@ -204,6 +207,7 @@ export default function ReserveDonations() {
           data &&
           data.donations.map((item, index) => (
             <Card
+              ZoomTrigger={ZoomTrigger}
               key={`${item.uid}-reserve-donations-${index}`}
               item={{
                 createdAt: item.createdAt,

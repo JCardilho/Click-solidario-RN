@@ -29,6 +29,7 @@ import { SoliciteDonationsSerivce } from '~/utils/services/SoliciteDonationsServ
 import { ISoliciteDonation } from '~/utils/services/DTO/solicite-donation.dto';
 import { DefaultInformationsForSoliciteDonationsPage } from '~/layouts/solicite-donations/default-infromations';
 import { Badge } from '~/components/Badge';
+import { useZoom } from '~/components/Zoom';
 
 export default function RequestDonationsScreen() {
   const { name } = useLocalSearchParams();
@@ -40,6 +41,7 @@ export default function RequestDonationsScreen() {
   const [endCount, setEndCount] = useState<number>(0);
   const [disableLoadMore, setDisableLoadMore] = useState<boolean>(false);
   const scrollRef = useRef<ScrollView>(null);
+  const { ZoomTrigger, ZoomView } = useZoom();
 
   const { data, isLoading, refetch, isRefetching } = useQuery<ISoliciteDonation[]>({
     queryKey: ['solicite-donations'],
@@ -102,6 +104,7 @@ export default function RequestDonationsScreen() {
   return (
     <>
       <SafeAreaView />
+      <ZoomView />
       <ScrollView
         className="w-full p-4 flex flex-col gap-4"
         style={{
@@ -171,6 +174,7 @@ export default function RequestDonationsScreen() {
           data.map((item, index) => (
             <Card
               key={`${item.uid}-solicite-donations-${index}`}
+              ZoomTrigger={ZoomTrigger}
               item={{
                 createdAt: item.createdAt,
                 id: item.uid,

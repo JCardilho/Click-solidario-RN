@@ -7,6 +7,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Badge } from './Badge';
 import { Skeleton, SkeletonContent, SkeletonRect } from './Skeleton';
 import Carousel from 'react-native-reanimated-carousel';
+import { IZoomTrigger } from './Zoom';
 
 interface IItem {
   id: string;
@@ -30,6 +31,7 @@ interface IProps {
   status?: React.ReactNode;
   isFinished?: boolean;
   isLoading?: boolean;
+  ZoomTrigger?: ({ uri, children }: IZoomTrigger) => JSX.Element;
 }
 
 export const Card = (props: IProps) => {
@@ -64,16 +66,25 @@ export const Card = (props: IProps) => {
                   mode="parallax"
                   width={WD.width - 50}
                   height={WD.width / 2}
-                  
                   data={props!.item!.images!}
                   scrollAnimationDuration={1000}
-                  renderItem={({ index, item }) => (
-                    <Image
-                      source={{ uri: item }}
-                      className={`w-full h-full rounded-lg border-2 ${borderImage}`}
-                      key={item + index}
-                    />
-                  )}
+                  renderItem={({ index, item }) =>
+                    props.ZoomTrigger ? (
+                      <props.ZoomTrigger uri={item}>
+                        <Image
+                          source={{ uri: item }}
+                          className={`w-full h-full rounded-lg border-2 ${borderImage}`}
+                          key={item + index}
+                        />
+                      </props.ZoomTrigger>
+                    ) : (
+                      <Image
+                        source={{ uri: item }}
+                        className={`w-full h-full rounded-lg border-2 ${borderImage}`}
+                        key={item + index}
+                      />
+                    )
+                  }
                 />
               </View>
             </>
