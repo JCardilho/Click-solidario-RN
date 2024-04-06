@@ -16,6 +16,8 @@ interface IItem {
   ownerName?: string;
   createdAt: string | Date;
   images?: string[] | null;
+  state?: string;
+  city?: string;
 }
 
 interface IHidden {
@@ -31,12 +33,13 @@ interface IProps {
   status?: React.ReactNode;
   isFinished?: boolean;
   isLoading?: boolean;
+  isVerified?: boolean;
   ZoomTrigger?: ({ uri, children }: IZoomTrigger) => JSX.Element;
 }
 
 export const Card = (props: IProps) => {
-  const borderContainer = props.isFinished ? 'border-green-500' : 'border-blue-500';
-  const borderImage = props.isFinished ? 'border-green-500' : 'border-primary';
+  const borderContainer = props.isFinished ? 'border-green-500' : 'border-transparent';
+  const borderImage = props.isFinished ? 'border-green-500' : 'border-transparent';
   const WD = useWindowDimensions();
 
   return (
@@ -58,10 +61,10 @@ export const Card = (props: IProps) => {
 
       {!props.isLoading && props.item && (
         <View
-          className={`w-full border p-4 rounded-lg  bg-white flex flex-col gap-2 my-4 shadow-xl shadow-zinc-800 ${borderContainer}`}>
+          className={`w-full border p-4 rounded-lg  bg-white flex flex-col gap-2 my-4 shadow-2xl shadow-zinc-800 ${borderContainer}`}>
           {props.item.images && props.item.images.length > 0 && (
             <>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, elevation: 5 }}>
                 <Carousel
                   mode="parallax"
                   width={WD.width - 50}
@@ -103,9 +106,16 @@ export const Card = (props: IProps) => {
           <Text className="text-md font-kanit">
             Criado em: {format(new Date(props.item.createdAt), 'dd-MM-yyyy HH:mm')}
           </Text>
+          {props.item.city ||
+            (props.item.state && (
+              <Text className="text-md font-kanit">
+                Localização: {props.item.city && props.item.city}{' '}
+                {props.item.state && `/ ${props.item.state}`}
+              </Text>
+            ))}
           <Divider />
 
-          {(!props.hidden?.status || props.isFinished) && (
+          {(!props.hidden?.status || props.isFinished || props.isVerified) && (
             <>
               <Text className="text-md font-kanit">Status:</Text>
               <View className="w-full flex items-center flex-row gap-2">
@@ -113,6 +123,11 @@ export const Card = (props: IProps) => {
                 {props.isFinished && (
                   <Badge icon="hourglass-3" colorIcon="white">
                     Finalizado!!
+                  </Badge>
+                )}
+                {props.isVerified && (
+                  <Badge icon="handshake-o" colorIcon="white">
+                    Verificado pela assistente social
                   </Badge>
                 )}
               </View>

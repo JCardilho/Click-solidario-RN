@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '~/components/Button';
@@ -39,6 +40,7 @@ export default function ReserveDonations() {
   const [disableLoadMore, setDisableLoadMore] = useState<boolean>(false);
   const scrollRef = useRef<ScrollView>(null);
   const { ZoomView, ZoomTrigger } = useZoom();
+  const WD = useWindowDimensions();
 
   const { data, isLoading, refetch, isRefetching } = useQuery<{
     userReserveCount: number;
@@ -69,13 +71,21 @@ export default function ReserveDonations() {
             donations: result.donations,
           };
         }
-        const result = await ReserveDonationsService.GetAllReserveDonations(user?.uid, 0, endAt);
+        const result = await ReserveDonationsService.GetAllReserveDonations(
+          user?.uid,
+          0,
+          endAt,
+          user.state,
+          user.city
+        );
 
         if (result.donations.length === 0) {
           const result = await ReserveDonationsService.GetAllReserveDonations(
             user?.uid,
             0,
-            endAt + 10
+            endAt + 10,
+            user.state,
+            user.city
           );
           if (result.donations.length === 0) {
             setDisableLoadMore(true);
@@ -181,7 +191,9 @@ export default function ReserveDonations() {
         <View className="w-full flex flex-row gap-1 ">
           <Input
             placeholder="Pesquisar"
-            className="w-[85%]"
+            style={{
+              width: WD.width - 100,
+            }}
             onChangeText={(text) => setSearch(text)}
             value={search}
           />
@@ -219,6 +231,8 @@ export default function ReserveDonations() {
                     : item.description,
                 images: item.images as string[],
                 ownerName: item.ownerName,
+                city: item.city,
+                state: item.state,
               }}
               hidden={{
                 status: true,

@@ -4,6 +4,8 @@ export interface CreateReserveDonationDTO {
   images: Array<String> | undefined;
   ownerUid: string;
   ownerName?: string;
+  city: string;
+  state: string;
 }
 
 export interface IReserveDonation extends CreateReserveDonationDTO {

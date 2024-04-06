@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod/src/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { MediaTypeOptions, launchImageLibraryAsync } from 'expo-image-picker';
 import { Stack, useRouter } from 'expo-router';
 import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
@@ -9,15 +9,18 @@ import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, ScrollView, Text, TextInput, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import { useNotifications } from 'react-native-notificated';
 import { z } from 'zod';
 import { useBottomSheetHook } from '~/components/BottomSheet';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Input } from '~/components/Input';
+import { Select } from '~/components/Select';
 import firebase from '~/utils/firebase';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
 import { ISoliciteDonation } from '~/utils/services/DTO/solicite-donation.dto';
+import { LocationService } from '~/utils/services/LocationService';
 import { ReserveDonationsService } from '~/utils/services/ReserveDonationsService';
 import { SoliciteDonationsSerivce } from '~/utils/services/SoliciteDonationsService';
 
@@ -28,6 +31,8 @@ const createSoliciteDonationSchema = z.object({
   description: z.string({
     required_error: 'Descrição é obrigatória',
   }),
+  state: z.string().optional(),
+  city: z.string().optional(),
   image: z.array(z.string()),
 });
 
@@ -37,6 +42,7 @@ export default function CreateSoliciteDonation() {
   const router = useRouter();
   const { user } = useCurrentUserHook();
   const [submitRef, setSubmit] = useState(false);
+  const { notify } = useNotifications();
 
   const {
     control,
@@ -62,6 +68,8 @@ export default function CreateSoliciteDonation() {
         images: [],
         ownerUid: user.uid,
         ownerName: user.name,
+        city: user.city,
+        state: user.state,
       });
 
       return result;
@@ -148,6 +156,50 @@ export default function CreateSoliciteDonation() {
     textNeedConfirm: 'Você deseja confirmar a solicitação desse item à doação?',
   });
 
+  const { data: AllStates, isRefetching: isPendingGetAllStates } = useQuery({
+    queryKey: ['get-all-states'],
+    queryFn: async () => {
+      try {
+        const result = await LocationService.GetAllStatesFromBrazil();
+        return result;
+      } catch (err) {
+        console.log('Erro ao buscar estados', err);
+        notify('error', {
+          params: {
+            title: 'Erro ao buscar estados',
+          },
+        });
+        return [];
+      }
+    },
+  });
+
+  const {
+    data: Municipality,
+    isPending: isPendingMunicipality,
+    mutate: GetMunicipalityMutate,
+  } = useMutation({
+    mutationKey: ['get-municipality'],
+    mutationFn: async (uf: string) => {
+      try {
+        const result = await LocationService.GetAllMunicipalityFromBrazil(uf);
+        return result;
+      } catch (err) {
+        console.log('Erro ao buscar a cidade', err);
+        notify('error', {
+          params: {
+            title: 'Erro ao buscar a cidade',
+          },
+        });
+        return [];
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (user && user.state) GetMunicipalityMutate(user.state);
+  }, [user]);
+
   return (
     <>
       <BottomSheet />
@@ -187,6 +239,65 @@ export default function CreateSoliciteDonation() {
                 </>
               )}
             />
+
+            <View>
+              {AllStates && !isPendingGetAllStates && (
+                <Controller
+                  control={control}
+                  name="state"
+                  defaultValue={user?.state || ''}
+                  render={({ field: { onChange, value } }) => (
+                    <Select
+                      key={`select-state-${value}`}
+                      isError={errors.state ? true : false}
+                      onValueChange={(value) => {
+                        setValue('state', value);
+                        if (getValues('city')) setValue('city', '');
+                        GetMunicipalityMutate(value);
+                      }}
+                      items={
+                        AllStates?.map((state) => ({
+                          label: state.nome,
+                          value: state.sigla,
+                          key: `select-state-${state.sigla}`,
+                        })) || []
+                      }
+                      label="Digite seu estado:"
+                      placeholder="Estado"
+                      value={value}
+                    />
+                  )}
+                />
+              )}
+            </View>
+            <View>
+              {(Municipality || user?.city) && !isPendingMunicipality && (
+                <Controller
+                  control={control}
+                  name="city"
+                  defaultValue={user?.city || ''}
+                  render={({ field: { onChange, value } }) => (
+                    <Select
+                      key={`select-municipality-${value}`}
+                      isError={errors.city ? true : false}
+                      onValueChange={(value) => {
+                        setValue('city', value);
+                      }}
+                      items={
+                        Municipality?.map((city) => ({
+                          label: city.nome,
+                          value: city.nome,
+                          key: `select-municipality-${city.nome}`,
+                        })) || []
+                      }
+                      label="Digite sua cidade:"
+                      placeholder="Cidade"
+                      value={value}
+                    />
+                  )}
+                />
+              )}
+            </View>
 
             {watch('image') && watch('image')!.length < 1 && (
               <Text>Nenhuma imagem selecionada</Text>

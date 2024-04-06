@@ -56,6 +56,8 @@ const CreateReserveDonation = async (
       endOwnerUidOfLastReserve: '',
     },
     ownerName: donation.ownerName,
+    city: donation.city,
+    state: donation.state,
   });
 
   return {
@@ -73,7 +75,9 @@ const CreateReserveDonation = async (
 const GetAllReserveDonations = async (
   uid: string,
   startAtParam: number,
-  endAtParam: number
+  endAtParam: number,
+  state: string,
+  city: string
 ): Promise<{
   userReserveCount: number;
   donations: IReserveDonation[];
@@ -109,6 +113,8 @@ const GetAllReserveDonations = async (
       ownerUid: data.ownerUid,
       createdAt: data.created.toDate(),
       ownerName: data.ownerName,
+      city: data.city,
+      state: data.state,
       reserve: {
         endDateOfLastReserve: data.reserve.endDateOfLastReserve
           ? data.reserve.endDateOfLastReserve.toDate()
@@ -118,6 +124,27 @@ const GetAllReserveDonations = async (
       },
     };
   });
+
+  if (state && city) {
+    const sortedData = updateDate.sort((a, b) => {
+      if (a.state === state) {
+        if (a.city === city) {
+          return -1;
+        } else if (b.city === city) {
+          return 1;
+        }
+        return 0;
+      }
+      return 0;
+    });
+
+    const removeMyReserve = sortedData.filter((data) => data.ownerUid !== uid);
+
+    return {
+      userReserveCount: removeIfDateIsBefore.length,
+      donations: removeMyReserve,
+    };
+  }
 
   const removeMyReserve = updateDate.filter((data) => data.ownerUid !== uid);
 
@@ -142,6 +169,8 @@ const GetMyReserveDonations = async (uid: string): Promise<IReserveDonation[]> =
         ownerUid: data.ownerUid,
         createdAt: data.created.toDate(),
         ownerName: data.ownerName,
+        city: data.city,
+        state: data.state,
         reserve: {
           endDateOfLastReserve: data.reserve.endDateOfLastReserve
             ? data.reserve.endDateOfLastReserve.toDate()
@@ -168,6 +197,8 @@ const GetOneReserveDonation = async (uid: string): Promise<IReserveDonation | un
         ownerUid: data.ownerUid,
         createdAt: data.created.toDate(),
         ownerName: data.ownerName,
+        city: data.city,
+        state: data.state,
         reserve: {
           endDateOfLastReserve: data.reserve.endDateOfLastReserve
             ? data.reserve.endDateOfLastReserve.toDate()
@@ -344,6 +375,8 @@ const SearchReserveDonations = async (
           ownerUid: data.ownerUid,
           createdAt: data.created.toDate(),
           ownerName: data.ownerName,
+          city: data.city,
+          state: data.state,
           reserve: {
             endDateOfLastReserve: data.reserve.endDateOfLastReserve
               ? data.reserve.endDateOfLastReserve.toDate()
@@ -373,6 +406,8 @@ const GetMyReserves = async (uid: string): Promise<IReserveDonation[]> => {
         ownerUid: data.ownerUid,
         createdAt: data.created.toDate(),
         ownerName: data.ownerName,
+        city: data.city,
+        state: data.state,
         reserve: {
           endDateOfLastReserve: data.reserve.endDateOfLastReserve
             ? data.reserve.endDateOfLastReserve.toDate()

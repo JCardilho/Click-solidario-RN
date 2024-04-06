@@ -4,6 +4,8 @@ export interface CreateSoliciteDonationDTO {
   images: Array<String> | undefined;
   ownerUid: string;
   ownerName?: string;
+  state: string;
+  city: string;
 }
 
 export interface ISoliciteDonation extends CreateSoliciteDonationDTO {

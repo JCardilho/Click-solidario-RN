@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '~/components/Button';
@@ -42,6 +43,7 @@ export default function RequestDonationsScreen() {
   const [disableLoadMore, setDisableLoadMore] = useState<boolean>(false);
   const scrollRef = useRef<ScrollView>(null);
   const { ZoomTrigger, ZoomView } = useZoom();
+  const WD = useWindowDimensions();
 
   const { data, isLoading, refetch, isRefetching } = useQuery<ISoliciteDonation[]>({
     queryKey: ['solicite-donations'],
@@ -62,13 +64,21 @@ export default function RequestDonationsScreen() {
           setEndAt(5);
           return result;
         }
-        const result = await SoliciteDonationsSerivce.GetAllSoliciteDonations(user?.uid, 0, endAt);
+        const result = await SoliciteDonationsSerivce.GetAllSoliciteDonations(
+          user?.uid,
+          0,
+          endAt,
+          user.state,
+          user.city
+        );
 
         if (result.length === 0) {
           const result = await SoliciteDonationsSerivce.GetAllSoliciteDonations(
             user?.uid,
             0,
-            endAt + 10
+            endAt + 10,
+            user.state,
+            user.city
           );
           if (result.length === 0) {
             setDisableLoadMore(true);
@@ -147,7 +157,9 @@ export default function RequestDonationsScreen() {
         <View className="w-full flex flex-row gap-1 ">
           <Input
             placeholder="Pesquisar"
-            className="w-[85%]"
+            style={{
+              width: WD.width - 100,
+            }}
             onChangeText={(text) => setSearch(text)}
             value={search}
           />
@@ -185,6 +197,8 @@ export default function RequestDonationsScreen() {
                     : item.description,
                 images: item.images as string[],
                 ownerName: item.ownerName,
+                city: item.city,
+                state: item.state,
               }}
               href={() => {
                 router.push(

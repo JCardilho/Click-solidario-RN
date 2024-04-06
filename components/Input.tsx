@@ -10,6 +10,7 @@ interface IProps {
   message?: string;
   className?: string;
   value?: string;
+  style?: any;
 }
 
 export const Input = (props: IProps) => {
@@ -19,6 +20,7 @@ export const Input = (props: IProps) => {
       <TextInput
         value={props.value}
         placeholder={props.placeholder}
+        style={props.style}
         className={`
     border rounded-lg p-4 font-kanit
     ${props.error ? 'border-red-500' : 'border-primary'}

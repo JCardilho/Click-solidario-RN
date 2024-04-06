@@ -47,6 +47,8 @@ const CreateSoliciteDonation = async (
     isVerified: false,
     helpedList: [],
     isFinished: false,
+    city: donation.city,
+    state: donation.state,
   };
 
   const doc = await addDoc(ref, createDoc);
@@ -61,7 +63,9 @@ const CreateSoliciteDonation = async (
 const GetAllSoliciteDonations = async (
   uid: string,
   startAtParam: number,
-  endAtParam: number
+  endAtParam: number,
+  state: string,
+  city: string
 ): Promise<ISoliciteDonation[]> => {
   const ref = collection(getFirestore(firebase), CollectionName);
   const query1 = query(
@@ -72,16 +76,37 @@ const GetAllSoliciteDonations = async (
     limit(endAtParam)
   );
   const snapshot = await getDocs(query1);
-  const result: ISoliciteDonation[] = snapshot.docs
-    .map((doc) => {
-      return {
-        ...(doc.data() as any),
-        uid: doc.id,
-        createdAt: doc.data().createdAt.toDate(),
-      };
-    })
-    .filter((donation) => donation.ownerUid !== uid);
 
+  const formattedData = snapshot.docs.map((doc) => {
+    return {
+      ...(doc.data() as any),
+      uid: doc.id,
+      createdAt: doc.data().createdAt.toDate(),
+    };
+  });
+
+  if (state && city) {
+    const sortedData = formattedData.sort((a, b) => {
+      if (a.state === state) {
+        if (a.city === city) {
+          return -1;
+        } else if (b.city === city) {
+          return 1;
+        }
+        return 0;
+      }
+      return 0;
+    });
+
+    const removeMySoliciations = sortedData.filter((donation) => donation.ownerUid !== uid);
+
+    const result: ISoliciteDonation[] = removeMySoliciations;
+
+    return result;
+  }
+
+  const removeMySoliciations = formattedData.filter((donation) => donation.ownerUid !== uid);
+  const result: ISoliciteDonation[] = removeMySoliciations;
   return result;
 };
 
