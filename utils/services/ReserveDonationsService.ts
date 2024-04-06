@@ -85,7 +85,7 @@ const GetAllReserveDonations = async (
       where('reserve.endDateOfLastReserve', '==', null),
       where('reserve.endDateOfLastReserve', '<', new Date())
     ),
-    orderBy('reserve.endDateOfLastReserve', 'desc'),
+    orderBy('reserve.endDateOfLastReserve', 'asc'),
     startAt(startAtParam),
     limit(endAtParam)
   );
@@ -99,29 +99,31 @@ const GetAllReserveDonations = async (
       doc.data().reserve.endDateOfLastReserve.toDate() > new Date()
   );
 
+  const updateDate = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      uid: doc.id,
+      name: data.name,
+      description: data.description,
+      images: data.images,
+      ownerUid: data.ownerUid,
+      createdAt: data.created.toDate(),
+      ownerName: data.ownerName,
+      reserve: {
+        endDateOfLastReserve: data.reserve.endDateOfLastReserve
+          ? data.reserve.endDateOfLastReserve.toDate()
+          : undefined,
+        endOwnerNameOfLastReserve: data.reserve.endOwnerNameOfLastReserve,
+        endOwnerUidOfLastReserve: data.reserve.endOwnerUidOfLastReserve,
+      },
+    };
+  });
+
+  const removeMyReserve = updateDate.filter((data) => data.ownerUid !== uid);
+
   return {
     userReserveCount: removeIfDateIsBefore.length,
-    donations: snapshot.docs
-      .map((doc) => {
-        const data = doc.data();
-        return {
-          uid: doc.id,
-          name: data.name,
-          description: data.description,
-          images: data.images,
-          ownerUid: data.ownerUid,
-          createdAt: data.created.toDate(),
-          ownerName: data.ownerName,
-          reserve: {
-            endDateOfLastReserve: data.reserve.endDateOfLastReserve
-              ? data.reserve.endDateOfLastReserve.toDate()
-              : undefined,
-            endOwnerNameOfLastReserve: data.reserve.endOwnerNameOfLastReserve,
-            endOwnerUidOfLastReserve: data.reserve.endOwnerUidOfLastReserve,
-          },
-        };
-      })
-      .filter((data) => data.ownerUid !== uid),
+    donations: removeMyReserve,
   };
 };
 
