@@ -37,7 +37,7 @@ export const useLoaderHook = () => {
 
   const stopLoadingForReactQueryError = {
     onError: (err: any) => {
-      console.log(err)
+      console.log(err);
       setIsLoading(false);
     },
   };
@@ -90,7 +90,7 @@ export const Loader = (props: IProps) => {
         </View>
       )}
 
-      {props.fullscreen && !props.center && isLoading && (
+      {props.fullscreen && !props.center && (isLoading || props.isLoader) && (
         <View className="absolute z-50 w-screen h-screen bg-black/20 bg-opacity-50 flex-1 items-center justify-center top-12">
           <ActivityIndicator size="large" color={'#023E8A'} />
         </View>

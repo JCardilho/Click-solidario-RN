@@ -10,6 +10,8 @@ export interface CreateUserDTO {
     key: string;
     type: string;
   };
+  state: string;
+  city: string;
 }
 
 export interface IUser extends Omit<CreateUserDTO, 'password'>, Pick<AuthCredential, 'providerId'> {

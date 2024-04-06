@@ -44,6 +44,9 @@ const createUser = async (params: CreateUserDTO): Promise<void> => {
       image: '',
       notifications: [],
       conversations: [],
+      city: params.city,
+      state: params.state,
+      posts_saved: [],
     });
     const auth = getAuth(firebase);
     await createUserWithEmailAndPassword(auth, params.email, params.password);
