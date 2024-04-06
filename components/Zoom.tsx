@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   useAnimatedRef,
   useSharedValue,
@@ -70,7 +70,7 @@ export const useZoom = () => {
 
   const ZoomTrigger = ({ uri, children }: IZoomTrigger) => {
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={() => {
           setOpen({
             isOpen: !open?.isOpen,
@@ -79,7 +79,7 @@ export const useZoom = () => {
         }}
         className="w-full">
         {children}
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 

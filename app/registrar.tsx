@@ -270,47 +270,50 @@ export default function Registrar() {
 
             <View>
               {AllStates && !isPendingGetAllStates && (
-                <Controller
-                  control={control}
-                  name="state"
-                  render={({ field: { onChange, value } }) => (
-                    <RNPickerSelect
-                      key={`select-state`}
-                      style={{
-                        viewContainer: {
-                          backgroundColor: '#eaeaea',
-                          borderRadius: 7,
-                          borderWidth: 1,
-                          borderColor: errors.state ? 'red' : '#023E8A',
-                        },
-                        placeholder: {
-                          textAlign: 'center',
-                          color: '#000',
-                          fontFamily: 'Kanit_400Regular',
-                        },
-                        done: {
-                          fontFamily: 'Kanit_400Regular',
-                        },
-                      }}
-                      onValueChange={(value) => {
-                        setValue('state', value);
-                        if (getValues('city')) setValue('city', '');
-                        GetMunicipalityMutate(value);
-                      }}
-                      items={
-                        AllStates?.map((state) => ({
-                          label: state.nome,
-                          value: state.sigla,
-                          key: `select-state-${state.sigla}`,
-                        })) || []
-                      }
-                      placeholder={{
-                        label: 'Selecione seu estado',
-                        value: null,
-                      }}
-                    />
-                  )}
-                />
+                <>
+                  <Text className="text-md font-kanit">Digite seu estado: </Text>
+                  <Controller
+                    control={control}
+                    name="state"
+                    render={({ field: { onChange, value } }) => (
+                      <RNPickerSelect
+                        key={`select-state`}
+                        style={{
+                          viewContainer: {
+                            backgroundColor: '#f2f2f2',
+                            borderRadius: 7,
+                            borderWidth: 1,
+                            borderColor: errors.state ? 'red' : '#023E8A',
+                          },
+                          placeholder: {
+                            textAlign: 'center',
+                            color: '#000',
+                            fontFamily: 'Kanit_400Regular',
+                          },
+                          done: {
+                            fontFamily: 'Kanit_400Regular',
+                          },
+                        }}
+                        onValueChange={(value) => {
+                          setValue('state', value);
+                          if (getValues('city')) setValue('city', '');
+                          GetMunicipalityMutate(value);
+                        }}
+                        items={
+                          AllStates?.map((state) => ({
+                            label: state.nome,
+                            value: state.sigla,
+                            key: `select-state-${state.sigla}`,
+                          })) || []
+                        }
+                        placeholder={{
+                          label: 'Estado',
+                          value: null,
+                        }}
+                      />
+                    )}
+                  />
+                </>
               )}
               {errors.state && (
                 <Text className="text-md text-red-500">* {errors.state?.message}</Text>
@@ -318,45 +321,48 @@ export default function Registrar() {
             </View>
             <View>
               {Municipality && !isPendingMunicipality && (
-                <Controller
-                  control={control}
-                  name="city"
-                  render={({ field: { onChange, value } }) => (
-                    <RNPickerSelect
-                      key={`select-municipality`}
-                      style={{
-                        viewContainer: {
-                          backgroundColor: '#eaeaea',
-                          borderRadius: 7,
-                          borderWidth: 1,
-                          borderColor: errors.city ? 'red' : '#023E8A',
-                        },
-                        placeholder: {
-                          textAlign: 'center',
-                          color: '#000',
-                          fontFamily: 'Kanit_400Regular',
-                        },
-                        done: {
-                          fontFamily: 'Kanit_400Regular',
-                        },
-                      }}
-                      onValueChange={(value) => {
-                        setValue('city', value);
-                      }}
-                      items={
-                        Municipality?.map((city) => ({
-                          label: city.nome,
-                          value: city.nome,
-                          key: `select-municipality-${city.nome}`,
-                        })) || []
-                      }
-                      placeholder={{
-                        label: 'Selecione sua cidade',
-                        value: null,
-                      }}
-                    />
-                  )}
-                />
+                <>
+                  <Text className="text-md font-kanit">Digite sua cidade: </Text>
+                  <Controller
+                    control={control}
+                    name="city"
+                    render={({ field: { onChange, value } }) => (
+                      <RNPickerSelect
+                        key={`select-municipality`}
+                        style={{
+                          viewContainer: {
+                            backgroundColor: '#f2f2f2',
+                            borderRadius: 7,
+                            borderWidth: 1,
+                            borderColor: errors.city ? 'red' : '#023E8A',
+                          },
+                          placeholder: {
+                            textAlign: 'center',
+                            color: '#000',
+                            fontFamily: 'Kanit_400Regular',
+                          },
+                          done: {
+                            fontFamily: 'Kanit_400Regular',
+                          },
+                        }}
+                        onValueChange={(value) => {
+                          setValue('city', value);
+                        }}
+                        items={
+                          Municipality?.map((city) => ({
+                            label: city.nome,
+                            value: city.nome,
+                            key: `select-municipality-${city.nome}`,
+                          })) || []
+                        }
+                        placeholder={{
+                          label: 'Cidade',
+                          value: null,
+                        }}
+                      />
+                    )}
+                  />
+                </>
               )}
               {errors.city && (
                 <Text className="text-md text-red-500">* {errors.city?.message}</Text>
@@ -364,13 +370,14 @@ export default function Registrar() {
             </View>
 
             <BouncyCheckbox
-              className="text-lg  p-5 rounded-lg border border-primary"
+              className="text-lg p-5 rounded-lg border border-primary font-kanit"
               text="Selecione se você deseja receber doações!!"
-              fillColor="##3b82f6"
               unfillColor="#ffffff"
-              iconStyle={{ borderColor: 'blue', backgroundColor: '#3b82f6' }}
-              innerIconStyle={{ borderColor: 'blue', backgroundColor: '#3b82f6' }}
+              fillColor="#023E8A"
+              iconStyle={{ borderColor: 'blue' }}
+              innerIconStyle={{ borderColor: 'blue' }}
               onPress={(isChecked: boolean) => setValue('isReceptor', isChecked)}
+              textStyle={{ fontFamily: 'Kanit_400Regular' }}
             />
 
             {watch('isReceptor') && (
