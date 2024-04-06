@@ -11,12 +11,13 @@ interface IProps {
   }[];
   label?: string;
   placeholder?: string;
+  value: string;
 }
 
 export const Select = (props: IProps) => {
   return (
     <>
-      ^{props.label && <Text className="font-kanit text-sm">{props.label}</Text>}
+      {props.label && <Text className="font-kanit text-sm">{props.label}</Text>}
       <RNPickerSelect
         key={`select-municipality`}
         style={{
@@ -39,9 +40,10 @@ export const Select = (props: IProps) => {
         items={props.items}
         placeholder={{
           label: props.placeholder,
-          value: null,
+          value: props.value,
         }}
       />
+      {props.isError && <Text className="text-red-500 text-sm">* Campo obrigatório</Text>}
     </>
   );
 };

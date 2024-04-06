@@ -14,6 +14,8 @@ import { Button } from '~/components/Button';
 import { LocationService } from '~/utils/services/LocationService';
 import { useNotifications } from 'react-native-notificated';
 import { Loader } from '~/components/Loader';
+import { Select } from '~/components/Select';
+import { Checkbox } from '~/components/Checkbox';
 
 const criarUserSchema = z
   .object({
@@ -270,13 +272,11 @@ export default function Registrar() {
 
             <View>
               {AllStates && !isPendingGetAllStates && (
-                <>
-                  <Text className="text-md font-kanit">Digite seu estado: </Text>
-                  <Controller
-                    control={control}
-                    name="state"
-                    render={({ field: { onChange, value } }) => (
-                      <RNPickerSelect
+                <Controller
+                  control={control}
+                  name="state"
+                  render={({ field: { onChange, value } }) => (
+                    /*  <RNPickerSelect
                         key={`select-state`}
                         style={{
                           viewContainer: {
@@ -310,24 +310,38 @@ export default function Registrar() {
                           label: 'Estado',
                           value: null,
                         }}
-                      />
-                    )}
-                  />
-                </>
-              )}
-              {errors.state && (
-                <Text className="text-md text-red-500">* {errors.state?.message}</Text>
+                      /> */
+
+                    <Select
+                      key={`select-state-${value}`}
+                      isError={errors.state ? true : false}
+                      onValueChange={(value) => {
+                        setValue('state', value);
+                        if (getValues('city')) setValue('city', '');
+                        GetMunicipalityMutate(value);
+                      }}
+                      items={
+                        AllStates?.map((state) => ({
+                          label: state.nome,
+                          value: state.sigla,
+                          key: `select-state-${state.sigla}`,
+                        })) || []
+                      }
+                      label="Digite seu estado:"
+                      placeholder="Estado"
+                      value={value}
+                    />
+                  )}
+                />
               )}
             </View>
             <View>
               {Municipality && !isPendingMunicipality && (
-                <>
-                  <Text className="text-md font-kanit">Digite sua cidade: </Text>
-                  <Controller
-                    control={control}
-                    name="city"
-                    render={({ field: { onChange, value } }) => (
-                      <RNPickerSelect
+                <Controller
+                  control={control}
+                  name="city"
+                  render={({ field: { onChange, value } }) => (
+                    /*  <RNPickerSelect
                         key={`select-municipality`}
                         style={{
                           viewContainer: {
@@ -359,17 +373,31 @@ export default function Registrar() {
                           label: 'Cidade',
                           value: null,
                         }}
-                      />
-                    )}
-                  />
-                </>
-              )}
-              {errors.city && (
-                <Text className="text-md text-red-500">* {errors.city?.message}</Text>
+                      /> */
+
+                    <Select
+                      key={`select-municipality-${value}`}
+                      isError={errors.city ? true : false}
+                      onValueChange={(value) => {
+                        setValue('city', value);
+                      }}
+                      items={
+                        Municipality?.map((city) => ({
+                          label: city.nome,
+                          value: city.nome,
+                          key: `select-municipality-${city.nome}`,
+                        })) || []
+                      }
+                      label="Digite sua cidade:"
+                      placeholder="Cidade"
+                      value={value}
+                    />
+                  )}
+                />
               )}
             </View>
 
-            <BouncyCheckbox
+            {/*  <BouncyCheckbox
               className="text-lg p-5 rounded-lg border border-primary font-kanit"
               text="Selecione se você deseja receber doações!!"
               unfillColor="#ffffff"
@@ -378,6 +406,11 @@ export default function Registrar() {
               innerIconStyle={{ borderColor: 'blue' }}
               onPress={(isChecked: boolean) => setValue('isReceptor', isChecked)}
               textStyle={{ fontFamily: 'Kanit_400Regular' }}
+            /> */}
+
+            <Checkbox
+              onPress={(isChecked) => setValue('isReceptor', isChecked)}
+              placeholder="Selecione se você deseja receber doações!!"
             />
 
             {watch('isReceptor') && (
