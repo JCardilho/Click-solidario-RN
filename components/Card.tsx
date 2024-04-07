@@ -68,6 +68,18 @@ export const Card = (props: IProps) => {
             className={`w-full border p-4 rounded-lg  bg-white flex flex-col gap-2 my-4 shadow-2xl shadow-zinc-800 ${borderContainer}`}>
             {props.item.images && props.item.images.length > 0 && (
               <>
+                {props.item.type && (
+                  <View className="items-start justify-start">
+                    <Badge
+                      colorIcon="#1c1c1c"
+                      icon={props.item.type === 'solicite' ? 'dropbox' : 'handshake-o'}
+                      color="bg-zinc-200"
+                      classNameText="text-zinc-800">
+                      {props.item.type === 'solicite' ? 'Solicitação' : 'Reserva'}
+                    </Badge>
+                  </View>
+                )}
+
                 <View style={{ flex: 1, elevation: 5 }}>
                   <Carousel
                     mode="parallax"
@@ -119,10 +131,7 @@ export const Card = (props: IProps) => {
             )}
             <Divider />
 
-            {((!props.hidden?.status && props.status) ||
-              props.isFinished ||
-              props.isVerified ||
-              props.item.type) && (
+            {((!props.hidden?.status && props.status) || props.isFinished || props.isVerified) && (
               <>
                 {!props.hidden && props.status && (
                   <Text className="text-md font-kanit">Status:</Text>
@@ -138,16 +147,6 @@ export const Card = (props: IProps) => {
                   {props.isVerified && (
                     <Badge icon="handshake-o" colorIcon="white">
                       Verificado pela assistente social
-                    </Badge>
-                  )}
-                  {props.item.type === 'solicite' && (
-                    <Badge colorIcon="white" icon="plus">
-                      Solicitação
-                    </Badge>
-                  )}
-                  {props.item.type === 'reserve' && (
-                    <Badge colorIcon="white" icon="dropbox">
-                      Reserva
                     </Badge>
                   )}
                 </View>

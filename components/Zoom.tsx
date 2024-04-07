@@ -59,7 +59,8 @@ export const useZoom = () => {
                   });
                 }, 500);
               }}
-              className="absolute bottom-4 w-full">
+              className="absolute bottom-12 w-full items-center justify-center bg-zinc-200"
+              variant="borded">
               Fechar
             </Button>
           </Animated.View>

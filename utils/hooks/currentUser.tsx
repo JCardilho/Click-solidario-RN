@@ -88,23 +88,24 @@ export const useCurrentUserHook = () => {
     return;
   };
 
-  const verifyUserAndSendUserFromHome = async () => {
+  const verifyUserAndSendUserFromHome = async (): Promise<Function> => {
     try {
-      if (user && user !== null) return sendFromHome(user);
+      if (user && user !== null) return () => sendFromHome(user);
       const getCachedUser = (await getCache('user')) as IUser | null;
-      if (!getCachedUser || getCachedUser === null) return sendFromLogin();
+      if (!getCachedUser || getCachedUser === null) return () => sendFromLogin();
       if (getCachedUser) {
         try {
           const updateData = await UserService.UpdateDataUser(getCachedUser.uid);
 
-          if (updateData) return sendFromHome(updateData);
-          return sendFromLogin();
+          if (updateData) return () => sendFromHome(updateData);
+          return () => sendFromLogin();
         } catch (err) {
-          return sendFromLogin();
+          return () => sendFromLogin();
         }
       }
+      return () => sendFromLogin();
     } catch (err) {
-      return router.replace('/entrar');
+      return () => router.replace('/entrar');
     }
   };
 

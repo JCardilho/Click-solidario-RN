@@ -1,7 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Path, SvgFromUri, SvgUri } from 'react-native-svg';
 import { Link } from 'expo-router';
-import BottomSheet, { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import { useCallback, useMemo, useRef } from 'react';
 import { Button, IPropsButtomComponent } from './Button';
 
@@ -17,7 +21,7 @@ interface IProps {
 
 export const useBottomSheetHook = (props?: IProps) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => props?.snapPoints || ['35%', '50%', "90%", "100%"], []);
+  const snapPoints = useMemo(() => props?.snapPoints || ['35%', '50%', '90%', '100%'], []);
 
   function open() {
     handlePresentModalPress();
@@ -38,17 +42,31 @@ export const useBottomSheetHook = (props?: IProps) => {
     }
   }, []);
 
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={-1}
+        disappearsOnIndex={5}
+        pressBehavior={'close'}
+        onPress={() => {
+          console.log('backdrop press');
+          close();
+        }}
+      />
+    ),
+    []
+  );
+
   const component = () => {
     return (
       <>
         <BottomSheetModal
           ref={bottomSheetRef}
+          backdropComponent={renderBackdrop}
           snapPoints={snapPoints}
           index={0}
           enablePanDownToClose
-          enableContentPanningGesture
-          enableDismissOnClose
-          enableOverDrag
           onChange={handleSheetChanges}
           style={{
             borderWidth: 2,
