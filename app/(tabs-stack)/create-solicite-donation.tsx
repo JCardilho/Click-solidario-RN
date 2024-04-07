@@ -16,6 +16,7 @@ import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Input } from '~/components/Input';
 import { Select } from '~/components/Select';
+import { IncompleteRegisterScreen } from '~/components/incompleteRegisterScreen';
 import firebase from '~/utils/firebase';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
@@ -199,6 +200,8 @@ export default function CreateSoliciteDonation() {
   useEffect(() => {
     if (user && user.state) GetMunicipalityMutate(user.state);
   }, [user]);
+
+  if (!user || (user && !user.cpf)) return <IncompleteRegisterScreen />;
 
   return (
     <>

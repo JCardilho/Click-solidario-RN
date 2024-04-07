@@ -8,6 +8,7 @@ import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Loader, useLoaderHook } from '~/components/Loader';
 import { useZoom } from '~/components/Zoom';
+import { IncompleteRegisterScreen } from '~/components/incompleteRegisterScreen';
 import { ExcludeSoliccite } from '~/layouts/solicite-donations/(view-solicite-donation)/exclude-solicite';
 import { FinishReserveInViewSoliciteDonation } from '~/layouts/solicite-donations/(view-solicite-donation)/finish-solicite';
 import { SavePostSoliciteDonationPage } from '~/layouts/solicite-donations/one-solicite-donation/save-post';
