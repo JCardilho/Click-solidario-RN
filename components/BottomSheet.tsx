@@ -48,7 +48,7 @@ export const useBottomSheetHook = (props?: IProps) => {
           enablePanDownToClose
           enableContentPanningGesture
           enableDismissOnClose
-          enableHandlePanningGesture
+          enableOverDrag
           onChange={handleSheetChanges}
           style={{
             borderWidth: 2,

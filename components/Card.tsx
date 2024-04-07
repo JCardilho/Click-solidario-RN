@@ -19,6 +19,7 @@ interface IItem {
   images?: string[] | null;
   state?: string;
   city?: string;
+  type?: 'solicite' | 'reserve';
 }
 
 interface IHidden {
@@ -118,7 +119,10 @@ export const Card = (props: IProps) => {
             )}
             <Divider />
 
-            {((!props.hidden?.status && props.status) || props.isFinished || props.isVerified) && (
+            {((!props.hidden?.status && props.status) ||
+              props.isFinished ||
+              props.isVerified ||
+              props.item.type) && (
               <>
                 {!props.hidden && props.status && (
                   <Text className="text-md font-kanit">Status:</Text>
@@ -134,6 +138,16 @@ export const Card = (props: IProps) => {
                   {props.isVerified && (
                     <Badge icon="handshake-o" colorIcon="white">
                       Verificado pela assistente social
+                    </Badge>
+                  )}
+                  {props.item.type === 'solicite' && (
+                    <Badge colorIcon="white" icon="plus">
+                      Solicitação
+                    </Badge>
+                  )}
+                  {props.item.type === 'reserve' && (
+                    <Badge colorIcon="white" icon="dropbox">
+                      Reserva
                     </Badge>
                   )}
                 </View>

@@ -66,23 +66,23 @@ export const ReserveAction = ({ data, uid, refetch }: IProps) => {
 
   return (
     <>
-      {(data.reserve.endDateOfLastReserve && new Date() > data.reserve.endDateOfLastReserve) ||
-        (!data.reserve.endDateOfLastReserve && (
-          <>
-            <BottomSheet />
-            <Button
-              variant="success"
-              icon={{
-                name: 'handshake-o',
-                color: 'white',
-                size: 15,
-              }}
-              isLoading={isPending}
-              onPress={() => open()}>
-              Reservar
-            </Button>
-          </>
-        ))}
+      {((data.reserve.endDateOfLastReserve && new Date() > data.reserve.endDateOfLastReserve) ||
+        !data.reserve.endDateOfLastReserve) && (
+        <>
+          <BottomSheet />
+          <Button
+            variant="success"
+            icon={{
+              name: 'handshake-o',
+              color: 'white',
+              size: 15,
+            }}
+            isLoading={isPending}
+            onPress={() => open()}>
+            Reservar
+          </Button>
+        </>
+      )}
     </>
   );
 };
