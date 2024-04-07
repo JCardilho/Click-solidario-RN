@@ -14,6 +14,11 @@ export interface CreateUserDTO {
   city: string;
 }
 
+export interface CreateSocialAssistantDTO {
+  email: string;
+  password: string;
+}
+
 export interface IUser extends Omit<CreateUserDTO, 'password'>, Pick<AuthCredential, 'providerId'> {
   socialAssistant?: boolean;
   administrator?: boolean;

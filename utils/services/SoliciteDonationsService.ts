@@ -496,6 +496,23 @@ const RemoveSavedSoliciteDonation = async ({
   );
 };
 
+const VerifiedSocilitationOfSocialAssistence = async ({
+  uid,
+  isVerified,
+}: {
+  uid: string;
+  isVerified: boolean;
+}): Promise<void> => {
+  const docRef = doc(getFirestore(firebase), CollectionName, uid);
+  await setDoc(
+    docRef,
+    {
+      isVerified,
+    },
+    { merge: true }
+  );
+};
+
 export const SoliciteDonationsSerivce = {
   CreateSoliciteDonation,
   GetAllSoliciteDonations,
@@ -518,4 +535,5 @@ export const SoliciteDonationsSerivce = {
   UnVerifiedAssistence,
   SaveSoliciteDonation,
   RemoveSavedSoliciteDonation,
+  VerifiedSocilitationOfSocialAssistence,
 };

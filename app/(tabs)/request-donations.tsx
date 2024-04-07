@@ -123,33 +123,35 @@ export default function RequestDonationsScreen() {
         <View className="w-full  rounded-xl flex flex-col gap-4 p-4 items-center justify-center my-4">
           <FontAwesome name="plus" size={50} />
           <Text className="text-4xl font-kanit ">Solicitar ou Doar</Text>
-          <Text className="text-xl font-kanit text-center">
+          {/*  <Text className="text-xl font-kanit text-center">
             Solicite ou doe um item para quem precisa
-          </Text>
+          </Text> */}
         </View>
 
         <DefaultInformationsForSoliciteDonationsPage />
 
-        <View className="w-full flex flex-col gap-2 ">
-          <Button
-            icon={{
-              name: 'user',
-              color: 'white',
-              size: 15,
-            }}
-            onPress={() => router.push('/(tabs-stack)/(my-donations)/solicite-donations')}>
-            Minhas solicitações
-          </Button>
-          <Button
-            icon={{
-              name: 'plus',
-              color: 'white',
-              size: 15,
-            }}
-            onPress={() => router.push('/(tabs-stack)/create-solicite-donation')}>
-            Solicitar doação
-          </Button>
-        </View>
+        {user && !user.socialAssistant && (
+          <View className="w-full flex flex-col gap-2 ">
+            <Button
+              icon={{
+                name: 'user',
+                color: 'white',
+                size: 15,
+              }}
+              onPress={() => router.push('/(tabs-stack)/(my-donations)/solicite-donations')}>
+              Minhas solicitações
+            </Button>
+            <Button
+              icon={{
+                name: 'plus',
+                color: 'white',
+                size: 15,
+              }}
+              onPress={() => router.push('/(tabs-stack)/create-solicite-donation')}>
+              Solicitar doação
+            </Button>
+          </View>
+        )}
 
         <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
         <Text className="text-2xl text-center font-kanit my-6">Itens solicitados:</Text>
@@ -162,6 +164,7 @@ export default function RequestDonationsScreen() {
             }}
             onChangeText={(text) => setSearch(text)}
             value={search}
+            borderColorTailwind="border-zinc-500"
           />
           <Button
             variant="default"
@@ -205,14 +208,7 @@ export default function RequestDonationsScreen() {
                   `/(tabs-stack)/(one-solicite-donation)/(view-solicite-donation)/${item.uid}`
                 );
               }}
-              hidden={{
-                status: true,
-              }}
-              /*  status={
-              <>
-                <Badge>Aguardando</Badge>
-              </>
-            } */
+              isVerified={item.isVerified}
             />
           ))}
 

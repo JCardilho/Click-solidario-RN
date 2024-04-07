@@ -11,6 +11,7 @@ interface IProps {
   className?: string;
   value?: string;
   style?: any;
+  borderColorTailwind?: string;
 }
 
 export const Input = (props: IProps) => {
@@ -23,7 +24,7 @@ export const Input = (props: IProps) => {
         style={props.style}
         className={`
     border rounded-lg p-4 font-kanit
-    ${props.error ? 'border-red-500' : 'border-primary'}
+    ${props.error ? 'border-red-500' : props.borderColorTailwind ? props.borderColorTailwind : 'border-primary'}
         `}
         onChangeText={props.onChangeText}
         multiline={props.isTextArea}

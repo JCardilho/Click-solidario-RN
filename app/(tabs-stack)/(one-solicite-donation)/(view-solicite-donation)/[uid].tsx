@@ -1,7 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useNotifications } from 'react-native-notificated';
+import { Badge } from '~/components/Badge';
 import { Button } from '~/components/Button';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Loader, useLoaderHook } from '~/components/Loader';
@@ -9,6 +11,7 @@ import { useZoom } from '~/components/Zoom';
 import { ExcludeSoliccite } from '~/layouts/solicite-donations/(view-solicite-donation)/exclude-solicite';
 import { FinishReserveInViewSoliciteDonation } from '~/layouts/solicite-donations/(view-solicite-donation)/finish-solicite';
 import { SavePostSoliciteDonationPage } from '~/layouts/solicite-donations/one-solicite-donation/save-post';
+import { VerifiedSoliciteDonation } from '~/layouts/solicite-donations/one-solicite-donation/verified-post';
 import {
   ViewDataHelpedListForViewSoliciteDonation,
   ViewDataImageForViewSoliciteDonation,
@@ -17,6 +20,7 @@ import {
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import { ISoliciteDonation } from '~/utils/services/DTO/solicite-donation.dto';
+import { IUser } from '~/utils/services/DTO/user.dto';
 import { SoliciteDonationsSerivce } from '~/utils/services/SoliciteDonationsService';
 import { UserService } from '~/utils/services/UserService';
 
@@ -37,6 +41,16 @@ export default function ViewOneSoliciteDonation() {
       const result = await SoliciteDonationsSerivce.GetOneSoliciteDonations(uidFormatted);
       if (!result) throw new Error('Reserva não encontrada');
       setIsLoading(false);
+      return result;
+    },
+  });
+
+  const { data: owner, mutate } = useMutation({
+    mutationKey: ['find-owner', uid],
+    mutationFn: async () => {
+      if (!data) return undefined;
+      const result = await UserService.getOneUser(data.ownerUid);
+      if (!result) return undefined;
       return result;
     },
   });
@@ -112,6 +126,10 @@ export default function ViewOneSoliciteDonation() {
     },
   });
 
+  useEffect(() => {
+    if (data) mutate();
+  }, [data]);
+
   /*   useEffect(() => {
     if (ViewReserveDonations.find((item) => item.uid === uid)) {
       refetch();
@@ -129,86 +147,99 @@ export default function ViewOneSoliciteDonation() {
         {data && !isLoading && !isRefetching && (
           <>
             <ViewDataImageForViewSoliciteDonation data={data} ZoomTrigger={ZoomTrigger} />
+            {data.isVerified && (
+              <View className="w-full flex flex-col gap-2 items-center justify-center p-4 pt-0 mb-4">
+                <Badge icon="handshake-o" colorIcon="white">
+                  Essa postagem foi verificada por um assistente social!!
+                </Badge>
+              </View>
+            )}
             <View className="w-full flex flex-col gap-2 ">
-              <ViewDataTextForViewSoliciteDonation data={data} />
+              <ViewDataTextForViewSoliciteDonation data={data} owner={owner} />
             </View>
 
             <ViewDataHelpedListForViewSoliciteDonation data={data} />
 
             <SavePostSoliciteDonationPage data={data} />
 
-            <View className="w-full flex flex-col gap-2 ">
-              {user?.uid === data.ownerUid && (
-                <>
-                  {!data.isFinished && (
-                    <Button
-                      variant="default"
-                      icon={{
-                        name: 'paint-brush',
-                        color: 'white',
-                        size: 15,
-                      }}
-                      href={() => {
-                        router.push(
-                          `/(tabs-stack)/(one-solicite-donation)/(edit-solicite-donation)/${uid}`
-                        );
-                      }}>
-                      Editar
-                    </Button>
-                  )}
-                  <FinishReserveInViewSoliciteDonation uid={uid} refetch={refetch} data={data} />
-                  <ExcludeSoliccite uid={uid} refetch={refetch} data={data} />
-                </>
-              )}
+            {user && user.socialAssistant && (
+              <VerifiedSoliciteDonation queryId={['solicite-donation', uid as any]} data={data} />
+            )}
 
-              {user && user.uid !== data.ownerUid && (
-                <>
-                  <Button
-                    variant="default"
-                    icon={{
-                      name: 'comment',
-                      color: 'white',
-                      size: 15,
-                    }}
-                    onPress={async () => await mutateAsync()}
-                    isLoading={isPending}>
-                    Entrar em contato
-                  </Button>
-                  {user &&
-                    user.uid &&
-                    data.helpedList &&
-                    !data.helpedList.find((item) => item.uid === user.uid) && (
+            {user && !user.socialAssistant && (
+              <View className="w-full flex flex-col gap-2 ">
+                {user?.uid === data.ownerUid && (
+                  <>
+                    {!data.isFinished && (
                       <Button
                         variant="default"
                         icon={{
-                          name: 'handshake-o',
+                          name: 'paint-brush',
                           color: 'white',
                           size: 15,
                         }}
-                        onPress={async () => {
-                          if (!user) return;
-                          const verifyConversation = await findOneConversation(data.ownerUid);
-                          if (!verifyConversation) {
-                            notify('warning', {
-                              params: {
-                                title:
-                                  'Você precisa conversar antes de registrar a sua assistência!',
-                                description: '',
-                              },
-                            });
-                            return;
-                          }
+                        href={() => {
                           router.push(
-                            `/(tabs-stack)/(one-solicite-donation)/(register-assistence)/${uid}`
+                            `/(tabs-stack)/(one-solicite-donation)/(edit-solicite-donation)/${uid}`
                           );
-                        }}
-                        isLoading={isPending}>
-                        Registrar assistência
+                        }}>
+                        Editar
                       </Button>
                     )}
-                </>
-              )}
-            </View>
+                    <FinishReserveInViewSoliciteDonation uid={uid} refetch={refetch} data={data} />
+                    <ExcludeSoliccite uid={uid} refetch={refetch} data={data} />
+                  </>
+                )}
+
+                {user && user.uid !== data.ownerUid && (
+                  <>
+                    <Button
+                      variant="default"
+                      icon={{
+                        name: 'comment',
+                        color: 'white',
+                        size: 15,
+                      }}
+                      onPress={async () => await mutateAsync()}
+                      isLoading={isPending}>
+                      Entrar em contato
+                    </Button>
+                    {user &&
+                      user.uid &&
+                      data.helpedList &&
+                      !data.helpedList.find((item) => item.uid === user.uid) && (
+                        <Button
+                          variant="default"
+                          icon={{
+                            name: 'handshake-o',
+                            color: 'white',
+                            size: 15,
+                          }}
+                          onPress={async () => {
+                            if (!user) return;
+                            const verifyConversation = await findOneConversation(data.ownerUid);
+                            if (!verifyConversation) {
+                              notify('warning', {
+                                params: {
+                                  title:
+                                    'Você precisa conversar antes de registrar a sua assistência!',
+                                  description: '',
+                                },
+                              });
+                              return;
+                            }
+                            router.push(
+                              `/(tabs-stack)/(one-solicite-donation)/(register-assistence)/${uid}`
+                            );
+                          }}
+                          isLoading={isPending}>
+                          Registrar assistência
+                        </Button>
+                      )}
+                  </>
+                )}
+              </View>
+            )}
           </>
         )}
 

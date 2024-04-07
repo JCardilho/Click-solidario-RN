@@ -146,44 +146,46 @@ export default function ReserveDonations() {
 
         <DefaultInformationsForReserveDonationsPage />
 
-        <View className="w-full flex flex-col gap-2">
-          <Button
-            variant="default"
-            icon={{
-              name: 'user',
-              color: 'white',
-              size: 15,
-            }}
-            href={() => router.push('/(tabs-stack)/(my-donations)/reserve-donations')}>
-            Meus itens disponibilizados
-          </Button>
-
-          <Button
-            variant="default"
-            icon={{
-              name: 'plus',
-              color: 'white',
-              size: 15,
-            }}
-            href={() => router.push('/(tabs-stack)/create-reserve-donation')}>
-            Disponibilizar um item à doação
-          </Button>
-
-          {data && data?.userReserveCount > 0 && (
+        {user && !user.socialAssistant && (
+          <View className="w-full flex flex-col gap-2">
             <Button
               variant="default"
               icon={{
-                name: 'dropbox',
+                name: 'user',
                 color: 'white',
                 size: 15,
               }}
-              className="mb-2"
-              href={() => router.push('/(tabs-stack)/my-reserves')}>
-              Minhas reservas (Você tem {data?.userReserveCount}{' '}
-              {data.userReserveCount === 1 ? 'reserva ativa' : 'reservas ativas'} )
+              href={() => router.push('/(tabs-stack)/(my-donations)/reserve-donations')}>
+              Meus itens disponibilizados
             </Button>
-          )}
-        </View>
+
+            <Button
+              variant="default"
+              icon={{
+                name: 'plus',
+                color: 'white',
+                size: 15,
+              }}
+              href={() => router.push('/(tabs-stack)/create-reserve-donation')}>
+              Disponibilizar um item à doação
+            </Button>
+
+            {data && data?.userReserveCount > 0 && (
+              <Button
+                variant="default"
+                icon={{
+                  name: 'dropbox',
+                  color: 'white',
+                  size: 15,
+                }}
+                className="mb-2"
+                href={() => router.push('/(tabs-stack)/my-reserves')}>
+                Minhas reservas (Você tem {data?.userReserveCount}{' '}
+                {data.userReserveCount === 1 ? 'reserva ativa' : 'reservas ativas'} )
+              </Button>
+            )}
+          </View>
+        )}
 
         <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
         <Text className="text-2xl text-center font-kanit my-6">Itens disponibilizados:</Text>
@@ -196,6 +198,7 @@ export default function ReserveDonations() {
             }}
             onChangeText={(text) => setSearch(text)}
             value={search}
+            borderColorTailwind="border-zinc-500"
           />
           <Button
             variant="default"

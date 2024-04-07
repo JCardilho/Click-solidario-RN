@@ -178,80 +178,82 @@ export default function ViewOneReserveDonation() {
 
             <SavePostReserveDonationPage data={data} />
 
-            <View className="w-full flex flex-col gap-2">
-              {user?.uid === data.ownerUid && (
-                <>
-                  {data.reserve &&
-                    data.reserve.endDateOfLastReserve &&
-                    new Date() < data.reserve.endDateOfLastReserve && (
-                      <>
+            {user && user.socialAssistant && (
+              <View className="w-full flex flex-col gap-2">
+                {user?.uid === data.ownerUid && (
+                  <>
+                    {data.reserve &&
+                      data.reserve.endDateOfLastReserve &&
+                      new Date() < data.reserve.endDateOfLastReserve && (
+                        <>
+                          <Button
+                            variant="default"
+                            icon={{
+                              name: 'handshake-o',
+                              color: 'white',
+                              size: 15,
+                            }}
+                            onPress={async () => await mutateAsync()}
+                            isLoading={isPending}>
+                            Entrar no chat
+                          </Button>
+                        </>
+                      )}
+
+                    {data.reserve &&
+                      data.reserve.endDateOfLastReserve &&
+                      getYear(data.reserve.endDateOfLastReserve) !== 2100 && (
                         <Button
                           variant="default"
                           icon={{
-                            name: 'handshake-o',
+                            name: 'paint-brush',
                             color: 'white',
                             size: 15,
                           }}
-                          onPress={async () => await mutateAsync()}
-                          isLoading={isPending}>
-                          Entrar no chat
+                          href={() =>
+                            router.push(
+                              `/(tabs-stack)/one-reserve-donation/(edit-reserve-donation)/${uid}`
+                            )
+                          }>
+                          Editar
                         </Button>
-                      </>
-                    )}
-
-                  {data.reserve &&
-                    data.reserve.endDateOfLastReserve &&
-                    getYear(data.reserve.endDateOfLastReserve) !== 2100 && (
-                      <Button
-                        variant="default"
-                        icon={{
-                          name: 'paint-brush',
-                          color: 'white',
-                          size: 15,
-                        }}
-                        href={() =>
-                          router.push(
-                            `/(tabs-stack)/one-reserve-donation/(edit-reserve-donation)/${uid}`
-                          )
-                        }>
-                        Editar
-                      </Button>
-                    )}
-                  <FinishReserveInViewReserveDonation uid={uid} refetch={refetch} data={data} />
-                  <ExcludeReserve uid={uid} refetch={refetch} data={data} />
-                </>
-              )}
-
-              {user?.uid !== data.ownerUid && (
-                <>
-                  <ReserveAction uid={uid} refetch={refetch} data={data} />
-                </>
-              )}
-
-              {data.reserve &&
-                user &&
-                data.reserve.endOwnerUidOfLastReserve &&
-                data.reserve.endOwnerUidOfLastReserve === user.uid &&
-                data.reserve.endOwnerNameOfLastReserve === user.name && (
-                  <Button
-                    variant="default"
-                    icon={{
-                      name: 'handshake-o',
-                      color: 'white',
-                      size: 15,
-                    }}
-                    onPress={async () => await mutateAsync()}
-                    isLoading={isPending}>
-                    Entrar em contato
-                  </Button>
+                      )}
+                    <FinishReserveInViewReserveDonation uid={uid} refetch={refetch} data={data} />
+                    <ExcludeReserve uid={uid} refetch={refetch} data={data} />
+                  </>
                 )}
 
-              {data.reserve.endDateOfLastReserve &&
-                new Date() < data.reserve.endDateOfLastReserve &&
-                getYear(data.reserve.endDateOfLastReserve) !== 2100 && (
-                  <CancelReserve uid={uid} refetch={refetch} data={data} />
+                {user?.uid !== data.ownerUid && (
+                  <>
+                    <ReserveAction uid={uid} refetch={refetch} data={data} />
+                  </>
                 )}
-            </View>
+
+                {data.reserve &&
+                  user &&
+                  data.reserve.endOwnerUidOfLastReserve &&
+                  data.reserve.endOwnerUidOfLastReserve === user.uid &&
+                  data.reserve.endOwnerNameOfLastReserve === user.name && (
+                    <Button
+                      variant="default"
+                      icon={{
+                        name: 'handshake-o',
+                        color: 'white',
+                        size: 15,
+                      }}
+                      onPress={async () => await mutateAsync()}
+                      isLoading={isPending}>
+                      Entrar em contato
+                    </Button>
+                  )}
+
+                {data.reserve.endDateOfLastReserve &&
+                  new Date() < data.reserve.endDateOfLastReserve &&
+                  getYear(data.reserve.endDateOfLastReserve) !== 2100 && (
+                    <CancelReserve uid={uid} refetch={refetch} data={data} />
+                  )}
+              </View>
+            )}
           </>
         )}
 

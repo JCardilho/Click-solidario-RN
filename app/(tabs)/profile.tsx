@@ -49,9 +49,11 @@ export default function Profile() {
           </Text>
           <Text className="font-kanit text-lg">Email: {user.email}</Text>
         </View>
-        <Button icon={{ name: 'paint-brush', color: 'white', size: 15 }} variant="default">
-          Editar Perfil
-        </Button>
+        {user && !user.socialAssistant && (
+          <Button icon={{ name: 'paint-brush', color: 'white', size: 15 }} variant="default">
+            Editar Perfil
+          </Button>
+        )}
         {user.administrator && (
           <>
             <Button
@@ -60,7 +62,8 @@ export default function Profile() {
                 color: 'white',
                 size: 15,
               }}
-              variant="default">
+              variant="default"
+              href={() => router.push('/create-social-assistant')}>
               Cadastrar assitente social
             </Button>
 

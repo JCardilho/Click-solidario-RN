@@ -14,6 +14,7 @@ export default function StackLayout() {
       <Stack.Screen name="one-reserve-donation" />
       <Stack.Screen name="my-reserves" />
       <Stack.Screen name="create-solicite-donation" />
+      <Stack.Screen name="create-social-assistant" />
     </Stack>
   );
 }

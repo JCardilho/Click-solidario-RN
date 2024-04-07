@@ -57,10 +57,10 @@ export default function CreateSoliciteDonation() {
   const { isPending, mutate } = useMutation<ISoliciteDonation | undefined>({
     mutationKey: ['createSoliciteDonation'],
     mutationFn: async () => {
-      console.log('vai passar pelo uid');
       if (!user || !user.uid) return;
 
-      console.log('entrou');
+      const city = getValues('city') ? getValues('city') : user.city;
+      const state = getValues('state') ? getValues('state') : user.state;
 
       const result = await SoliciteDonationsSerivce.CreateSoliciteDonation({
         description: getValues('description'),
@@ -68,8 +68,8 @@ export default function CreateSoliciteDonation() {
         images: [],
         ownerUid: user.uid,
         ownerName: user.name,
-        city: user.city,
-        state: user.state,
+        city: city || '',
+        state: state || '',
       });
 
       return result;

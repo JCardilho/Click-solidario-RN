@@ -66,8 +66,8 @@ export default function CreateDonationItems() {
         images: [],
         ownerUid: user.uid,
         ownerName: user.name,
-        city: user.city,
-        state: user.state,
+        city: getValues('city') || user.city,
+        state: getValues('state') || user.state,
       });
 
       return result;

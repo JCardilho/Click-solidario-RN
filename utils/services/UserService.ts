@@ -6,7 +6,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CreateUserDTO, IConversationsUser, IUser } from './DTO/user.dto';
+import { CreateSocialAssistantDTO, CreateUserDTO, IConversationsUser, IUser } from './DTO/user.dto';
 
 import {
   collection,
@@ -141,8 +141,6 @@ const deleteOldImageToUserInFirebaseStorage = async (image: string) => {
   await deleteObject(desertRef);
 };
 
-const SendNotificationMessage = async (uid: string, otherUserUid: string): Promise<void> => {};
-
 const CreateConversation = async (
   uid: string,
   params: Omit<IConversationsUser, 'createdAt'>
@@ -268,6 +266,22 @@ const GetAllPostsSaved = async (uid: string): Promise<IUser['posts_saved']> => {
   return user.posts_saved || [];
 };
 
+const CreateSocialAssistant = async (params: CreateSocialAssistantDTO) => {
+  if (!params.email || !params.password) throw new Error('Email ou senha não informados');
+
+  const verifyLastLetterEmailIfIsSpace =
+    params.email[params.email.length - 1] === ' ' ? params.email.slice(0, -1) : params.email;
+
+  params.email = verifyLastLetterEmailIfIsSpace.toLowerCase();
+  const ref = collection(getFirestore(firebase), 'users');
+  await addDoc(ref, {
+    email: params.email,
+    socialAssistant: true,
+  });
+  const auth = getAuth(firebase);
+  await createUserWithEmailAndPassword(auth, params.email, params.password);
+};
+
 export const UserService = {
   createUser,
   loginUser,
@@ -280,4 +294,5 @@ export const UserService = {
   getOneUser,
   UpdateDataUser,
   GetAllPostsSaved,
+  CreateSocialAssistant,
 };
