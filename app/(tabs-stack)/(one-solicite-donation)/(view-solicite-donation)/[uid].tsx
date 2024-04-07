@@ -168,7 +168,7 @@ export default function ViewOneSoliciteDonation() {
 
             {user && !user.socialAssistant && (
               <View className="w-full flex flex-col gap-2 ">
-                {user?.uid === data.ownerUid && (
+                {(user?.uid === data.ownerUid || user.administrator) && (
                   <>
                     {!data.isFinished && (
                       <Button

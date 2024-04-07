@@ -18,6 +18,7 @@ import {
   query,
   where,
   getDocs,
+  deleteDoc,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, deleteObject } from 'firebase/storage';
 
@@ -282,6 +283,27 @@ const CreateSocialAssistant = async (params: CreateSocialAssistantDTO) => {
   await createUserWithEmailAndPassword(auth, params.email, params.password);
 };
 
+const GetAllSocialAssistants = async (): Promise<IUser[]> => {
+  const queryRef = query(
+    collection(getFirestore(firebase), 'users'),
+    where('socialAssistant', '==', true)
+  );
+  const querySnapshot = await getDocs(queryRef);
+  const users: IUser[] = [];
+  querySnapshot.forEach((doc) => {
+    users.push({
+      ...doc.data(),
+      uid: doc.id,
+    } as IUser);
+  });
+  return users;
+};
+
+const DeleteSocialAssistant = async (uid: string) => {
+  const docRef = doc(getFirestore(firebase), 'users', uid);
+  await deleteDoc(docRef);
+};
+
 export const UserService = {
   createUser,
   loginUser,
@@ -295,4 +317,6 @@ export const UserService = {
   UpdateDataUser,
   GetAllPostsSaved,
   CreateSocialAssistant,
+  GetAllSocialAssistants,
+  DeleteSocialAssistant,
 };

@@ -68,6 +68,17 @@ export default function Profile() {
             </Button>
 
             <Button
+              icon={{
+                name: 'heart-o',
+                color: 'white',
+                size: 15,
+              }}
+              variant="default"
+              href={() => router.push('/all-social-assistants')}>
+              Exibir assistentes sociais
+            </Button>
+
+            <Button
               variant="default"
               icon={{
                 name: 'shield',
