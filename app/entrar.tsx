@@ -1,5 +1,13 @@
 import { Stack, Link, useRouter } from 'expo-router';
-import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet } from 'react-native';
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Image,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
@@ -197,7 +205,7 @@ const LoginComponent = () => {
         params: {
           title: err.message,
         },
-      /*   config: {
+        /*   config: {
           notificationPosition: 'bottom-left',
         }, */
       });
@@ -250,7 +258,7 @@ const LoginComponent = () => {
   return (
     <>
       <Atalho.BottomSheet />
-      <View className={styles.container}>
+      <ScrollView className={styles.container}>
         <View className={styles.main}>
           {/* <View className="absolute  left-[-150px] bottom-[-50px] opacity-50 rounded-full  overflow-hidden">
             <Image
@@ -260,8 +268,8 @@ const LoginComponent = () => {
             />
           </View> */}
 
-          <View className="w-auto flex flex-col gap-4   rounded-lg p-4 ">
-            <View className="w-auto flex flex-col gap-4  m-4 items-center justify-center">
+          <View className="w-full flex flex-col gap-4 rounded-lg p-4">
+            <View className="w-auto full flex-col gap-4  items-center justify-center">
               {/*   <Image source={Logo} className="w-20 h-20 " alt="background-image" /> */}
               <Text className="text-center text-6xl font-bold">Entrar</Text>
             </View>
@@ -331,7 +339,7 @@ const LoginComponent = () => {
             </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </>
   );
 };
@@ -339,8 +347,8 @@ const LoginComponent = () => {
 const styles = {
   button: 'items-center bg-indigo-500 rounded-[28px] shadow-md p-4',
   buttonText: 'text-white text-lg font-semibold text-center',
-  container: 'flex-1 p-6 bg-white',
-  main: 'flex-1 max-w-[960] justify-center relative',
+  container: 'flex-1 bg-white overflow-visible',
+  main: 'w-screen h-screen items-center justify-center relative overflow-visible',
   title: 'text-[64px] font-bold',
   subtitle: 'text-4xl text-gray-700',
 };
