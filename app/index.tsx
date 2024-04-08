@@ -26,8 +26,10 @@ const InitialPageContet = () => {
 
   const verify = async () => {
     const result = await verifyUserAndSendUserFromHome();
-    translateY.value = withSpring(100);
-    opacityRef.value = withSpring(0);
+    setTimeout(() => {
+      translateY.value = withSpring(100);
+      opacityRef.value = withSpring(0);
+    }, 1000);
     setTimeout(() => {
       result();
     }, 1000);

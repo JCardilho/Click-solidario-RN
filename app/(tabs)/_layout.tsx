@@ -27,9 +27,9 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ color, focused }) =>
             focused ? (
-              <Ionicons size={focused ? 35 : 30} name="home" color={color} />
+              <Ionicons size={focused ? 30 : 25} name="home" color={color} />
             ) : (
-              <Ionicons size={focused ? 35 : 30} name="home-outline" color={color} />
+              <Ionicons size={focused ? 30 : 25} name="home-outline" color={color} />
             ),
           tabBarLabel: ({ color, focused }) => (
             <Text
@@ -46,9 +46,9 @@ export default function TabLayout() {
           title: 'Donations',
           tabBarIcon: ({ color, focused }) =>
             focused ? (
-              <FontAwesome size={focused ? 35 : 30} name="dropbox" color={color} />
+              <FontAwesome size={focused ? 30 : 25} name="dropbox" color={color} />
             ) : (
-              <SimpleLineIcons size={focused ? 35 : 30} name="social-dropbox" color={color} />
+              <SimpleLineIcons size={focused ? 30 : 25} name="social-dropbox" color={color} />
             ),
           tabBarLabel: ({ color, focused }) => (
             <View className="w-auto flex flex-col items-center justify-center">
@@ -71,9 +71,9 @@ export default function TabLayout() {
           title: 'Request-Donations',
           tabBarIcon: ({ color, focused }) =>
             focused ? (
-              <FontAwesome size={focused ? 35 : 30} name="plus" color={color} />
+              <FontAwesome size={focused ? 30 : 25} name="plus" color={color} />
             ) : (
-              <AntDesign size={focused ? 35 : 30} name="plus" color={color} />
+              <AntDesign size={focused ? 30 : 25} name="plus" color={color} />
             ),
           tabBarLabel: ({ color, focused }) => (
             <View className="w-auto flex flex-col items-center justify-center">
@@ -96,7 +96,7 @@ export default function TabLayout() {
           title: 'Perfil',
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome
-              size={focused ? 35 : 30}
+              size={focused ? 30 : 25}
               name={focused ? 'user' : 'user-o'}
               color={color}
             />

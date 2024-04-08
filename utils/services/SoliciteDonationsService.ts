@@ -163,7 +163,7 @@ const SearchSoliciteDonations = async (
       return {
         ...(data as any),
         uid: doc.id,
-        createdAt: data.created.toDate(),
+        createdAt: data.createdAt.toDate(),
       };
     })
     .filter((data) => data.ownerUid !== uid)

@@ -1,11 +1,12 @@
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -28,6 +29,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import { useCurrentUserHook } from './../../utils/hooks/currentUser';
 import { useZoom } from '~/components/Zoom';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
 export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
@@ -41,6 +43,10 @@ export default function ReserveDonations() {
   const scrollRef = useRef<ScrollView>(null);
   const { ZoomView, ZoomTrigger } = useZoom();
   const WD = useWindowDimensions();
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [textForBottomSheetButton, setTextForBottomSheetButton] = useState<'Pesquisar' | 'Fechar'>(
+    'Pesquisar'
+  );
 
   const { data, isLoading, refetch, isRefetching } = useQuery<{
     userReserveCount: number;
@@ -127,6 +133,14 @@ export default function ReserveDonations() {
     }
   }, [endAt]);
 
+  const snapPoints = useMemo(() => ['8%', '16%', '27%'], []);
+  const inputRef = useRef<TextInput>(null);
+
+  const handleSheetChanges = useCallback((index: number) => {
+    if (index === 0) return setTextForBottomSheetButton('Pesquisar');
+    setTextForBottomSheetButton('Fechar');
+  }, []);
+
   return (
     <>
       <SafeAreaView />
@@ -189,7 +203,7 @@ export default function ReserveDonations() {
 
         <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
         <Text className="text-2xl text-center font-kanit my-6">Itens disponibilizados:</Text>
-
+        {/* 
         <View className="w-full flex flex-row gap-1 ">
           <Input
             placeholder="Pesquisar"
@@ -210,7 +224,7 @@ export default function ReserveDonations() {
               color: 'white',
               size: 16,
             }}></Button>
-        </View>
+        </View> */}
 
         {isLoading && (
           <View className="w-full mt-4">
@@ -288,6 +302,88 @@ export default function ReserveDonations() {
 
         <View className="my-12"></View>
       </ScrollView>
+
+      <BottomSheet
+        snapPoints={snapPoints}
+        ref={bottomSheetRef}
+        style={{ backgroundColor: 'transparent', zIndex: 10000000 }}
+        index={0}
+        handleHeight={0}
+        enableHandlePanningGesture={false}
+        handleIndicatorStyle={{ backgroundColor: 'transparent', display: 'none' }}
+        backgroundComponent={(styles) => <View></View>}
+        onChange={handleSheetChanges}>
+        {bottomSheetRef && bottomSheetRef.current && (
+          <View style={styles.contentContainer}>
+            <TouchableOpacity
+              className="flex-row gap-2 bg-blue-500 rounded-3xl p-2 items-center justify-center"
+              onPress={() => {
+                if (textForBottomSheetButton === 'Pesquisar') {
+                  setTextForBottomSheetButton('Fechar');
+                  bottomSheetRef.current?.snapToIndex(1);
+                  return;
+                }
+                if (inputRef && inputRef.current) inputRef.current!.blur();
+                bottomSheetRef.current?.snapToIndex(0);
+              }}>
+              <FontAwesome
+                name={textForBottomSheetButton === 'Pesquisar' ? 'search' : 'close'}
+                size={15}
+                color={'white'}
+              />
+              <Text className="font-kanit text-sm text-white">{textForBottomSheetButton}</Text>
+            </TouchableOpacity>
+            <View className="w-full flex flex-row gap-1 items-center justify-center mt-4 ">
+              {textForBottomSheetButton === 'Fechar' && (
+                <Input
+                  placeholder="Pesquisar"
+                  style={{
+                    width: WD.width - 100,
+                  }}
+                  ref={inputRef}
+                  onChangeText={(text) => setSearch(text)}
+                  value={search}
+                  borderColorTailwind="border-zinc-500"
+                  onPressOut={() => {
+                    bottomSheetRef.current?.snapToIndex(2);
+                  }}
+                  onBlur={() => {
+                    bottomSheetRef.current?.snapToIndex(1);
+                  }}
+                  className="bg-white"
+                />
+              )}
+              <Button
+                variant="default"
+                className="h-full px-6"
+                onPress={() => {
+                  if (inputRef && inputRef.current) inputRef.current!.blur();
+                  bottomSheetRef.current?.snapToIndex(0);
+                  refetch();
+                }}
+                isLoading={isRefetching}
+                icon={{
+                  name: 'search',
+                  color: 'white',
+                  size: 16,
+                }}></Button>
+            </View>
+          </View>
+        )}
+      </BottomSheet>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: 'grey',
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+});

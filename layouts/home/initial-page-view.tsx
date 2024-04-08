@@ -10,7 +10,7 @@ import { Divider } from '~/components/Divider';
 import { Card } from '~/components/Card';
 import { useZoom } from '~/components/Zoom';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '~/components/Button';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -100,62 +100,56 @@ export const InitialPageView = (props: IProps) => {
           </TouchableOpacity>
         </View>
 
-        <View className="w-full flex items-center justify-center">
+        <View className="w-full flex items-center justify-center p-4">
           <Text className="font-montserrat font-bold text-4xl text-center mt-2">Postagens</Text>
 
           <Divider margin="my-4" />
 
-          {isPending && (
-            <View>
-              <Card isLoading={true} />
-            </View>
-          )}
+          {isPending && <Card isLoading={true} />}
 
-          <View className="p-4">
-            {!isPending &&
-              data?.slice(0, take).map((item) => (
-                <Card
-                  key={item.uid + Math.random() * 1000}
-                  item={{
-                    name: item.name,
-                    description: item.description,
-                    images: item.images as any,
-                    ownerName: item.ownerName,
-                    city: item.city,
-                    state: item.state,
-                    createdAt: item.createdAt,
-                    id: item.uid,
-                    type: item.type === 'solicite' ? 'solicite' : 'reserve',
-                  }}
-                  ZoomTrigger={ZoomTrigger}
-                  href={() => {
-                    if (item.type === 'solicite') {
-                      router.push(
-                        `/(tabs-stack)/(one-solicite-donation)/(view-solicite-donation)/${item.uid}`
-                      );
-                    } else {
-                      router.push(
-                        `/(tabs-stack)/one-reserve-donation/(view-reserve-donation)/${item.uid}`
-                      );
-                    }
-                  }}
-                  isVerified={item!.isVerified!}
-                />
-              ))}
-          </View>
-
-          <Button
-            icon={{
-              name: 'chevron-down',
-              color: 'white',
-              size: 20,
-            }}
-            onPress={() => setTake(take + 5)}>
-            Ver mais
-          </Button>
-
-          <View className="h-[250px] w-full"></View>
+          {!isPending &&
+            data?.slice(0, take).map((item) => (
+              <Card
+                key={`${item.uid}-initial-page`}
+                item={{
+                  name: item.name,
+                  description: item.description,
+                  images: item.images as any,
+                  ownerName: item.ownerName,
+                  city: item.city,
+                  state: item.state,
+                  createdAt: item.createdAt,
+                  id: item.uid,
+                  type: item.type === 'solicite' ? 'solicite' : 'reserve',
+                }}
+                ZoomTrigger={ZoomTrigger}
+                href={() => {
+                  if (item.type === 'solicite') {
+                    router.push(
+                      `/(tabs-stack)/(one-solicite-donation)/(view-solicite-donation)/${item.uid}`
+                    );
+                  } else {
+                    router.push(
+                      `/(tabs-stack)/one-reserve-donation/(view-reserve-donation)/${item.uid}`
+                    );
+                  }
+                }}
+                isVerified={item!.isVerified!}
+              />
+            ))}
         </View>
+
+        <Button
+          icon={{
+            name: 'chevron-down',
+            color: 'white',
+            size: 20,
+          }}
+          onPress={() => setTake(take + 5)}>
+          Ver mais
+        </Button>
+
+        <View className="h-[250px] w-full"></View>
       </ScrollView>
     </>
   );

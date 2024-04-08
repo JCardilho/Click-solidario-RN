@@ -1,4 +1,4 @@
-import { Text, TextInput, View } from 'react-native';
+import { Text, TextInput, TextInputAndroidProps, TextInputProps, View } from 'react-native';
 
 interface IProps {
   isTextArea?: boolean;
@@ -12,16 +12,19 @@ interface IProps {
   value?: string;
   style?: any;
   borderColorTailwind?: string;
+  ref?: any;
 }
 
-export const Input = (props: IProps) => {
+export const Input = (props: IProps & TextInputAndroidProps & TextInputProps) => {
   return (
     <View className={`w-auto flex flex-col ${props.className}`}>
       {props.label && <Text className="text-md font-kanit">{props.label}</Text>}
       <TextInput
+        {...props}
         value={props.value}
         placeholder={props.placeholder}
         style={props.style}
+        ref={props.ref}
         className={`
     border rounded-lg p-4 font-kanit
     ${props.error ? 'border-red-500' : props.borderColorTailwind ? props.borderColorTailwind : 'border-primary'}
