@@ -3,6 +3,7 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 interface IProps {
   onPress: (value: boolean) => void;
   placeholder?: string;
+  isChecked?: boolean;
 }
 
 export const Checkbox = (props: IProps) => {
@@ -16,6 +17,7 @@ export const Checkbox = (props: IProps) => {
       innerIconStyle={{ borderColor: 'blue' }}
       onPress={(isChecked: boolean) => props.onPress(isChecked)}
       textStyle={{ fontFamily: 'Kanit_400Regular' }}
+      isChecked={props.isChecked}
     />
   );
 };

@@ -304,6 +304,11 @@ const DeleteSocialAssistant = async (uid: string) => {
   await deleteDoc(docRef);
 };
 
+const UpdateUser = async (uid: string, data: Partial<IUser>) => {
+  const docRef = doc(getFirestore(firebase), 'users', uid);
+  await setDoc(docRef, data, { merge: true });
+};
+
 export const UserService = {
   createUser,
   loginUser,
@@ -319,4 +324,5 @@ export const UserService = {
   CreateSocialAssistant,
   GetAllSocialAssistants,
   DeleteSocialAssistant,
+  UpdateUser,
 };

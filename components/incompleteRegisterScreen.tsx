@@ -15,7 +15,7 @@ export const IncompleteRegisterScreen = () => {
       <Button
         variant="ghost"
         onPress={() => {
-          router.replace('/profile');
+          router.replace('/edit-user');
         }}
         classNameText="text-primary font-bold underline">
         Completar cadastro

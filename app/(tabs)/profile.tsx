@@ -50,7 +50,10 @@ export default function Profile() {
           <Text className="font-kanit text-lg">Email: {user.email}</Text>
         </View>
         {user && !user.socialAssistant && (
-          <Button icon={{ name: 'paint-brush', color: 'white', size: 15 }} variant="default">
+          <Button
+            icon={{ name: 'paint-brush', color: 'white', size: 15 }}
+            variant="default"
+            onPress={() => router.push('/edit-user')}>
             Editar Perfil
           </Button>
         )}
