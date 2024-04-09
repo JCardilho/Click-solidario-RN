@@ -30,16 +30,13 @@ export const SelectImage = () => {
   const { mutate, isPending } = useMutation({
     mutationKey: ['upload-image-for-profile'],
     mutationFn: async () => {
-      if (!uploading) return;
+      if (!uploading || !user) return;
       try {
         const response = await fetch(uploading);
         const blob = await response.blob();
         const fileName = uploading.substring(uploading.lastIndexOf('/') + 1);
         const storage = getStorage();
-        const mountainsRef = ref(
-          storage,
-          `images/users/${user?.uid}/${fileName + Date.now().toString()}`
-        );
+        const mountainsRef = ref(storage, `images/users/${user?.uid}/${user?.uid}`);
 
         if (user && user.image) {
           await UserService.deleteOldImageToUserInFirebaseStorage(user.image);
@@ -64,8 +61,8 @@ export const SelectImage = () => {
         <TouchableOpacity className="w-full flex items-center justify-center" onPress={pickImage}>
           <Image source={{ uri: uploading }} className="w-40 h-40 rounded-full" alt="user-image" />
           <Text className="text-center font-kanit text-lg">
-                Clique no icone acima para adicionar uma imagem!!
-              </Text>
+            Clique no icone acima para adicionar uma imagem!!
+          </Text>
         </TouchableOpacity>
       ) : (
         <>
@@ -78,7 +75,7 @@ export const SelectImage = () => {
                 className="w-40 h-40 rounded-full"
                 alt="user-image"
               />
-               <Text className="text-center font-kanit text-lg">
+              <Text className="text-center font-kanit text-lg">
                 Clique no icone acima para adicionar uma imagem!!
               </Text>
             </TouchableOpacity>

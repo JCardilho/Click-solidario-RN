@@ -20,7 +20,6 @@
           ]
         }
       ],
-
       "expo-build-properties"
     ],
     "experiments": {
@@ -35,7 +34,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -44,14 +45,14 @@
         "foregroundImage": "./assets/favicon1.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.kyoudan.clicksolidarioo"
+      "package": "com.kyoudan.clicksolidariooo"
     },
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "26681e6d-a389-4e8d-9fa4-b62d2343761b"
+        "projectId": "8213055d-7a07-43e9-bd48-d0269fb7edcf"
       }
     }
   }

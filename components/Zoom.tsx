@@ -78,7 +78,7 @@ export const useZoom = () => {
             uri,
           });
         }}
-        className="w-full">
+        className="w-auto">
         {children}
       </Pressable>
     );

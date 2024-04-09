@@ -27,13 +27,7 @@ const criarUserSchema = z
       .email({
         message: 'Email inválido',
       }),
-    senha: z
-      .string({
-        required_error: 'Senha é obrigatória',
-      })
-      .min(6, {
-        message: 'Senha deve ter no mínimo 6 caracteres',
-      }),
+
     cpf: z.string().optional(),
     name: z
       .string({
@@ -112,6 +106,24 @@ export default function EditUser() {
     mutationFn: async () => {
       if (!user || !user.uid) return;
 
+      if (
+        user.city === getValues('city') &&
+        user.state === getValues('state') &&
+        user.email === getValues('email') &&
+        user.name === getValues('name') &&
+        user.cpf === getValues('cpf') &&
+        user.pix?.key === getValues('pix.key') &&
+        user.pix?.type === getValues('pix.type_pix')
+      ) {
+        notify('warning', {
+          params: {
+            title: 'Nenhuma alteração foi encontrada!!',
+          },
+        });
+
+        return;
+      }
+
       const newFields = {
         email: getValues('email'),
         cpf: getValues('cpf'),
@@ -131,14 +143,19 @@ export default function EditUser() {
         ...newFields,
       });
 
+      notify('success', {
+        params: {
+          title: 'Perfil atualizado com sucesso',
+        },
+      });
+
+      router.back();
+
       return resposta;
     },
     onError: (err) => {
       console.log('Erro ao criar usuário');
       console.log('err', err);
-    },
-    onSuccess: () => {
-      router.back();
     },
   });
 
@@ -147,6 +164,11 @@ export default function EditUser() {
     queryFn: async () => {
       try {
         const result = await LocationService.GetAllStatesFromBrazil();
+
+        if (user?.city) {
+          GetMunicipalityMutate(user.state);
+        }
+
         return result;
       } catch (err) {
         console.log('Erro ao buscar estados', err);
@@ -169,6 +191,7 @@ export default function EditUser() {
     mutationFn: async (uf: string) => {
       try {
         const result = await LocationService.GetAllMunicipalityFromBrazil(uf);
+        setValue('city', user?.city || '');
         return result;
       } catch (err) {
         console.log('Erro ao buscar a cidade', err);
@@ -243,22 +266,6 @@ export default function EditUser() {
                     onChangeText={onChange}
                     value={value}
                     error={errors.name?.message}
-                  />
-                )}
-              />
-            </View>
-            <View>
-              <Controller
-                control={control}
-                name="email"
-                defaultValue={user?.email}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    placeholder="Email"
-                    label="Digite seu email:"
-                    onChangeText={onChange}
-                    value={value}
-                    error={errors.email?.message}
                   />
                 )}
               />

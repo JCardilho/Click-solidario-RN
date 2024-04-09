@@ -5,6 +5,7 @@ import { ScrollView, View } from 'react-native';
 import { Card } from '~/components/Card';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Loader } from '~/components/Loader';
+import { NoneItemsScreen } from '~/components/NoneItemsScreen';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
@@ -33,6 +34,8 @@ export default function MyReservers() {
   return (
     <>
       <HeaderBack title="Minhas reservas" />
+
+      {data && data.length === 0 && <NoneItemsScreen />}
 
       <ScrollView className="w-full px-2">
         {/* <View className="w-full flex items-center">

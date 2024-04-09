@@ -30,6 +30,7 @@ import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import { useCurrentUserHook } from './../../utils/hooks/currentUser';
 import { useZoom } from '~/components/Zoom';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Divider } from '~/components/Divider';
 
 export default function ReserveDonations() {
   const { name } = useLocalSearchParams();
@@ -160,7 +161,7 @@ export default function ReserveDonations() {
 
         <DefaultInformationsForReserveDonationsPage />
 
-        {user && !user.socialAssistant && (
+        {/* {user && !user.socialAssistant && (
           <View className="w-full flex flex-col gap-2">
             <Button
               variant="default"
@@ -184,25 +185,53 @@ export default function ReserveDonations() {
               Disponibilizar um item à doação
             </Button>
 
-            {data && data?.userReserveCount > 0 && (
-              <Button
-                variant="default"
-                icon={{
-                  name: 'dropbox',
-                  color: 'white',
-                  size: 15,
-                }}
-                className="mb-2"
-                href={() => router.push('/(tabs-stack)/my-reserves')}>
-                Minhas reservas (Você tem {data?.userReserveCount}{' '}
-                {data.userReserveCount === 1 ? 'reserva ativa' : 'reservas ativas'} )
-              </Button>
-            )}
+            
           </View>
+        )} */}
+
+        {user && !user.socialAssistant && (
+          <>
+            <View className="w-full h-auto flex flex-row items-center justify-around ">
+              <TouchableOpacity
+                className="w-fit h-auto flex flex-col gap-2 items-center justify-center"
+                onPress={() => router.push('/(tabs-stack)/(my-donations)/reserve-donations')}>
+                <View className="w-20 h-20 rounded-full items-center justify-center shadow-2xl shadow-black bg-zinc-100">
+                  <FontAwesome name="user" size={30} color="#000" />
+                </View>
+                <View>
+                  <Text className="text-center font-kanit text-lg">Meus itens</Text>
+                  <Text className="text-center font-kanit text-lg">disponibilizados</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="w-fit flex flex-col gap-2 items-center justify-center"
+                onPress={() => router.push('/(tabs-stack)/create-reserve-donation')}>
+                <View className="w-20 h-20 rounded-full items-center justify-center shadow-2xl shadow-black bg-zinc-100">
+                  <FontAwesome name="plus" size={30} color="#000" />
+                </View>
+                <View>
+                  <Text className="text-center font-kanit text-lg">Disponibilizar um item</Text>
+                  <Text className="text-center font-kanit text-lg">à doação</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            {data && data?.userReserveCount > 0 && (
+              <TouchableOpacity
+                className="mt-4 w-full items-center justify-center bg-red-50 shadow-2xl shadow-zinc-500 border border-red-500 rounded-lg p-4"
+                onPress={() => router.push('/(tabs-stack)/my-reserves')}>
+                <Text className="font-kanit text-lg">
+                  Minhas reservas (Você tem {data?.userReserveCount}{' '}
+                  {data.userReserveCount === 1 ? 'reserva ativa' : 'reservas ativas'} )
+                </Text>
+              </TouchableOpacity>
+            )}
+          </>
         )}
 
-        <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
-        <Text className="text-2xl text-center font-kanit my-6">Itens disponibilizados:</Text>
+        <Divider />
+        <Text className="text-2xl text-center font-kanit my-6 text-zinc-600">
+          Itens disponibilizados:
+        </Text>
         {/* 
         <View className="w-full flex flex-row gap-1 ">
           <Input
@@ -238,6 +267,7 @@ export default function ReserveDonations() {
             <Card
               ZoomTrigger={ZoomTrigger}
               key={`${item.uid}-reserve-donations-${index}`}
+              isRenderImage
               item={{
                 createdAt: item.createdAt,
                 id: item.uid,
@@ -250,6 +280,7 @@ export default function ReserveDonations() {
                 ownerName: item.ownerName,
                 city: item.city,
                 state: item.state,
+                ownerUid: item.ownerUid,
               }}
               hidden={{
                 status: true,
@@ -310,63 +341,70 @@ export default function ReserveDonations() {
         index={0}
         handleHeight={0}
         enableHandlePanningGesture={false}
+        enableContentPanningGesture={false}
+        enablePanDownToClose={false}
         handleIndicatorStyle={{ backgroundColor: 'transparent', display: 'none' }}
         backgroundComponent={(styles) => <View></View>}
         onChange={handleSheetChanges}>
         {bottomSheetRef && bottomSheetRef.current && (
           <View style={styles.contentContainer}>
-            <TouchableOpacity
-              className="flex-row gap-2 bg-blue-500 rounded-3xl p-2 items-center justify-center"
-              onPress={() => {
-                if (textForBottomSheetButton === 'Pesquisar') {
-                  setTextForBottomSheetButton('Fechar');
-                  bottomSheetRef.current?.snapToIndex(1);
-                  return;
-                }
-                if (inputRef && inputRef.current) inputRef.current!.blur();
-                bottomSheetRef.current?.snapToIndex(0);
-              }}>
-              <FontAwesome
-                name={textForBottomSheetButton === 'Pesquisar' ? 'search' : 'close'}
-                size={15}
-                color={'white'}
-              />
-              <Text className="font-kanit text-sm text-white">{textForBottomSheetButton}</Text>
-            </TouchableOpacity>
-            <View className="w-full flex flex-row gap-1 items-center justify-center mt-4 ">
-              {textForBottomSheetButton === 'Fechar' && (
-                <Input
-                  placeholder="Pesquisar"
-                  style={{
-                    width: WD.width - 100,
-                  }}
-                  ref={inputRef}
-                  onChangeText={(text) => setSearch(text)}
-                  value={search}
-                  borderColorTailwind="border-zinc-500"
-                  onPressOut={() => {
-                    bottomSheetRef.current?.snapToIndex(2);
-                  }}
-                  onBlur={() => {
-                    bottomSheetRef.current?.snapToIndex(1);
-                  }}
-                  className="bg-white"
-                />
-              )}
-              <Button
-                variant="default"
-                className="h-full px-6"
+            <View className="w-full items-center justify-center">
+              <TouchableOpacity
+                className="flex-row gap-2 bg-blue-500 rounded-3xl p-2 items-center justify-center"
                 onPress={() => {
+                  if (textForBottomSheetButton === 'Pesquisar') {
+                    setTextForBottomSheetButton('Fechar');
+                    bottomSheetRef.current?.snapToIndex(1);
+                    return;
+                  }
                   if (inputRef && inputRef.current) inputRef.current!.blur();
                   bottomSheetRef.current?.snapToIndex(0);
-                  refetch();
-                }}
-                isLoading={isRefetching}
-                icon={{
-                  name: 'search',
-                  color: 'white',
-                  size: 16,
-                }}></Button>
+                }}>
+                <FontAwesome
+                  name={textForBottomSheetButton === 'Pesquisar' ? 'search' : 'close'}
+                  size={15}
+                  color={'white'}
+                />
+                <Text className="font-kanit text-sm text-white">{textForBottomSheetButton}</Text>
+              </TouchableOpacity>
+            </View>
+            <View className="w-full flex flex-row gap-1 items-center justify-center mt-4 ">
+              {textForBottomSheetButton === 'Fechar' && (
+                <>
+                  <Input
+                    placeholder="Pesquisar"
+                    style={{
+                      width: WD.width - 100,
+                    }}
+                    reference={inputRef}
+                    onChangeText={(text) => setSearch(text)}
+                    value={search}
+                    borderColorTailwind="border-zinc-500"
+                    onPressOut={() => {
+                      bottomSheetRef.current?.snapToIndex(2);
+                    }}
+                    onBlur={() => {
+                      bottomSheetRef.current?.snapToIndex(1);
+                    }}
+                    className="bg-white"
+                  />
+
+                  <Button
+                    variant="default"
+                    className="h-full px-6"
+                    onPress={() => {
+                      if (inputRef && inputRef.current) inputRef.current!.blur();
+                      bottomSheetRef.current?.snapToIndex(0);
+                      refetch();
+                    }}
+                    isLoading={isRefetching}
+                    icon={{
+                      name: 'search',
+                      color: 'white',
+                      size: 16,
+                    }}></Button>
+                </>
+              )}
             </View>
           </View>
         )}

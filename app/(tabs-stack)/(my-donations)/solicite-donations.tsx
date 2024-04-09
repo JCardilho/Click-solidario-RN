@@ -6,6 +6,7 @@ import { Card } from '~/components/Card';
 import { Divider } from '~/components/Divider';
 import { HeaderBack } from '~/components/HeaderBack';
 import { Loader } from '~/components/Loader';
+import { NoneItemsScreen } from '~/components/NoneItemsScreen';
 import { useCurrentUserHook } from '~/utils/hooks/currentUser';
 import { useRefreshOnFocus } from '~/utils/hooks/refreshOnFocus';
 import { IReserveDonation } from '~/utils/services/DTO/reserve-donation.dto';
@@ -31,6 +32,8 @@ export default function MyDonationsInSoliciteDonationsPage() {
   return (
     <>
       <HeaderBack title="Minhas solicitações" />
+
+      {data && data.length === 0 && <NoneItemsScreen />}
 
       <ScrollView className="w-full px-2">
         {/* <View className="w-full flex items-center">

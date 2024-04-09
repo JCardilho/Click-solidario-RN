@@ -12,7 +12,7 @@ interface IProps {
   value?: string;
   style?: any;
   borderColorTailwind?: string;
-  ref?: any;
+  reference?: any;
 }
 
 export const Input = (props: IProps & TextInputAndroidProps & TextInputProps) => {
@@ -24,7 +24,7 @@ export const Input = (props: IProps & TextInputAndroidProps & TextInputProps) =>
         value={props.value}
         placeholder={props.placeholder}
         style={props.style}
-        ref={props.ref}
+        ref={props.reference}
         className={`
     border rounded-lg p-4 font-kanit
     ${props.error ? 'border-red-500' : props.borderColorTailwind ? props.borderColorTailwind : 'border-primary'}

@@ -34,6 +34,7 @@ import { DefaultInformationsForSoliciteDonationsPage } from '~/layouts/solicite-
 import { Badge } from '~/components/Badge';
 import { useZoom } from '~/components/Zoom';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Divider } from '~/components/Divider';
 
 export default function RequestDonationsScreen() {
   const { name } = useLocalSearchParams();
@@ -145,9 +146,9 @@ export default function RequestDonationsScreen() {
 
         <DefaultInformationsForSoliciteDonationsPage />
 
-        {user && !user.socialAssistant && (
+        {/*  {user && !user.socialAssistant && (
           <View className="w-full flex flex-col gap-2 ">
-            <Button
+              <Button
               icon={{
                 name: 'user',
                 color: 'white',
@@ -164,12 +165,35 @@ export default function RequestDonationsScreen() {
               }}
               onPress={() => router.push('/(tabs-stack)/create-solicite-donation')}>
               Solicitar doação
-            </Button>
+            </Button> *
+          </View>
+        )}
+ */}
+        {user && !user.socialAssistant && (
+          <View className="w-full h-auto flex flex-row items-center justify-around ">
+            <TouchableOpacity
+              className="w-fit h-auto flex flex-col gap-2 items-center justify-center"
+              onPress={() => router.push('/(tabs-stack)/(my-donations)/solicite-donations')}>
+              <View className="w-20 h-20 rounded-full items-center justify-center shadow-2xl shadow-black bg-zinc-100">
+                <FontAwesome name="user" size={30} color="#000" />
+              </View>
+              <Text className="text-center font-kanit text-lg w-24">Minhas solicitações</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="w-fit flex flex-col gap-2 items-center justify-center"
+              onPress={() => router.push('/(tabs-stack)/create-solicite-donation')}>
+              <View className="w-20 h-20 rounded-full items-center justify-center shadow-2xl shadow-black bg-zinc-100">
+                <FontAwesome name="plus" size={30} color="#000" />
+              </View>
+              <Text className="text-center font-kanit text-lg w-24">Solicitar doação</Text>
+            </TouchableOpacity>
           </View>
         )}
 
-        <View className="h-1 w-full bg-zinc-300 rounded-lg my-4"></View>
-        <Text className="text-2xl text-center font-kanit my-6">Itens solicitados:</Text>
+        <Divider />
+        <Text className="text-2xl text-zinc-600 text-center font-kanit my-6">
+          Itens solicitados:
+        </Text>
 
         {isLoading && (
           <View className="w-full mt-4">
@@ -183,6 +207,7 @@ export default function RequestDonationsScreen() {
             <Card
               key={`${item.uid}-solicite-donations-${index}`}
               ZoomTrigger={ZoomTrigger}
+              isRenderImage
               item={{
                 createdAt: item.createdAt,
                 id: item.uid,
@@ -195,6 +220,7 @@ export default function RequestDonationsScreen() {
                 ownerName: item.ownerName,
                 city: item.city,
                 state: item.state,
+                ownerUid: item.ownerUid,
               }}
               href={() => {
                 router.push(
@@ -215,6 +241,8 @@ export default function RequestDonationsScreen() {
         index={0}
         handleHeight={0}
         enableHandlePanningGesture={false}
+        enableContentPanningGesture={false}
+        enablePanDownToClose={false}
         handleIndicatorStyle={{ backgroundColor: 'transparent', display: 'none' }}
         backgroundComponent={(styles) => <View></View>}
         onChange={handleSheetChanges}>
@@ -239,41 +267,44 @@ export default function RequestDonationsScreen() {
           </TouchableOpacity>
           <View className="w-full flex flex-row gap-1 items-center justify-center mt-4 ">
             {textForBottomSheetButton === 'Fechar' && (
-              <Input
-                placeholder="Pesquisar"
-                style={{
-                  width: WD.width - 100,
-                }}
-                ref={inputRef}
-                onChangeText={(text) => setSearch(text)}
-                value={search}
-                borderColorTailwind="border-zinc-500"
-                onPressOut={() => {
-                  bottomSheetRef.current?.snapToIndex(2);
-                }}
-                onBlur={() => {
-                  bottomSheetRef.current?.snapToIndex(1);
-                }}
-                className="bg-white"
-              />
-            )}
-            <Button
-              variant="default"
-              className="h-full px-6"
-              onPress={() => {
-                if (inputRef && inputRef.current) {
-                  inputRef.current!.blur();
-                }
+              <>
+                <Input
+                  placeholder="Pesquisar"
+                  style={{
+                    width: WD.width - 100,
+                  }}
+                  reference={inputRef}
+                  onChangeText={(text) => setSearch(text)}
+                  value={search}
+                  borderColorTailwind="border-zinc-500"
+                  onPressOut={() => {
+                    bottomSheetRef.current?.snapToIndex(2);
+                  }}
+                  onBlur={() => {
+                    bottomSheetRef.current?.snapToIndex(1);
+                  }}
+                  className="bg-white"
+                />
 
-                bottomSheetRef.current?.snapToIndex(0);
-                refetch();
-              }}
-              isLoading={isRefetching}
-              icon={{
-                name: 'search',
-                color: 'white',
-                size: 16,
-              }}></Button>
+                <Button
+                  variant="default"
+                  className="h-full px-6"
+                  onPress={() => {
+                    if (inputRef && inputRef.current) {
+                      inputRef.current!.blur();
+                    }
+
+                    bottomSheetRef.current?.snapToIndex(0);
+                    refetch();
+                  }}
+                  isLoading={isRefetching}
+                  icon={{
+                    name: 'search',
+                    color: 'white',
+                    size: 16,
+                  }}></Button>
+              </>
+            )}
           </View>
         </View>
       </BottomSheet>
