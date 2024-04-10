@@ -48,6 +48,16 @@ export default function Profile() {
             {greeting}, {user?.name}
           </Text>
           <Text className="font-kanit text-lg">Email: {user.email}</Text>
+          <Text className="font-kanit text-lg">
+            Localização: {user.city} / {user.state}
+          </Text>
+          {user.pix && (
+            <>
+              <Text className="font-kanit text-lg">
+                Chave ({user.pix.type}): {user.pix?.key}
+              </Text>
+            </>
+          )}
         </View>
         {user && !user.socialAssistant && (
           <Button

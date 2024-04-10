@@ -130,7 +130,7 @@ export default function Registrar() {
       const resposta = await UserService.createUser({
         email: getValues('email'),
         password: getValues('senha'),
-        cpf: getValues('cpf'),
+        cpf: getValues('isReceptor') ? getValues('cpf') : '',
         name: getValues('name'),
         pix: {
           key: getValues('pix.key') || '',

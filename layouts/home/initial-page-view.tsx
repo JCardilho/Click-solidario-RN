@@ -111,7 +111,7 @@ export const InitialPageView = (props: IProps) => {
 
         <View className="w-full flex items-center justify-center p-4">
           <Text className="font-kanit font-bold text-2xl text-center mb-4 text-zinc-500">
-            Minhas solicitações
+            Postagens
           </Text>
 
           {isPending && <Card isLoading={true} />}
@@ -121,6 +121,7 @@ export const InitialPageView = (props: IProps) => {
               <Card
                 key={`${item.uid}-initial-page`}
                 isRenderImage
+                isReduceDescription
                 item={{
                   name: item.name,
                   description: item.description,

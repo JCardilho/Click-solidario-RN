@@ -208,6 +208,7 @@ export default function RequestDonationsScreen() {
               key={`${item.uid}-solicite-donations-${index}`}
               ZoomTrigger={ZoomTrigger}
               isRenderImage
+              isReduceDescription
               item={{
                 createdAt: item.createdAt,
                 id: item.uid,

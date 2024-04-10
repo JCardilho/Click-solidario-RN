@@ -268,6 +268,7 @@ export default function ReserveDonations() {
               ZoomTrigger={ZoomTrigger}
               key={`${item.uid}-reserve-donations-${index}`}
               isRenderImage
+              isReduceDescription
               item={{
                 createdAt: item.createdAt,
                 id: item.uid,

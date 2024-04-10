@@ -126,7 +126,7 @@ export default function EditUser() {
 
       const newFields = {
         email: getValues('email'),
-        cpf: getValues('cpf'),
+        cpf: getValues('isReceptor') ? getValues('cpf') : '',
         name: getValues('name'),
         pix: {
           key: getValues('pix.key') || '',

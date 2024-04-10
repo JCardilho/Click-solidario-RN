@@ -107,7 +107,7 @@ export const Card = (props: IProps) => {
                   {isLoading && (
                     <View className="w-14 h-14">
                       <SkeletonContent>
-                        <SkeletorCircle cx={10} cy={10} r={20} />
+                        <SkeletorCircle cx={20} cy={20} r={20} />
                       </SkeletonContent>
                     </View>
                   )}

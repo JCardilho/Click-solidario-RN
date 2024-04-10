@@ -27,6 +27,7 @@ import QuestionStoryset from '~/assets/background/QuestionsStoryset.png';
 import Logo from '~/assets/icon/logo.png';
 import { useBottomSheetHook } from '~/components/BottomSheet';
 import { useNotifications } from 'react-native-notificated';
+import { FontAwesome } from '@expo/vector-icons';
 
 const criarUserSchema = z.object({
   email: z
@@ -75,9 +76,9 @@ export default function LoginPage() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      {firstOpen === true && (
+      {!firstOpen === true && (
         <PagerView style={stylesS.viewPager} initialPage={0} ref={ref}>
-          <View className="justify-center items-center px-4" key="1">
+          <View className="justify-center items-center px-4 bg-white" key="1">
             <Image
               source={PersonDonationStoryset}
               className="object-cover w-[250px] h-[250px]"
@@ -89,45 +90,45 @@ export default function LoginPage() {
                 Click Solidário
               </Text>
             </View>
-            <Divider />
+            <Divider color="bg-transparent" />
             <Text className="text-center font-kanit  text-2xl">
-              Estamos felizes em ter você por aqui, <Text className="text-blue-500">ajudar</Text>{' '}
-              nunca foi tão <Text className="text-blue-500">fácil</Text>, faça parte dessa{' '}
-              <Text className="text-blue-500"> corrente do bem</Text>
+              Estamos felizes em ter você por aqui! <Text className="text-blue-500">Ajudar</Text>{' '}
+              nunca foi tão <Text className="text-blue-500">fácil</Text>. Faça parte dessa{' '}
+              <Text className="text-blue-500"> corrente do bem!</Text>
             </Text>
-            <Divider />
+            <Divider color="bg-transparent" />
             <View className="w-full">
-              <Button
-                variant="default"
-                onPress={() => {
-                  ref.current?.setPage(1);
-                }}
-                icon={{
-                  name: 'arrow-right',
-                  color: 'white',
-                  size: 15,
-                }}>
-                Próximo
-              </Button>
               <View className="items-center justify-center">
-                <Button
-                  variant="ghost"
+                <TouchableOpacity
                   onPress={() => {
-                    ref.current?.setPage(2);
+                    ref.current?.setPage(1);
                   }}
-                  icon={{
-                    name: 'sign-out',
-                    color: 'black',
-                    size: 15,
-                  }}>
-                  Pular
-                </Button>
+                  className="w-20 h-20 bg-blue-500 rounded-full items-center justify-center">
+                  <FontAwesome name="arrow-right" size={24} color="white" />
+                </TouchableOpacity>
               </View>
-              <Text className="text-center font-kanit mt-6">Você pode arrastar para o lado</Text>
-              <Text className="text-center font-kanit mt-6 text-sm">1/2</Text>
+              <View className="items-center justify-center"></View>
+              <View className="w-full flex flex-row gap-2 items-center justify-center mt-12">
+                <View className="w-2 h-2 rounded-full bg-blue-500"></View>
+                <View className="w-2 h-2 rounded-full bg-zinc-500"></View>
+                <View className="w-2 h-2 rounded-full bg-zinc-500"></View>
+              </View>
             </View>
+            <Button
+              variant="ghost"
+              onPress={() => {
+                ref.current?.setPage(2);
+              }}
+              icon={{
+                name: 'sign-out',
+                color: 'black',
+                size: 15,
+              }}
+              className="absolute bottom-4 right-4">
+              Pular
+            </Button>
           </View>
-          <View className="p-4 items-center" key="2">
+          <View className="p-4 items-center justify-center bg-white" key="2">
             <Image
               source={QuestionStoryset}
               className="object-cover w-[250px] h-[250px]"
@@ -143,7 +144,7 @@ export default function LoginPage() {
             </Text>
             <Divider />
             <View className="my-4 flex-col gap-4">
-              <Text className="font-kanit text-yellow-500 text-center">
+              <Text className="font-kanit text-red-500 text-center">
                 Obs: A página inicial contém o conteúdo das duas páginas
               </Text>
               <Text className="text-justify font-kanit text-xl">
@@ -158,20 +159,21 @@ export default function LoginPage() {
             </View>
 
             <View className="w-full">
-              <Button
-                variant="default"
-                onPress={() => {
-                  ref.current?.setPage(2);
-                }}
-                icon={{
-                  name: 'arrow-right',
-                  color: 'white',
-                  size: 15,
-                }}>
-                Entrar ou criar conta
-              </Button>
-              <Text className="text-center font-kanit mt-6">Você pode arrastar para o lado</Text>
-              <Text className="text-center font-kanit mt-6 text-sm">2/2</Text>
+              <View className="items-center justify-center">
+                <TouchableOpacity
+                  onPress={() => {
+                    ref.current?.setPage(2);
+                  }}
+                  className="w-20 h-20 bg-blue-500 rounded-full items-center justify-center">
+                  <FontAwesome name="arrow-right" size={24} color="white" />
+                </TouchableOpacity>
+              </View>
+              <View className="items-center justify-center"></View>
+              <View className="w-full flex flex-row gap-2 items-center justify-center mt-12">
+                <View className="w-2 h-2 rounded-full bg-zinc-500"></View>
+                <View className="w-2 h-2 rounded-full bg-blue-500"></View>
+                <View className="w-2 h-2 rounded-full bg-zinc-500"></View>
+              </View>
             </View>
           </View>
           <View key="3">
@@ -180,7 +182,7 @@ export default function LoginPage() {
         </PagerView>
       )}
 
-      {firstOpen === false && <LoginComponent />}
+      {!firstOpen === false && <LoginComponent />}
     </>
   );
 }
