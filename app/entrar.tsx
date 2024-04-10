@@ -76,7 +76,7 @@ export default function LoginPage() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      {!firstOpen === true && (
+      {firstOpen === true && (
         <PagerView style={stylesS.viewPager} initialPage={0} ref={ref}>
           <View className="justify-center items-center px-4 bg-white" key="1">
             <Image
@@ -182,7 +182,7 @@ export default function LoginPage() {
         </PagerView>
       )}
 
-      {!firstOpen === false && <LoginComponent />}
+      {firstOpen === false && <LoginComponent />}
     </>
   );
 }
