@@ -31,7 +31,7 @@ export default function RegisterSolicitationPage() {
         throw new Error('Tipo de ajuda é obrigatório');
       }
 
-      if (!uid  || !user || !user.uid || !user.name) throw new Error('Dados inválidos');
+      if (!uid || !user || !user.uid || !user.name) throw new Error('Dados inválidos');
 
       const uidFormatted = Array.isArray(uid) ? uid[0] : uid;
       if (!uidFormatted) throw new Error('UID não encontrado');

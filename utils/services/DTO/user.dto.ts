@@ -5,18 +5,13 @@ export interface CreateUserDTO {
   email: string;
   cpf?: string;
   name?: string;
-  password: string;
+  password: string; // Não está no banco de dados
   pix?: {
     key: string;
     type: string;
   };
   state: string;
   city: string;
-}
-
-export interface CreateSocialAssistantDTO {
-  email: string;
-  password: string;
 }
 
 export interface IUser extends Omit<CreateUserDTO, 'password'>, Pick<AuthCredential, 'providerId'> {
@@ -51,6 +46,11 @@ export interface IPostSaved {
   postId: string;
   postTitle: string;
   postDescription: string;
+}
+
+export interface CreateSocialAssistantDTO {
+  email: string;
+  password: string;
 }
 
 const userSchema = z.object({

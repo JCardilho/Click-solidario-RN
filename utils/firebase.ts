@@ -22,6 +22,7 @@ import initialize from './firebaseInitialize';
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 }; */
 
+/*
 const firebaseConfig = {
   apiKey: 'AIzaSyB2MnlM2Iwsyd3V8obVP2xF4Ti4dFzRAFI',
   authDomain: 'click-solidariov2.com',
@@ -32,6 +33,17 @@ const firebaseConfig = {
   appId: '1:622298577976:android:d8e1009e351856cef5bacd',
   measurementId: 'G-measurement-id',
   
+};
+*/
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyC5Y6nl34a0hgAlIK5N9sdrL3sBKVSYnxg',
+  authDomain: 'click-solidariov1.firebaseapp.com',
+  projectId: 'click-solidariov1',
+  storageBucket: 'click-solidariov1.appspot.com',
+  messagingSenderId: '449973756973',
+  appId: '1:449973756973:web:ddee6191c9ae0b039c04a4',
+  measurementId: 'G-T94G4NT096',
 };
 
 const firebase = initializeApp(firebaseConfig);

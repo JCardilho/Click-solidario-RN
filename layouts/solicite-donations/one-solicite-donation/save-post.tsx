@@ -96,7 +96,6 @@ export const SavePostSoliciteDonationPage = (props: IProps) => {
             ],
             padding: 10,
             justifyContent: 'center',
-
           }}>
           <TouchableOpacity
             onPress={() => {
