@@ -3,6 +3,7 @@ import {
   UserCredential,
   createUserWithEmailAndPassword,
   getAuth,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -70,6 +71,20 @@ const getOneUser = async (uid: string): Promise<IUser> => {
   };
 };
 
+const getOneUserByEmail = async (email: string): Promise<IUser> => {
+  const queryRef = query(collection(getFirestore(firebase), 'users'), where('email', '==', email));
+  const querySnapshot = await getDocs(queryRef);
+  if (querySnapshot.empty) throw new Error('Usuário não encontrado');
+  const user = querySnapshot.docs[0].data() as IUser;
+  return {
+    ...user,
+    conversations: user.conversations?.map((conv: any) => ({
+      ...conv,
+      createdAt: conv.createdAt.toDate(),
+    })),
+  };
+};
+
 const loginUser = async (email: string, password: string): Promise<IUser> => {
   const auth = getAuth(firebase);
 
@@ -91,7 +106,11 @@ const loginUser = async (email: string, password: string): Promise<IUser> => {
       if (docSnap.empty) throw new Error('Usuário não encontrado');
       const user = docSnap.docs[0].data() as IUser;
 
+      console.log('response', response);
+
       const getToken = await response.user.getIdTokenResult();
+
+      console.log('token', getToken);
 
       const saveUserForApplication = {
         ...user,
@@ -309,6 +328,15 @@ const UpdateUser = async (uid: string, data: Partial<IUser>) => {
   await setDoc(docRef, data, { merge: true });
 };
 
+const RecoverPassword = async (email: string) => {
+  const formattedEmail = email.toLowerCase().replace(/ /g, '');
+  const findUser = await getOneUserByEmail(formattedEmail);
+  if (!findUser) throw new Error('Usuário não encontrado');
+
+  const auth = getAuth(firebase);
+  await sendPasswordResetEmail(auth, formattedEmail);
+};
+
 export const UserService = {
   createUser,
   loginUser,
@@ -325,4 +353,5 @@ export const UserService = {
   GetAllSocialAssistants,
   DeleteSocialAssistant,
   UpdateUser,
+  RecoverPassword,
 };

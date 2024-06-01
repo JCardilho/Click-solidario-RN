@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
@@ -191,6 +192,9 @@ const LoginComponent = () => {
   const router = useRouter();
   const { setUser } = useCurrentUserHook();
   const { notify } = useNotifications();
+  const [isPassowrd, setIsPassword] = useState<boolean>(true);
+
+  const WD = useWindowDimensions();
 
   const { isPending, isError, mutate } = useMutation({
     mutationKey: ['loginUser'],
@@ -290,20 +294,35 @@ const LoginComponent = () => {
                 )}
               />
             </View>
-            <View>
+            <View className="w-full flex flex-row gap-2 items-end ">
               <Controller
                 control={control}
                 name="senha"
                 render={({ field: { onChange, value } }) => (
-                  <Input
-                    placeholder="Senha"
-                    onChangeText={onChange}
-                    label="Digite sua senha"
-                    value={value}
-                    error={errors.senha?.message}
-                  />
+                  <>
+                    <Input
+                      placeholder="Senha"
+                      style={{
+                        width: WD.width - 100,
+                      }}
+                      onChangeText={onChange}
+                      label="Digite sua senha"
+                      value={value}
+                      error={errors.senha?.message}
+                      isPassword={isPassowrd}
+                    />
+                  </>
                 )}
               />
+              <Button
+                onPress={() => setIsPassword(!isPassowrd)}
+                className="h-auto"
+                variant="ghost"
+                icon={{
+                  name: isPassowrd ? 'eye-slash' : 'eye',
+                  color: 'black',
+                  size: 25,
+                }}></Button>
             </View>
 
             <Button
@@ -333,10 +352,12 @@ const LoginComponent = () => {
             <View className="w-full flex items-center justify-center">
               <Text className="font-kanit text-sm">Esqueceu sua senha?</Text>
 
-              <TouchableOpacity onPress={() => Atalho.open()} className="  p-2  rounded-lg ">
-                <Text className="text-center text-blue-500 underline font-bold text-2xl">
+              <TouchableOpacity className="  p-2  rounded-lg ">
+                <Link
+                  href={'/recover-password'}
+                  className="text-center text-blue-500 underline font-bold text-2xl">
                   Recuperar-senha
-                </Text>
+                </Link>
               </TouchableOpacity>
             </View>
           </View>

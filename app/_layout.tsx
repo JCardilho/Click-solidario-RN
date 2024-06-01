@@ -55,6 +55,8 @@ export default function Layout() {
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs-stack)" options={{ headerShown: false }} />
               <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="recover-password" options={{ headerShown: false }} />
+           
             </Stack>
           </BottomSheetModalProvider>
         </GestureHandlerRootView>

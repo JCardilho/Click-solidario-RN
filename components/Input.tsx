@@ -13,6 +13,7 @@ interface IProps {
   style?: any;
   borderColorTailwind?: string;
   reference?: any;
+  isPassword?: boolean;
 }
 
 export const Input = (props: IProps & TextInputAndroidProps & TextInputProps) => {
@@ -21,6 +22,7 @@ export const Input = (props: IProps & TextInputAndroidProps & TextInputProps) =>
       {props.label && <Text className="text-md font-kanit">{props.label}</Text>}
       <TextInput
         {...props}
+        secureTextEntry={props.isPassword ? true : false}
         value={props.value}
         placeholder={props.placeholder}
         style={props.style}
